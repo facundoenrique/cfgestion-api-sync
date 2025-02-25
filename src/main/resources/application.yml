@@ -24,7 +24,7 @@ enabled: false
 spring:
     config:
         activate:
-        on-profile: prod
+            on-profile: prod
     docker:
         compose:
             enabled: false

@@ -1,4 +1,4 @@
-package org.api_sync.adapter.output;
+package org.api_sync.adapter.inbound;
 
 import org.springframework.web.bind.annotation.*;
 

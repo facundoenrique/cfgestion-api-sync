@@ -5,6 +5,7 @@ import org.api_sync.adapter.outbound.entities.Articulo;
 import org.api_sync.adapter.outbound.repository.ArticuloRepository;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
+import org.api_sync.services.exceptions.ItemNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,6 +44,12 @@ public class ArticuloService {
 		return articuloRepository.findAll().stream()
 				       .map(articuloMapper::toDTO)
 				       .collect(Collectors.toList());
+	}
+
+	public ArticuloDTO getItem(String item) {
+		return articuloRepository.findByNumero(item)
+				       .map(articuloMapper::toDTO)
+				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: "+item));
 	}
 }
 

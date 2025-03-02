@@ -12,7 +12,6 @@ public class PrecioMapper {
 				       .id(precio.getId())
 				       .articuloId(precio.getArticulo().getId())
 				       .importe(precio.getImporte())
-				       .iva(precio.getIva())
 				       .fechaVigencia(precio.getFechaVigencia())
 				       .build();
 	}

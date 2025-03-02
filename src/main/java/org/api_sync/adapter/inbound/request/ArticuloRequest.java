@@ -3,14 +3,13 @@ package org.api_sync.adapter.inbound.request;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import java.util.Date;
 
 
 @Getter
 public class ArticuloRequest {
-	@NotNull(message = "El ID no puede ser nulo")
+//	@NotNull(message = "El ID no puede ser nulo") //solo para update y delete
 	private Long id;
 	private Date fechaCreado; //es una fecha, despues lo tengo que analizar bien para que se usa.
 	private int enviado;

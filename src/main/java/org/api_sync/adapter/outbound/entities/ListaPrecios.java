@@ -3,29 +3,28 @@ package org.api_sync.adapter.outbound.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
-@Table(name = "precios")
+@Table(name = "listas_precios")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Precio {
+public class ListaPrecios {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne
-	@JoinColumn(name = "articulo_id", nullable = false)
-	private Articulo articulo;
+	@Column(nullable = false)
+	private LocalDate fechaCreacion;
 	
 	@Column(nullable = false)
-	private BigDecimal importe;
+	private LocalDate fechaModificacion;
 	
-	@Column(name = "fecha_vigencia", nullable = false)
-	private LocalDate fechaVigencia;
+	@OneToMany(mappedBy = "listaPrecios", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ItemListaPrecios> items;
 }

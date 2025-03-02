@@ -3,15 +3,17 @@ package org.api_sync.adapter.outbound.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 
 @Entity
-@Table(name = "articulos")
+@Table(name = "articulos", uniqueConstraints = {@UniqueConstraint(columnNames = "numero")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Articulo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,8 +30,9 @@ public class Articulo {
 	private int tipo;
 	
 	private double descuento;
-	
-	private float iva;
+
+	@Column(nullable = false)
+	private BigDecimal iva;
 	
 	private String nombre;
 	
@@ -40,7 +43,7 @@ public class Articulo {
 	private double costo;
 	
 	private int minimo;
-	
+	@Column(nullable = false, unique = true)
 	private String numero; // este es el codigo de barras que se ingresa en la facturacion, tiene que ser String
 	
 	private int empresa;
@@ -72,8 +75,6 @@ public class Articulo {
 	private int compuesto;
 	
 	private String marca;
-	
-	private int codIva;
 	
 	private double cantidad;
 }

@@ -2,6 +2,7 @@ package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "items_lista_precios")
@@ -26,5 +27,5 @@ public class ItemListaPrecios {
 	@OneToOne
 	@JoinColumn(name = "precio_id", nullable = false)
 	private Precio precio;
-	
+
 }

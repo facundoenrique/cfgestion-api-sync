@@ -34,5 +34,5 @@ public class ListaPrecios {
 	@ManyToOne
 	@JoinColumn(name = "proveedor_id", nullable = false)
 	private Proveedor proveedor;
-	
+
 }

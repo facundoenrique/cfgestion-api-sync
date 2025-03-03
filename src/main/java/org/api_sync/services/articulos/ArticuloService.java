@@ -51,5 +51,6 @@ public class ArticuloService {
 				       .map(articuloMapper::toDTO)
 				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: " + item != null ? item : "ALL"));
 	}
+  
 }
 

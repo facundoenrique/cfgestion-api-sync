@@ -9,4 +9,5 @@ import java.util.List;
 @Builder
 public class ListaPreciosRequest {
 	private List<ItemListaPreciosRequest> items;
+	private Long proveedor;
 }

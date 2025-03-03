@@ -4,6 +4,8 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
+
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -18,13 +20,13 @@ public class ArticuloRequest {
 	private int tipo;
 	private double descuento;
 	@DecimalMin(value = "0.0", message = "El IVA debe ser mayor o igual a 0")
-	private float iva;
-	@NotEmpty(message = "El número no puede estar vacío")
+	private BigDecimal iva;
 	private String nombre;
 	private String descripcion;
 	private int codUnidadMedida;
 	private double costo;
 	private int minimo;
+	@NotEmpty(message = "El número no puede estar vacío")
 	private String numero; // este es el codigo de barras que se ingresa en la facturacion, tiene que ser String
 
 	private int noStock;

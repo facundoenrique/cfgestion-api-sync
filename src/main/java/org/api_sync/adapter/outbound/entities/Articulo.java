@@ -40,19 +40,15 @@ public class Articulo {
 	
 	private int codUnidadMedida;
 	
-	private double costo;
-	
 	private int minimo;
 	@Column(nullable = false, unique = true)
 	private String numero; // este es el codigo de barras que se ingresa en la facturacion, tiene que ser String
-	
-	private int empresa;
 	
 	private int noStock;
 	
 	private int moneda;
 	
-	private int proveedor;
+//	private int proveedor;
 	
 	private int defecto;//cantidad de venta, cada vez que se pasa el codigo de barras, por lo gral es uno, pero puede haber casos en que no.
 	
@@ -61,8 +57,6 @@ public class Articulo {
 	private double gan1;
 	
 	private int maximo;
-	
-	private int defectoCompra;
 	
 	private int comision;
 	

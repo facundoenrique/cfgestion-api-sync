@@ -49,7 +49,7 @@ public class ArticuloService {
 	public ArticuloDTO getItem(String item) {
 		return articuloRepository.findByNumero(item)
 				       .map(articuloMapper::toDTO)
-				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: "+item));
+				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: " + item != null ? item : "ALL"));
 	}
 }
 

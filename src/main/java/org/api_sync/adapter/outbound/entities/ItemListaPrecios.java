@@ -3,8 +3,6 @@ package org.api_sync.adapter.outbound.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "items_lista_precios")
 @Getter
@@ -24,7 +22,9 @@ public class ItemListaPrecios {
 	@ManyToOne
 	@JoinColumn(name = "articulo_id", nullable = false)
 	private Articulo articulo;
+
+	@OneToOne
+	@JoinColumn(name = "precio_id", nullable = false)
+	private Precio precio;
 	
-	@Column(nullable = false, precision = 10, scale = 2)
-	private BigDecimal importe;
 }

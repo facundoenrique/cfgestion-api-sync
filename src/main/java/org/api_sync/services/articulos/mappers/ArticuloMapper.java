@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class ArticuloMapper {
 	public Articulo toEntity(ArticuloRequest request) {
 		Articulo articulo = new Articulo();
+		articulo.setIva(request.getIva());
 		articulo.setNumero(request.getNumero());
 		articulo.setNombre(request.getNombre());
 		articulo.setDescripcion(request.getDescripcion());

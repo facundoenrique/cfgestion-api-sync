@@ -24,7 +24,15 @@ public class ListaPrecios {
 	
 	@Column(nullable = false)
 	private LocalDate fechaModificacion;
+
+	@Column(nullable = false)
+	private String nombre;
 	
 	@OneToMany(mappedBy = "listaPrecios", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ItemListaPrecios> items;
+
+	@ManyToOne
+	@JoinColumn(name = "proveedor_id", nullable = false)
+	private Proveedor proveedor;
+	
 }

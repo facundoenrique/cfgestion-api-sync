@@ -9,6 +9,7 @@ import org.api_sync.services.exceptions.ItemNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,8 +24,22 @@ public class ArticuloService {
 	}
 	
 	public ArticuloDTO guardarArticulo(ArticuloRequest articuloRequest) {
+		Optional<Articulo> art = articuloRepository.findByNumero(articuloRequest.getNumero());
+		
+		if (art.isPresent()) {
+			Articulo item = updateAtributes(art.get(), articuloRequest);
+			return articuloMapper.toDTO(articuloRepository.save(item));
+		}
 		Articulo articulo = articuloMapper.toEntity(articuloRequest);
 		return articuloMapper.toDTO(articuloRepository.save(articulo));
+	}
+	
+
+	private Articulo updateAtributes(Articulo articulo, ArticuloRequest request) {
+		articulo.setNombre(request.getNombre());
+		articulo.setNumero(request.getNumero());
+		articulo.setEliminado(request.getEliminado());
+		return articulo;
 	}
 	
 	public ArticuloDTO actualizarArticulo(Long id, ArticuloRequest articuloRequest) {
@@ -33,12 +48,16 @@ public class ArticuloService {
 		}
 		Articulo articulo = articuloMapper.toEntity(articuloRequest);
 		articulo.setId(id);
+		return update(articulo);
+	}
+	
+	private ArticuloDTO update(Articulo articulo) {
 		return articuloMapper.toDTO(articuloRepository.save(articulo));
 	}
 	
-	public void eliminarArticulo(Long id) {
-		articuloRepository.deleteById(id);
-	}
+//	public void eliminarArticulo(Long id) {
+//		articuloRepository.deleteById(id);
+//	}
 	
 	public List<ArticuloDTO> listarArticulos() {
 		return articuloRepository.findAll().stream()

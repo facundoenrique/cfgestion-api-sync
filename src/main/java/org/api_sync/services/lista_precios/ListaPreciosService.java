@@ -98,7 +98,7 @@ public class ListaPreciosService {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
 			
 			Iterable<CSVRecord> records = CSVFormat.DEFAULT
-					                              .withDelimiter(separador)         // Usa ';' como separador
+					                              .withDelimiter(separador)         // Usa "separador" como separador
 					                              .withFirstRecordAsHeader()  // Usa la primera fila como encabezado
 					                              .withIgnoreHeaderCase()     // Ignora mayúsculas/minúsculas
 					                              .withTrim()                 // Elimina espacios en blanco adicionales
@@ -108,7 +108,11 @@ public class ListaPreciosService {
 			for (CSVRecord record : records) {
 				validarColumnas(record); // Validar si las columnas son las correctas
 				ItemListaPreciosRequest articulo = mapearAtributos(record); // Mapear los datos a la clase Articulo
-				articulos.add(articulo);
+				if (validarArticulo(articulo)) {
+					articulos.add(articulo);
+				} else {
+					System.out.println("Articulo " + articulo.getNumero() + "no tiene los datos correctos");
+				}
 			}
 			
 			
@@ -122,6 +126,22 @@ public class ListaPreciosService {
 		} catch (Exception e) {
 			throw new RuntimeException("Error al procesar el archivo CSV", e);
 		}
+	}
+	
+	private boolean validarArticulo(ItemListaPreciosRequest articulo) {
+		if (articulo.getNumero() == null) {
+			return false;
+		}
+		if (articulo.getNombre() == null) {
+			return false;
+		}
+		if (articulo.getImporte() == null) {
+			return false;
+		}
+		if (articulo.getIva() == null) {
+			return false;
+		}
+		return true;
 	}
 	
 	private void validarColumnas(CSVRecord record) {

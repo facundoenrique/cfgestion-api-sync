@@ -122,7 +122,6 @@ public class ListaPreciosService {
 					                    .nombre(nombre)
 					                    .build());
 			
-			// Aquí puedes hacer lo que necesites con los datos procesados, como guardarlos en la base de datos
 		} catch (Exception e) {
 			throw new RuntimeException("Error al procesar el archivo CSV", e);
 		}

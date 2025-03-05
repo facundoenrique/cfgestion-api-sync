@@ -30,8 +30,9 @@ public class ListaPreciosController {
 
 	@PostMapping("/cargar")
 	public ResponseEntity<String> cargarListaPrecios(@RequestParam("file") MultipartFile file,
-	@RequestParam("proveedor") Long proveedorId) {
-		listaPreciosService.procesarArchivo(file, proveedorId);
+	                                                 @RequestParam("proveedor") Long proveedorId,
+	                                                 @RequestParam("nombre_lista") String nombre) {
+		listaPreciosService.procesarArchivo(file, proveedorId, nombre);
 		return ResponseEntity.ok("Archivo procesado correctamente");
 	}
 }

@@ -12,11 +12,13 @@ import org.api_sync.adapter.outbound.repository.PrecioRepository;
 import org.api_sync.adapter.outbound.repository.ProveedorRepository;
 import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.api_sync.services.lista_precios.mappers.ListaPreciosMapper;
+import org.api_sync.services.lista_precios.utils.CSVUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class ListaPreciosService {
 		Proveedor proveedor = proveedorRepository.findById(request.getProveedor()).get();
 		
 		listaDePrecios.setProveedor(proveedor);
+		listaDePrecios.setNombre(request.getNombre());
 		
 		List<ItemListaPrecios> items = request.getItems().stream().map(itemRequest -> {
 			Articulo articulo = articuloRepository.findByNumero(itemRequest.getNumero())
@@ -86,10 +89,16 @@ public class ListaPreciosService {
 				       .collect(Collectors.toList());
 	}
 
-	public void procesarArchivo(MultipartFile file, Long proveedorId) {
-		try (Reader reader = new InputStreamReader(file.getInputStream())) {
+	public void procesarArchivo(MultipartFile file, Long proveedorId, String nombre) {
+		
+		try (InputStream inputStream = file.getInputStream()) {
+			
+			char separador = CSVUtils.detectarSeparador(inputStream);
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+			
 			Iterable<CSVRecord> records = CSVFormat.DEFAULT
-					                              .withDelimiter(';')         // Usa ';' como separador
+					                              .withDelimiter(separador)         // Usa ';' como separador
 					                              .withFirstRecordAsHeader()  // Usa la primera fila como encabezado
 					                              .withIgnoreHeaderCase()     // Ignora mayúsculas/minúsculas
 					                              .withTrim()                 // Elimina espacios en blanco adicionales
@@ -103,7 +112,11 @@ public class ListaPreciosService {
 			}
 			
 			
-			crearListaDePrecios(ListaPreciosRequest.builder().items(articulos).proveedor(proveedorId).build());
+			crearListaDePrecios(ListaPreciosRequest.builder()
+					                    .items(articulos)
+					                    .proveedor(proveedorId)
+					                    .nombre(nombre)
+					                    .build());
 			
 			// Aquí puedes hacer lo que necesites con los datos procesados, como guardarlos en la base de datos
 		} catch (Exception e) {

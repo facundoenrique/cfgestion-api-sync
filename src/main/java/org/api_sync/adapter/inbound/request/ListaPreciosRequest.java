@@ -10,4 +10,5 @@ import java.util.List;
 public class ListaPreciosRequest {
 	private List<ItemListaPreciosRequest> items;
 	private Long proveedor;
+	private String nombre;
 }

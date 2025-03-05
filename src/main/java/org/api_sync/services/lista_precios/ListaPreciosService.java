@@ -43,6 +43,7 @@ public class ListaPreciosService {
 		ListaPrecios listaDePrecios = new ListaPrecios();
 		listaDePrecios.setFechaCreacion(LocalDate.now());
 		listaDePrecios.setFechaModificacion(LocalDate.now());
+		listaDePrecios.setNombre(request.getNombre());
 		
 		if (!proveedorRepository.existsById(request.getProveedor())) {
 			throw new RuntimeException("Proveedor no encontrado");
@@ -51,7 +52,6 @@ public class ListaPreciosService {
 		Proveedor proveedor = proveedorRepository.findById(request.getProveedor()).get();
 		
 		listaDePrecios.setProveedor(proveedor);
-		listaDePrecios.setNombre(request.getNombre());
 		
 		List<ItemListaPrecios> items = request.getItems().stream().map(itemRequest -> {
 			Articulo articulo = articuloRepository.findByNumero(itemRequest.getNumero())
@@ -160,7 +160,7 @@ public class ListaPreciosService {
 		articulo.setImporte(new BigDecimal(record.get("importe_neto")));
 		articulo.setIva(new BigDecimal(record.get("iva")));
 		articulo.setDescripcion(getOrEmpty(record, "descripcion"));
-		articulo.setDescripcion(getOrEmpty(record, "marca"));
+		articulo.setMarca(getOrEmpty(record, "marca"));
 		articulo.setCodUnidadMedida(getIntegerOrDefault(record, "cod_unidad_medida"));
 		return articulo;
 	}

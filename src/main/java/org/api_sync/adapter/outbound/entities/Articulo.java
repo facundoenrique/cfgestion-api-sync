@@ -23,8 +23,6 @@ public class Articulo {
 	
 	private int enviado;
 	
-	private double precio1;
-	
 	private int familia;
 	
 	private int tipo;
@@ -47,8 +45,6 @@ public class Articulo {
 	private int noStock;
 	
 	private int moneda;
-	
-//	private int proveedor;
 	
 	private int defecto;//cantidad de venta, cada vez que se pasa el codigo de barras, por lo gral es uno, pero puede haber casos en que no.
 	

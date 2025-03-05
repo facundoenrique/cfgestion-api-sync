@@ -1,8 +1,12 @@
 package org.api_sync.services.lista_precios.mappers;
 
+import org.api_sync.adapter.outbound.entities.ItemListaPrecios;
 import org.api_sync.adapter.outbound.entities.ListaPrecios;
+import org.api_sync.services.lista_precios.dto.ItemListaPreciosDTO;
 import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ListaPreciosMapper {
@@ -11,29 +15,19 @@ public class ListaPreciosMapper {
 				       .id(listaDePrecios.getId())
 				       .fechaCreacion(listaDePrecios.getFechaCreacion())
 				       .fechaModificacion(listaDePrecios.getFechaModificacion())
+				       .items(mapItems(listaDePrecios.getItems()))
 				       .build();
 	}
 	
-//	public ListaPrecios toEntity(ListaPreciosRequest listaPreciosRequest) {
-//		List<ItemListaPrecios> items = listaPreciosRequest.getItems().stream().map(
-//				item -> ItemListaPrecios.builder()
-//						        .importe(item.getImporte())
-//						        .articulo(Articulo.builder()
-//								                  .id(item.getId())
-//								                  .numero(item.getNumero())
-//								                  .nombre(item.getNombre())
-//								                  .codUnidadMedida(item.getCodUnidadMedida())
-//								                  .iva(item.getIva())
-//								                  .build())
-//						        .build()
-//		).collect(Collectors.toList());
-//
-//		return ListaPrecios.builder()
-//				                              .fechaCreacion(LocalDate.now())
-//				                              .fechaModificacion(LocalDate.now())
-//				                              .items(items)
-//				                              .build();
-//
-//	}
+	public List<ItemListaPreciosDTO> mapItems(List<ItemListaPrecios> itemListaPrecios) {
+		return itemListaPrecios.stream().map(
+				itemListaPrecio -> ItemListaPreciosDTO.builder()
+						                   .nombre(itemListaPrecio.getArticulo().getNombre())
+						                   .importe(itemListaPrecio.getPrecio().getImporte()) //deberia sumarle el
+						                   // iva asi queda flama
+						                   .id(itemListaPrecio.getId())
+						                   .build()
+		).toList();
+	}
 
 }

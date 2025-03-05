@@ -23,8 +23,8 @@ public class Proveedor {
 	@Column(nullable = false)
 	private String cuit;
 	
-	@Column(name = "fecha_vigencia", nullable = false)
-	private LocalDate fechaVigencia;
+	@Column(name = "fecha_creado", nullable = false)
+	private LocalDate fechaCreado;
 	
 	private String domicilio;
 	private Integer localidad;

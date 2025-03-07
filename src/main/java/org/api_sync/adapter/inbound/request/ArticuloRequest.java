@@ -3,13 +3,12 @@ package org.api_sync.adapter.inbound.request;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-
+import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
 
-@Getter
+@Data
 public class ArticuloRequest {
 //	@NotNull(message = "El ID no puede ser nulo") //solo para update y delete
 	private Long id;

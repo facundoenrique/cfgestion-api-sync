@@ -20,7 +20,7 @@ public class Proveedor {
 	@Column(nullable = false)
 	private String razonSocial;
 	
-	@Column(unique = true, nullable = false, length = 11)
+	@Column(unique = true, nullable = true, length = 11)
 	private String cuit;
 	
 	private String domicilio;
@@ -34,4 +34,10 @@ public class Proveedor {
 	private String condicionIva;
 	@Column(name = "fecha_creado", nullable = false)
 	private LocalDate fechaCreado;
+	@PrePersist
+	public void prePersist() {
+		if (fechaCreado == null) {
+			fechaCreado = LocalDate.now(); // Asigna la fecha actual si es NULL
+		}
+	}
 }

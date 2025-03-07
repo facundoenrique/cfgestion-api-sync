@@ -16,16 +16,22 @@ public class Proveedor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
 	@Column(nullable = false)
 	private String razonSocial;
 	
-	@Column(nullable = false)
+	@Column(unique = true, nullable = false, length = 11)
 	private String cuit;
 	
+	private String domicilio;
+	private String localidad;
+	private String codigoPostal;
+	
+	@Column(unique = true)
+	private String email;
+	
+	private String telefono;
+	private String condicionIva;
 	@Column(name = "fecha_creado", nullable = false)
 	private LocalDate fechaCreado;
-	
-	private String domicilio;
-	private Integer localidad;
 }

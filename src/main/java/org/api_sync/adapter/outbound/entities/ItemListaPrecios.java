@@ -2,7 +2,6 @@ package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "items_lista_precios")

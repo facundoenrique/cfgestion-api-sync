@@ -13,5 +13,6 @@ public class ProveedorRequest {
 	private String telefono;
 	private Integer localidad;
 	private Integer provincia;
+	private Integer codigoPostal;
 }
 

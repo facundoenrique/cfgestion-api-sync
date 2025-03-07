@@ -1,6 +1,7 @@
 package org.api_sync.adapter.inbound;
 
 import lombok.RequiredArgsConstructor;
+import org.api_sync.adapter.inbound.request.ProveedorRequest;
 import org.api_sync.adapter.outbound.entities.Proveedor;
 import org.api_sync.services.suppliers.SupplierService;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class ProveedoresController {
 	//TODO reemplazar por proveedorRequest.
 
 	@PostMapping
-	public ResponseEntity<Proveedor> createSupplier(@RequestBody Proveedor supplier) {
+	public ResponseEntity<Proveedor> createSupplier(@RequestBody ProveedorRequest supplier) {
 		return ResponseEntity.ok(supplierService.saveSupplier(supplier));
 	}
 	

@@ -1,6 +1,7 @@
 package org.api_sync.services.suppliers;
 
 import lombok.RequiredArgsConstructor;
+import org.api_sync.adapter.inbound.request.ProveedorRequest;
 import org.api_sync.adapter.outbound.entities.Proveedor;
 import org.api_sync.adapter.outbound.repository.ProveedorRepository;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,10 @@ import java.util.Optional;
 public class SupplierService {
 
 	private final ProveedorRepository supplierRepository;
+	private final SupplierMapper supplierMapper;
 	
-	public Proveedor saveSupplier(Proveedor supplier) {
-		return supplierRepository.save(supplier);
+	public Proveedor saveSupplier(ProveedorRequest supplier) {
+		return supplierRepository.save(supplierMapper.toEntity(supplier));
 	}
 	
 	public List<Proveedor> getAllSuppliers() {

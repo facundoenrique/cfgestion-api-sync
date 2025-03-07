@@ -1,7 +1,9 @@
 package org.api_sync.adapter.inbound.request;
 
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
 
+@Getter
 public class ProveedorRequest {
 	private Long id;
 	@NotEmpty(message = "La razón social no puede estar vacía")

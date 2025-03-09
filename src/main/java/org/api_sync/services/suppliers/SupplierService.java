@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ProveedorRequest;
 import org.api_sync.adapter.outbound.entities.Proveedor;
 import org.api_sync.adapter.outbound.repository.ProveedorRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,11 @@ public class SupplierService {
 	private final SupplierMapper supplierMapper;
 	
 	public Proveedor saveSupplier(ProveedorRequest supplier) {
-		return supplierRepository.save(supplierMapper.toEntity(supplier));
+		try {
+			return supplierRepository.save(supplierMapper.toEntity(supplier));
+		} catch (DataIntegrityViolationException e) {
+			throw new RuntimeException("El CUIT '" + supplier.getCuit() + "' ya está registrado.");
+		}
 	}
 	
 	public List<Proveedor> getAllSuppliers() {

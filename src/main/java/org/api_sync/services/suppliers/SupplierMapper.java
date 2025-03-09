@@ -11,6 +11,9 @@ public class SupplierMapper {
 				       .razonSocial(request.getRazonSocial())
 				       .cuit(request.getCuit())
 				       .domicilio(request.getDomicilio())
+				       .email(request.getEmail())
+				       .telefono(request.getTelefono())
+//				       .localidad(request.getLocalidad())
 				       .build();
 	}
 }

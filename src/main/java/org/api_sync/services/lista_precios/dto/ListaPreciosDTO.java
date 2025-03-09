@@ -2,6 +2,7 @@ package org.api_sync.services.lista_precios.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.api_sync.adapter.outbound.entities.Proveedor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.List;
 @Data
 public class ListaPreciosDTO {
 	private Long id;
+	private String nombre;
+	private Proveedor proveedor;
 	private LocalDate fechaCreacion;
 	private LocalDate fechaModificacion;
 	private List<ItemListaPreciosDTO> items;

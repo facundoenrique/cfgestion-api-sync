@@ -16,6 +16,8 @@ public class ListaPreciosMapper {
 				       .fechaCreacion(listaDePrecios.getFechaCreacion())
 				       .fechaModificacion(listaDePrecios.getFechaModificacion())
 				       .items(mapItems(listaDePrecios.getItems()))
+				       .nombre(listaDePrecios.getNombre())
+				       .proveedor(listaDePrecios.getProveedor())
 				       .build();
 	}
 	

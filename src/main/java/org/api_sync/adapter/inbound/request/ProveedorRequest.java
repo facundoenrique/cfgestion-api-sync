@@ -14,5 +14,6 @@ public class ProveedorRequest {
 	private Integer localidad;
 	private Integer provincia;
 	private Integer codigoPostal;
+	private String email;
 }
 

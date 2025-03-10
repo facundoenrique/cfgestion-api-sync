@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
@@ -83,13 +84,21 @@ public class ListaPreciosService {
 		return listaDePreciosMapper.toDTO(listaDePrecios);
 	}
 	
+	public ListaPreciosDTO getListaPrecio(Long id) {
+		Optional<ListaPrecios> lista = listaDePreciosRepository.findById(id);
+		if (lista.isPresent()) {
+			return listaDePreciosMapper.toDTO(lista.get());
+		}
+		return null;
+	}
+	
 	public List<ListaPreciosDTO> listarListasDePrecios() {
 		return listaDePreciosRepository.findAll().stream()
 				       .map(listaDePreciosMapper::toDTO)
 				       .collect(Collectors.toList());
 	}
 
-	public void procesarArchivo(MultipartFile file, Long proveedorId, String nombre) {
+	public void procesarArchivo(MultipartFile file, Long proveedorId, String nombreLista) {
 		
 		try (InputStream inputStream = file.getInputStream()) {
 			
@@ -119,7 +128,7 @@ public class ListaPreciosService {
 			crearListaDePrecios(ListaPreciosRequest.builder()
 					                    .items(articulos)
 					                    .proveedor(proveedorId)
-					                    .nombre(nombre)
+					                    .nombre(nombreLista)
 					                    .build());
 			
 		} catch (Exception e) {

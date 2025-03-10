@@ -84,12 +84,12 @@ public class ListaPreciosService {
 		return listaDePreciosMapper.toDTO(listaDePrecios);
 	}
 	
-	public ListaPreciosDTO getListaPrecio(Long id) {
+	public Optional<ListaPreciosDTO> getListaPrecio(Long id) {
 		Optional<ListaPrecios> lista = listaDePreciosRepository.findById(id);
 		if (lista.isPresent()) {
-			return listaDePreciosMapper.toDTO(lista.get());
+			return Optional.of(listaDePreciosMapper.toDTO(lista.get()));
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	public List<ListaPreciosDTO> listarListasDePrecios() {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -32,7 +33,11 @@ public class ListaPreciosController {
 
 	@GetMapping("{id}")
 	public ResponseEntity<ListaPreciosDTO> getListaDePrecios(@PathVariable Long id) {
-		return ResponseEntity.ok(listaPreciosService.getListaPrecio(id));
+		Optional<ListaPreciosDTO> lista = listaPreciosService.getListaPrecio(id);
+		if (lista.isPresent()) {
+			return ResponseEntity.ok(lista.get());
+		}
+		return ResponseEntity.noContent().build();
 	}
 
 	@PostMapping("/cargar")
@@ -46,5 +51,7 @@ public class ListaPreciosController {
 		log.info("Archivo procesado correctamente");
 		return ResponseEntity.ok(response);
 	}
+
+	
 }
 

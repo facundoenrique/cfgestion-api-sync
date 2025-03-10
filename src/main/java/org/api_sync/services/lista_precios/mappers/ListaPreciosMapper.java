@@ -24,6 +24,7 @@ public class ListaPreciosMapper {
 	public List<ItemListaPreciosDTO> mapItems(List<ItemListaPrecios> itemListaPrecios) {
 		return itemListaPrecios.stream().map(
 				itemListaPrecio -> ItemListaPreciosDTO.builder()
+						                   .numero(itemListaPrecio.getArticulo().getNumero())
 						                   .nombre(itemListaPrecio.getArticulo().getNombre())
 						                   .importe(itemListaPrecio.getPrecio().getImporte()) //deberia sumarle el
 						                   // iva asi queda flama

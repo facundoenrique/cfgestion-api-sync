@@ -34,9 +34,9 @@ public class Proveedor {
 //	private Localidad localidad;
 	private String codigoPostal;
 	
-	@Column(unique = true)
+//	@Column(unique = true)
 	private String email;
-	@Column(unique = true)
+//	@Column(unique = true)
 	private String telefono;
 	private String condicionIva;
 

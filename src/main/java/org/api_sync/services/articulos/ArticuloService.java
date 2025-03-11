@@ -1,27 +1,27 @@
 package org.api_sync.services.articulos;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.outbound.entities.Articulo;
 import org.api_sync.adapter.outbound.repository.ArticuloRepository;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
+import org.api_sync.services.articulos.dto.PrecioDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
 import org.api_sync.services.exceptions.ItemNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ArticuloService {
 
 	private final ArticuloRepository articuloRepository;
 	private final ArticuloMapper articuloMapper;
-
-	public ArticuloService(ArticuloRepository articuloRepository, ArticuloMapper articuloMapper) {
-		this.articuloRepository = articuloRepository;
-		this.articuloMapper = articuloMapper;
-	}
+	private final PrecioService precioService;
 	
 	public ArticuloDTO guardarArticulo(ArticuloRequest articuloRequest) {
 		Optional<Articulo> art = articuloRepository.findByNumero(articuloRequest.getNumero());
@@ -58,17 +58,37 @@ public class ArticuloService {
 //	public void eliminarArticulo(Long id) {
 //		articuloRepository.deleteById(id);
 //	}
-	
+
 	public List<ArticuloDTO> listarArticulos() {
 		return articuloRepository.findAll().stream()
-				       .map(articuloMapper::toDTO)
-				       .collect(Collectors.toList());
+				       .map(item -> {
+					       ArticuloDTO dto = null;
+					       try {
+						       dto = articuloMapper.toDTO(item);
+						       PrecioDTO ultimoPrecioDto = precioService.obtenerPrecioVigente(item.getId());
+						       dto.setPrecioDto(ultimoPrecioDto);
+					       } catch (Exception e) {
+						       log.error(e.getMessage(), e);
+					       }
+					       return dto;
+				       })
+				       .toList();
 	}
 
-	public ArticuloDTO getItem(String item) {
-		return articuloRepository.findByNumero(item)
-				       .map(articuloMapper::toDTO)
-				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: " + item != null ? item : "ALL"));
+	public ArticuloDTO getItem(String numero) {
+		return articuloRepository.findByNumero(numero)
+				       .map(item -> {
+					       ArticuloDTO dto = null;
+						   try {
+							   dto = articuloMapper.toDTO(item);
+							   PrecioDTO ultimoPrecioDto = precioService.obtenerPrecioVigente(item.getId());
+							   dto.setPrecioDto(ultimoPrecioDto);
+						   } catch (Exception e) {
+							   log.error(e.getMessage(), e);
+						   }
+						   return dto;
+				       })
+				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: " + numero != null ? numero : "ALL"));
 	}
   
 }

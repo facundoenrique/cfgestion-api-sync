@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.api_sync.adapter.outbound.entities.Proveedor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Builder
@@ -13,7 +12,7 @@ public class ListaPreciosDTO {
 	private Long id;
 	private String nombre;
 	private Proveedor proveedor;
-	private LocalDate fechaCreacion;
-	private LocalDate fechaModificacion;
+	private String fechaCreacion;
+	private String fechaModificacion;
 	private List<ItemListaPreciosDTO> items;
 }

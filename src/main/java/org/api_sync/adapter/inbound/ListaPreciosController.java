@@ -44,8 +44,6 @@ public class ListaPreciosController {
 	public ResponseEntity<Response> cargarListaPrecios(@RequestParam("file") MultipartFile file,
 	                                                 @RequestParam("proveedor") Long proveedorId,
 	                                                 @RequestParam("nombre_lista") String nombre) {
-		log.info("Nombre lista: {}", nombre);
-		System.out.println("Nombre lista: "+ nombre);
 		listaPreciosService.procesarArchivo(file, proveedorId, nombre);
 		Response response = new Response("Archivo procesado correctamente", "ok");
 		log.info("Archivo procesado correctamente");

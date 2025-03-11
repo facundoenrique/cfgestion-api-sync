@@ -1,9 +1,6 @@
 package org.api_sync.services.articulos.dto;
 
-
-
 import lombok.Data;
-
 import java.util.Date;
 
 @Data
@@ -13,8 +10,6 @@ private Long id;
 private Date fechaCreado; //es una fecha, despues lo tengo que analizar bien para que se usa.
 
 private int enviado;
-
-private double precio1;
 
 private int familia;
 
@@ -69,5 +64,7 @@ private String marca;
 private int codIva;
 
 private double cantidad;
+
+private PrecioDTO precioDto;
 }
 

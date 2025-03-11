@@ -66,7 +66,7 @@ public class ArticuloService {
 					       try {
 						       dto = articuloMapper.toDTO(item);
 						       PrecioDTO ultimoPrecioDto = precioService.obtenerPrecioVigente(item.getId());
-						       dto.setPrecioDto(ultimoPrecioDto);
+						       dto.setPrecio(ultimoPrecioDto);
 					       } catch (Exception e) {
 						       log.error(e.getMessage(), e);
 					       }
@@ -82,7 +82,7 @@ public class ArticuloService {
 						   try {
 							   dto = articuloMapper.toDTO(item);
 							   PrecioDTO ultimoPrecioDto = precioService.obtenerPrecioVigente(item.getId());
-							   dto.setPrecioDto(ultimoPrecioDto);
+							   dto.setPrecio(ultimoPrecioDto);
 						   } catch (Exception e) {
 							   log.error(e.getMessage(), e);
 						   }

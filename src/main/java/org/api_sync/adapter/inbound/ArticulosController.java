@@ -31,9 +31,10 @@ public class ArticulosController {
 		return ResponseEntity.ok(articuloService.actualizarArticulo(id, articulo));
 	}
 	
-	@GetMapping()
-	public ResponseEntity<List<ArticuloDTO>> listarArticulos(@RequestParam String numero) {
-		if (numero != null || numero.length() == 0) {
+	@GetMapping
+	@ResponseBody  // 👈 Esto asegura que devuelve JSON en lugar de intentar buscar una vista
+	public ResponseEntity<List<ArticuloDTO>> listarArticulos(@RequestParam(required = false) String numero) {
+		if (numero == null || numero.length() == 0) {
 			return ResponseEntity.ok(articuloService.listarArticulos());
 		}
 		return ResponseEntity.ok(List.of(articuloService.getItem(numero)));

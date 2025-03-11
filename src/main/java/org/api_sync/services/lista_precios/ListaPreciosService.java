@@ -1,6 +1,7 @@
 package org.api_sync.services.lista_precios;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.api_sync.adapter.inbound.request.ItemListaPreciosRequest;
@@ -30,6 +31,7 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ListaPreciosService {
 	private static final List<String> EXPECTED_COLUMNS = List.of("numero", "nombre", "importe_neto", "iva");
 
@@ -80,6 +82,8 @@ public class ListaPreciosService {
 		}).collect(Collectors.toList());
 	
 		listaDePrecios.setItems(items);
+		log.info("Nombre lista: {}", listaDePrecios.getNombre());
+		
 		listaDePreciosRepository.save(listaDePrecios);
 		return listaDePreciosMapper.toDTO(listaDePrecios);
 	}

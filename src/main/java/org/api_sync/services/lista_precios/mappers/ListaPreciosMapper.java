@@ -6,15 +6,20 @@ import org.api_sync.services.lista_precios.dto.ItemListaPreciosDTO;
 import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
 public class ListaPreciosMapper {
 	public ListaPreciosDTO toDTO(ListaPrecios listaDePrecios) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		String fechaCreacion = listaDePrecios.getFechaCreacion().format(formatter);
+		String fechaModificacion = listaDePrecios.getFechaModificacion().format(formatter);
 		return ListaPreciosDTO.builder()
 				       .id(listaDePrecios.getId())
-				       .fechaCreacion(listaDePrecios.getFechaCreacion())
-				       .fechaModificacion(listaDePrecios.getFechaModificacion())
+				       .fechaCreacion(fechaCreacion)
+				       .fechaModificacion(fechaModificacion)
 				       .items(mapItems(listaDePrecios.getItems()))
 				       .nombre(listaDePrecios.getNombre())
 				       .proveedor(listaDePrecios.getProveedor())

@@ -4,6 +4,7 @@ package org.api_sync.adapter.inbound;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.request.ListaPreciosRequest;
+import org.api_sync.adapter.inbound.request.ListaPreciosUpdateRequest;
 import org.api_sync.services.lista_precios.ListaPreciosService;
 import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,14 @@ public class ListaPreciosController {
 		Response response = new Response("Archivo procesado correctamente", "ok");
 		log.info("Archivo procesado correctamente");
 		return ResponseEntity.ok(response);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<ListaPreciosDTO> actualizarListaPrecios(@PathVariable Long id,
+	                                                              @RequestBody ListaPreciosUpdateRequest updateRequest) {
+		
+		ListaPreciosDTO updatedListaPrecios = listaPreciosService.actualizarListaPrecios(id, updateRequest);
+		return ResponseEntity.ok(updatedListaPrecios);
 	}
 
 	

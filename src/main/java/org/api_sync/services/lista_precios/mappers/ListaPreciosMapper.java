@@ -33,6 +33,7 @@ public class ListaPreciosMapper {
 						                   .nombre(itemListaPrecio.getArticulo().getNombre())
 						                   .importe(itemListaPrecio.getPrecio().getImporte()) //deberia sumarle el
 						                   // iva asi queda flama
+						                   .iva(itemListaPrecio.getArticulo().getIva())
 						                   .id(itemListaPrecio.getId())
 						                   .build()
 		).toList();

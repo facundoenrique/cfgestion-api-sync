@@ -1,11 +1,13 @@
 package org.api_sync.services.lista_precios;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.api_sync.adapter.inbound.request.ItemListaPreciosRequest;
 import org.api_sync.adapter.inbound.request.ListaPreciosRequest;
+import org.api_sync.adapter.inbound.request.ListaPreciosUpdateRequest;
 import org.api_sync.adapter.outbound.entities.*;
 import org.api_sync.adapter.outbound.repository.ArticuloRepository;
 import org.api_sync.adapter.outbound.repository.ListaDePreciosRepository;
@@ -197,6 +199,27 @@ public class ListaPreciosService {
 		} catch (Exception e) {
 			return 0;
 		}
+	}
+
+
+	@Transactional
+	public ListaPreciosDTO actualizarListaPrecios(Long id, ListaPreciosUpdateRequest updateRequest) {
+		ListaPrecios listaPrecios = listaDePreciosRepository.findById(id)
+				                            .orElseThrow(() -> new RuntimeException("Lista de precios no encontrada"));
+		
+		// Actualizar el nombre de la lista de precios
+		listaPrecios.setNombre(updateRequest.getNombre());
+		
+		// Verificar si el proveedor existe
+		Proveedor proveedor = proveedorRepository.findById(updateRequest.getProveedor())
+				                      .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+		
+		// Actualizar el proveedor de la lista de precios
+		listaPrecios.setProveedor(proveedor);
+		
+		// Guardar los cambios
+		return listaDePreciosMapper.toDTO(listaDePreciosRepository.save(listaPrecios));
+		
 	}
 	
 }

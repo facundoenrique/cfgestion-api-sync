@@ -65,6 +65,6 @@ private int codIva;
 
 private double cantidad;
 
-private PrecioDTO precioDto;
+private PrecioDTO precio;
 }
 

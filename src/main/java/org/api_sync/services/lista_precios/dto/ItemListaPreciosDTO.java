@@ -12,4 +12,5 @@ public class ItemListaPreciosDTO {
 	private String numero;
 	private String nombre;
 	private BigDecimal importe;
+	private BigDecimal iva;
 }

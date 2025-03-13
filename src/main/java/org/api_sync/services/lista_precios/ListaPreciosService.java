@@ -1,6 +1,5 @@
 package org.api_sync.services.lista_precios;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
@@ -202,7 +201,6 @@ public class ListaPreciosService {
 	}
 
 
-	@Transactional
 	public ListaPreciosDTO actualizarListaPrecios(Long id, ListaPreciosUpdateRequest updateRequest) {
 		ListaPrecios listaPrecios = listaDePreciosRepository.findById(id)
 				                            .orElseThrow(() -> new RuntimeException("Lista de precios no encontrada"));

@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.outbound.entities.Articulo;
+import org.api_sync.adapter.outbound.entities.ItemListaPrecios;
+import org.api_sync.adapter.outbound.entities.Precio;
 import org.api_sync.adapter.outbound.repository.ArticuloRepository;
+import org.api_sync.adapter.outbound.repository.ItemListaPreciosRepository;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.api_sync.services.articulos.dto.PrecioDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
@@ -18,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class ArticuloService {
-
+	private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
 	private final ArticuloMapper articuloMapper;
 	private final PrecioService precioService;
@@ -26,7 +29,11 @@ public class ArticuloService {
 	public ArticuloDTO get(Long id) {
 		Articulo articulo = articuloRepository.findById(id)
 				                    .orElseThrow(() -> new RuntimeException("Articulo no encontrado"));
-		return articuloMapper.toDTO(articulo);
+		
+		ArticuloDTO dto = articuloMapper.toDTO(articulo);
+		PrecioDTO precioDTO = precioService.obtenerPrecioVigente(id);
+		dto.setPrecio(precioDTO);
+		return dto;
 	}
 	
 	public ArticuloDTO guardarArticulo(ArticuloRequest articuloRequest) {
@@ -49,12 +56,25 @@ public class ArticuloService {
 	}
 	
 	public ArticuloDTO actualizarArticulo(Long id, ArticuloRequest articuloRequest) {
-		if (!articuloRepository.existsById(id)) {
-			throw new RuntimeException("Articulo no encontrado");
+		
+		Articulo articuloRecuperado = articuloRepository.findById(id)
+				                              .orElseThrow(() -> new RuntimeException("Articulo no encontrado"));
+		
+		articuloRecuperado.setNombre(articuloRequest.getNombre());
+		articuloRecuperado.setDescripcion(articuloRequest.getDescripcion());
+		articuloRecuperado.setIva(articuloRequest.getIva());
+		articuloRecuperado.setNumero(articuloRequest.getNumero());
+
+		if (articuloRequest.getItemListId() != null) {
+			ItemListaPrecios itemList = itemListaPreciosRepository.findById(articuloRequest.getItemListId())
+					                            .orElseThrow(() -> new RuntimeException("Item list no encontrado"));
+			
+			Precio precio = itemList.getPrecio();
+			precio.setImporte(articuloRequest.getPrecio());
+			precioService.save(precio);
 		}
-		Articulo articulo = articuloMapper.toEntity(articuloRequest);
-		articulo.setId(id);
-		return update(articulo);
+		
+		return update(articuloRecuperado);
 	}
 	
 	private ArticuloDTO update(Articulo articulo) {

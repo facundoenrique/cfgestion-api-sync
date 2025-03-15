@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ProveedorRequest;
 import org.api_sync.adapter.outbound.entities.Proveedor;
@@ -20,7 +21,7 @@ public class ProveedoresController {
 	//TODO reemplazar por proveedorRequest.
 
 	@PostMapping
-	public ResponseEntity<Proveedor> createSupplier(@RequestBody ProveedorRequest supplier) {
+	public ResponseEntity<Proveedor> createSupplier(@RequestBody @Valid ProveedorRequest supplier) {
 		return ResponseEntity.ok(supplierService.saveSupplier(supplier));
 	}
 	
@@ -39,6 +40,12 @@ public class ProveedoresController {
 		supplierService.deleteSupplier(id);
 		return ResponseEntity.noContent().build();
 	}
-	
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Proveedor> updateSupplier(@PathVariable Long id,
+	                                                @RequestBody @Valid ProveedorRequest proveedorRequest) {
+		Proveedor proveedor = supplierService.update(id, proveedorRequest);
+		return ResponseEntity.ok(proveedor);
+	}
 }
 

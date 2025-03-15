@@ -48,4 +48,10 @@ public class SupplierService {
 		return supplierRepository.save(proveedor);
 	}
 	
+	public Proveedor update(Long proveedorId, ProveedorRequest proveedorRequest) {
+		Proveedor entity = supplierMapper.toEntity(proveedorRequest);
+		entity.setId(proveedorId);
+		return supplierRepository.save(entity);
+	}
+	
 }

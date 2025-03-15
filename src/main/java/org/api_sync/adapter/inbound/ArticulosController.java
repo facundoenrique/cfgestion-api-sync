@@ -19,6 +19,11 @@ public class ArticulosController {
 
 	private final ArticuloService articuloService;
 	private final PrecioService precioService;
+
+	@GetMapping("/{id}")
+	public ResponseEntity<ArticuloDTO> get(@PathVariable Long id) {
+		return ResponseEntity.ok(articuloService.get(id));
+	}
 	
 	@PostMapping
 	public ResponseEntity<ArticuloDTO> crearArticulo(@Valid @RequestBody ArticuloRequest articulo) {

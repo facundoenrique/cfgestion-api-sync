@@ -17,9 +17,7 @@ import java.util.Optional;
 public class ProveedoresController {
 
 	private final SupplierService supplierService;
-
-	//TODO reemplazar por proveedorRequest.
-
+	
 	@PostMapping
 	public ResponseEntity<Proveedor> createSupplier(@RequestBody @Valid ProveedorRequest supplier) {
 		return ResponseEntity.ok(supplierService.saveSupplier(supplier));

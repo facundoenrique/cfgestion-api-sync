@@ -23,6 +23,12 @@ public class ArticuloService {
 	private final ArticuloMapper articuloMapper;
 	private final PrecioService precioService;
 	
+	public ArticuloDTO get(Long id) {
+		Articulo articulo = articuloRepository.findById(id)
+				                    .orElseThrow(() -> new RuntimeException("Articulo no encontrado"));
+		return articuloMapper.toDTO(articulo);
+	}
+	
 	public ArticuloDTO guardarArticulo(ArticuloRequest articuloRequest) {
 		Optional<Articulo> art = articuloRepository.findByNumero(articuloRequest.getNumero());
 		

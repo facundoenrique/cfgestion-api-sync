@@ -20,6 +20,7 @@ public class ArticuloRequest {
 	private double descuento;
 	@DecimalMin(value = "0.0", message = "El IVA debe ser mayor o igual a 0")
 	private BigDecimal iva;
+	@NotEmpty(message = "El nombre no puede estar vacío")
 	private String nombre;
 	private String descripcion;
 	private int codUnidadMedida;

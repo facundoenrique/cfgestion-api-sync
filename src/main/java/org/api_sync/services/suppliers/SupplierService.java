@@ -49,9 +49,14 @@ public class SupplierService {
 	}
 	
 	public Proveedor update(Long proveedorId, ProveedorRequest proveedorRequest) {
-		Proveedor entity = supplierMapper.toEntity(proveedorRequest);
-		entity.setId(proveedorId);
-		return supplierRepository.save(entity);
+		Proveedor recovered = supplierRepository.findById(proveedorId).orElseThrow(() -> new RuntimeException(
+				"Proveedor no encontrado"));
+		recovered.setCuit(proveedorRequest.getCuit());
+		recovered.setRazonSocial(proveedorRequest.getRazonSocial());
+		recovered.setTelefono(proveedorRequest.getTelefono());
+		recovered.setEmail(proveedorRequest.getEmail());
+		recovered.setDomicilio(proveedorRequest.getDomicilio());
+		return supplierRepository.save(recovered);
 	}
 	
 }

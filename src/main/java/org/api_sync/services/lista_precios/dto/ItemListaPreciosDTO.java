@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Builder
 public class ItemListaPreciosDTO {
 	private Long id;
+	private Long itemListId;
 	private String numero;
 	private String nombre;
 	private BigDecimal importe;

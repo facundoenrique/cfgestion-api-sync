@@ -14,7 +14,7 @@ public class ArticuloRequest {
 	private Long id;
 	private Date fechaCreado; //es una fecha, despues lo tengo que analizar bien para que se usa.
 	private int enviado;
-	private double precio1;
+	private BigDecimal precio;
 	private int familia;
 	private int tipo;
 	private double descuento;
@@ -58,4 +58,6 @@ public class ArticuloRequest {
 	private String marca;
 	private int codIva;
 	private double cantidad;
+	
+	private Long itemListId;
 }

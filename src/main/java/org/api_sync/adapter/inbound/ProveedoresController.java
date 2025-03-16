@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ProveedorRequest;
 import org.api_sync.adapter.outbound.entities.Proveedor;
 import org.api_sync.services.suppliers.SupplierService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -24,8 +27,10 @@ public class ProveedoresController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<Proveedor>> getAllSuppliers() {
-		return ResponseEntity.ok(supplierService.getAllSuppliers());
+	public ResponseEntity<Page<Proveedor>> getAllSuppliers(
+			@PageableDefault(size = 25, sort = "razonSocial", direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		return ResponseEntity.ok(supplierService.getAllSuppliers(pageable));
 	}
 	
 	@GetMapping("/{id}")

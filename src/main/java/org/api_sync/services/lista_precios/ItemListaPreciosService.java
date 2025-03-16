@@ -23,6 +23,12 @@ public class ItemListaPreciosService {
 	private final ItemListaPreciosMapper itemListaPreciosMapper;
 	private final ArticuloRepository articuloRepository;
 	
+	public ItemListaPreciosDTO get(Long id) {
+		ItemListaPrecios dto = itemListaPreciosRepository.findById(id)
+				                       .orElseThrow(() -> new RuntimeException("ItemListaPrecios no encontrado"));
+		return itemListaPreciosMapper.toDTO(dto);
+	}
+	
 	@Transactional
 	public ItemListaPreciosDTO actualizarPrecio(Long itemListaPrecioId, PrecioRequest precioRequest) {
 		ItemListaPrecios itemListaPrecios = itemListaPreciosRepository.findById(itemListaPrecioId)

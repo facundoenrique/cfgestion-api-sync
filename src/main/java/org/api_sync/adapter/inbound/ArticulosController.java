@@ -24,12 +24,7 @@ public class ArticulosController {
 	public ResponseEntity<ArticuloDTO> get(@PathVariable Long id) {
 		return ResponseEntity.ok(articuloService.get(id));
 	}
-	
-	@PostMapping
-	public ResponseEntity<ArticuloDTO> crearArticulo(@Valid @RequestBody ArticuloRequest articulo) {
-		return ResponseEntity.ok(articuloService.guardarArticulo(articulo));
-	}
-	
+
 	@PutMapping("/{id}")
 	public ResponseEntity<ArticuloDTO> actualizarArticulo(@PathVariable @NotNull Long id,
 	                                                      @Valid @RequestBody ArticuloRequest articulo) {

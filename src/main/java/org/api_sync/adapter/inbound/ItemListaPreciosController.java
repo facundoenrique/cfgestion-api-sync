@@ -15,6 +15,11 @@ public class ItemListaPreciosController {
 
 	private final ItemListaPreciosService itemListaPreciosService;
 
+	@GetMapping
+	public ResponseEntity<ItemListaPreciosDTO> get(Long id) {
+		return ResponseEntity.ok(itemListaPreciosService.get(id));
+	}
+	
 	@PutMapping("/{id}/precio")
 	public ResponseEntity<ItemListaPreciosDTO> actualizarPrecio(
 			@PathVariable Long id,
@@ -23,4 +28,5 @@ public class ItemListaPreciosController {
 		ItemListaPreciosDTO actualizado = itemListaPreciosService.actualizarPrecio(id, precioRequest);
 		return ResponseEntity.ok(actualizado);
 	}
+	
 }

@@ -7,9 +7,10 @@ import org.api_sync.adapter.outbound.entities.Vendedor;
 import org.api_sync.adapter.outbound.repository.ProveedorRepository;
 import org.api_sync.adapter.outbound.repository.SellerRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,8 +29,8 @@ public class SupplierService {
 		}
 	}
 	
-	public List<Proveedor> getAllSuppliers() {
-		return supplierRepository.findAll();
+	public Page<Proveedor> getAllSuppliers(Pageable pageable) {
+		return supplierRepository.findAll(pageable);
 	}
 	
 	public Optional<Proveedor> getSupplierById(Long id) {

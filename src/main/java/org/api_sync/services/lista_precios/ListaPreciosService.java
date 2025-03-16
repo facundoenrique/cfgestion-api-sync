@@ -4,17 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.inbound.request.ItemListaPreciosRequest;
 import org.api_sync.adapter.inbound.request.ListaPreciosRequest;
 import org.api_sync.adapter.inbound.request.ListaPreciosUpdateRequest;
 import org.api_sync.adapter.outbound.entities.*;
-import org.api_sync.adapter.outbound.repository.ArticuloRepository;
-import org.api_sync.adapter.outbound.repository.ListaDePreciosRepository;
-import org.api_sync.adapter.outbound.repository.PrecioRepository;
-import org.api_sync.adapter.outbound.repository.ProveedorRepository;
+import org.api_sync.adapter.outbound.repository.*;
+import org.api_sync.services.articulos.dto.ArticuloDTO;
+import org.api_sync.services.articulos.mappers.ArticuloMapper;
 import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.api_sync.services.lista_precios.mappers.ListaPreciosMapper;
 import org.api_sync.services.lista_precios.utils.CSVUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +25,10 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,11 +41,13 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 public class ListaPreciosService {
 	private static final List<String> EXPECTED_COLUMNS = List.of("numero", "nombre", "importe_neto", "iva");
 
-	private final ListaDePreciosRepository listaDePreciosRepository;
+	private final ListaPreciosRepository listaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
+	private final ArticuloMapper articuloMapper;
 	private final ListaPreciosMapper listaDePreciosMapper;
 	private final PrecioRepository precioRepository;
 	private final ProveedorRepository proveedorRepository;
+	private final ItemListaPreciosRepository itemListaPreciosRepository;
 	
 
 	public ListaPreciosDTO crearListaDePrecios(ListaPreciosRequest request) {
@@ -85,22 +92,35 @@ public class ListaPreciosService {
 		listaDePrecios.setItems(items);
 		log.info("Nombre lista: {}", listaDePrecios.getNombre());
 		
-		listaDePreciosRepository.save(listaDePrecios);
+		listaPreciosRepository.save(listaDePrecios);
 		return listaDePreciosMapper.toDTO(listaDePrecios);
 	}
 	
 	public Optional<ListaPreciosDTO> getListaPrecio(Long id) {
-		Optional<ListaPrecios> lista = listaDePreciosRepository.findById(id);
+		Optional<ListaPrecios> lista = listaPreciosRepository.findById(id);
 		if (lista.isPresent()) {
 			return Optional.of(listaDePreciosMapper.toDTO(lista.get()));
 		}
 		return Optional.empty();
 	}
 	
-	public List<ListaPreciosDTO> listarListasDePrecios() {
-		return listaDePreciosRepository.findAll().stream()
-				       .map(listaDePreciosMapper::toDTO)
-				       .collect(Collectors.toList());
+	public Page<ListaPreciosDTO> listarListasDePrecios(LocalDate fechaDesde, LocalDate fechaHasta,
+	                                                         Long proveedorId, Pageable pageable) {
+		Specification<ListaPrecios> spec = Specification.where(null);
+		
+		if (fechaDesde != null) {
+			spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaCreacion"), fechaDesde));
+		}
+		if (fechaHasta != null) {
+			spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaCreacion"), fechaHasta));
+		}
+		if (proveedorId != null) {
+			spec = spec.and((root, query, cb) -> cb.equal(root.get("proveedor").get("id"), proveedorId));
+		}
+		
+		Page<ListaPrecios> listaPreciosPage = listaPreciosRepository.findAll(spec, pageable);
+		
+		return listaPreciosPage.map(listaDePreciosMapper::toDTO);
 	}
 
 	public void procesarArchivo(MultipartFile file, Long proveedorId, String nombreLista) {
@@ -202,7 +222,7 @@ public class ListaPreciosService {
 
 
 	public ListaPreciosDTO actualizarListaPrecios(Long id, ListaPreciosUpdateRequest updateRequest) {
-		ListaPrecios listaPrecios = listaDePreciosRepository.findById(id)
+		ListaPrecios listaPrecios = listaPreciosRepository.findById(id)
 				                            .orElseThrow(() -> new RuntimeException("Lista de precios no encontrada"));
 		
 		// Actualizar el nombre de la lista de precios
@@ -216,8 +236,51 @@ public class ListaPreciosService {
 		listaPrecios.setProveedor(proveedor);
 		
 		// Guardar los cambios
-		return listaDePreciosMapper.toDTO(listaDePreciosRepository.save(listaPrecios));
-		
+		return listaDePreciosMapper.toDTO(listaPreciosRepository.save(listaPrecios));
 	}
-	
+
+	public ArticuloDTO addItem(ArticuloRequest articuloRequest, Long listId) {
+		return saveItemWithList(articuloRequest, listId);
+	}
+
+	private ArticuloDTO saveItemWithList(ArticuloRequest articuloRequest, Long listId) {
+		
+		ListaPrecios listaPrecios = listaPreciosRepository.findById(listId)
+				                            .orElseThrow(() -> new RuntimeException("Lista inexistente"));
+		
+		Optional<Articulo> itemOptional = articuloRepository.findByNumero(articuloRequest.getNumero());
+		
+		Articulo item;
+		if (itemOptional.isPresent()) {
+			//Tendria que validar que no este insertado en la lista;
+			if (listaPrecios.getItems().stream().anyMatch(
+					i -> i.getArticulo().getNumero().equals(articuloRequest.getNumero()))) {
+				//lo actualizo ? que hago ? deberia actualizar el precio.
+			}
+			item = itemOptional.get();
+		} else {
+			Articulo articulo = articuloMapper.toEntity(articuloRequest);
+			articulo.setFechaCreado(Date.from(Instant.now()));
+			item = articuloRepository.save(articulo);
+		}
+		
+		Precio precio = Precio.builder()
+				                .articulo(item)
+				                .importe(articuloRequest.getPrecio())
+				                .fechaVigencia(LocalDate.now())
+				                .build();
+		
+		Precio precioInserted = precioRepository.save(precio);
+		
+		ItemListaPrecios itemListaPrecios = ItemListaPrecios.builder()
+				                                    .articulo(item)
+				                                    .precio(precioInserted)
+				                                    .listaPrecios(listaPrecios)
+				                                    .build();
+		
+		itemListaPreciosRepository.save(itemListaPrecios);
+		
+		return articuloMapper.toDTO(item);
+	}
+
 }

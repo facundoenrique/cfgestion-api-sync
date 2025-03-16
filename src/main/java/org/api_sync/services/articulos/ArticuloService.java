@@ -3,11 +3,11 @@ package org.api_sync.services.articulos;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
-import org.api_sync.adapter.outbound.entities.Articulo;
-import org.api_sync.adapter.outbound.entities.ItemListaPrecios;
-import org.api_sync.adapter.outbound.entities.Precio;
+import org.api_sync.adapter.outbound.entities.*;
 import org.api_sync.adapter.outbound.repository.ArticuloRepository;
 import org.api_sync.adapter.outbound.repository.ItemListaPreciosRepository;
+import org.api_sync.adapter.outbound.repository.ListaPreciosRepository;
+import org.api_sync.adapter.outbound.repository.PrecioRepository;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.api_sync.services.articulos.dto.PrecioDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
@@ -15,13 +15,15 @@ import org.api_sync.services.exceptions.ItemNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ArticuloService {
-	private final ItemListaPreciosRepository itemListaPreciosRepository;
+private final PrecioRepository precioRepository;
+private final ListaPreciosRepository listaPreciosRepository;
+private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
 	private final ArticuloMapper articuloMapper;
 	private final PrecioService precioService;
@@ -35,18 +37,6 @@ public class ArticuloService {
 		dto.setPrecio(precioDTO);
 		return dto;
 	}
-	
-	public ArticuloDTO guardarArticulo(ArticuloRequest articuloRequest) {
-		Optional<Articulo> art = articuloRepository.findByNumero(articuloRequest.getNumero());
-		
-		if (art.isPresent()) {
-			Articulo item = updateAtributes(art.get(), articuloRequest);
-			return articuloMapper.toDTO(articuloRepository.save(item));
-		}
-		Articulo articulo = articuloMapper.toEntity(articuloRequest);
-		return articuloMapper.toDTO(articuloRepository.save(articulo));
-	}
-	
 
 	private Articulo updateAtributes(Articulo articulo, ArticuloRequest request) {
 		articulo.setNombre(request.getNombre());
@@ -55,7 +45,8 @@ public class ArticuloService {
 		return articulo;
 	}
 	
-	public ArticuloDTO actualizarArticulo(Long id, ArticuloRequest articuloRequest) {
+	public ArticuloDTO actualizarArticulo(Long id,
+	                                      ArticuloRequest articuloRequest) {
 		
 		Articulo articuloRecuperado = articuloRepository.findById(id)
 				                              .orElseThrow(() -> new RuntimeException("Articulo no encontrado"));

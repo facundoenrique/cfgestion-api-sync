@@ -35,6 +35,7 @@ public class ArticuloRequest {
 
 	private int proveedor;
 
+	@Min(value = 0, message = "El defecto debe ser mayor o igual a 0")
 	private int defecto;//cantidad de venta, cada vez que se pasa el codigo de barras, por lo gral es uno, pero puede haber casos en que no.
 
 	private int eliminado;
@@ -43,7 +44,6 @@ public class ArticuloRequest {
 
 	private int maximo;
 	
-	@Min(value = 0, message = "El defectoCompra debe ser mayor o igual a 0")
 	private int defectoCompra;
 
 	private int comision;

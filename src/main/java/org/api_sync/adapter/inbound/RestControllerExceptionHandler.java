@@ -1,10 +1,15 @@
 package org.api_sync.adapter.inbound;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,5 +22,20 @@ public class RestControllerExceptionHandler {
 				                                               errors.put(error.getField(), error.getDefaultMessage())
 		);
 		return ResponseEntity.badRequest().body(errors);
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ProblemDetail handleDuplicateKeyException(DataIntegrityViolationException e) {
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+				HttpStatus.BAD_REQUEST, "El CUIT ya está registrado."
+		);
+		problemDetail.setTitle("Conflicto de datos");
+		problemDetail.setType(URI.create("/proveedores"));
+		
+		problemDetail.setProperty("timestamp", System.currentTimeMillis());
+		problemDetail.setProperty("debugInfo", "Consulta los logs para más detalles.");
+		
+		return problemDetail;
 	}
 }

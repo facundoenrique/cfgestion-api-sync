@@ -12,8 +12,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/proveedores")
 @RequiredArgsConstructor
@@ -34,7 +32,7 @@ public class ProveedoresController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Optional<Proveedor>> getSupplierById(@PathVariable Long id) {
+	public ResponseEntity<Proveedor> getSupplierById(@PathVariable Long id) {
 		return ResponseEntity.ok(supplierService.getSupplierById(id));
 	}
 	

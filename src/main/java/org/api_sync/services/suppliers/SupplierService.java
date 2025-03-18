@@ -11,8 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class SupplierService {
@@ -33,8 +31,9 @@ public class SupplierService {
 		return supplierRepository.findAll(pageable);
 	}
 	
-	public Optional<Proveedor> getSupplierById(Long id) {
-		return supplierRepository.findById(id);
+	public Proveedor getSupplierById(Long id) {
+		return supplierRepository.findById(id)
+				       .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 	}
 	
 	public void deleteSupplier(Long id) {

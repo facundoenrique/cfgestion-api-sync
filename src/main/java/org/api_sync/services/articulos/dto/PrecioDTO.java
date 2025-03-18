@@ -14,7 +14,5 @@ public class PrecioDTO {
 	
 	private BigDecimal importe;
 	
-	private BigDecimal iva;
-	
 	private LocalDate fechaVigencia;
 }

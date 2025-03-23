@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ProveedorRequest {
-	private Long id;
+	private Integer id;
 	@NotEmpty(message = "La razón social no puede estar vacía")
 	private String razonSocial;
 	private String cuit;

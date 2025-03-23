@@ -12,6 +12,8 @@ import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.api_sync.services.articulos.dto.PrecioDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
 import org.api_sync.services.exceptions.ItemNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -106,6 +108,21 @@ private final ItemListaPreciosRepository itemListaPreciosRepository;
 						   return dto;
 				       })
 				       .orElseThrow(() -> new ItemNotFoundException("ITEM NOT FOUND: " + numero != null ? numero : "ALL"));
+	}
+
+	public Page<ArticuloDTO> search(String numero, String nombre, Pageable pageable) {
+		return articuloRepository.findByNumeroContainingOrNombreContaining(numero, nombre, pageable)
+				       .map(item -> {
+					       ArticuloDTO dto = null;
+					       try {
+						       dto = articuloMapper.toDTO(item);
+						       PrecioDTO ultimoPrecioDto = precioService.obtenerPrecioVigente(item.getId());
+						       dto.setPrecio(ultimoPrecioDto);
+					       } catch (Exception e) {
+						       log.error(e.getMessage(), e);
+					       }
+					       return dto;
+				       });
 	}
   
 }

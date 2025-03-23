@@ -1,27 +1,15 @@
-package org.api_sync.adapter.outbound.entities;
+package org.api_sync.adapter.inbound.request;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
 import java.util.Date;
 
-@Entity
-@Table(name = "clientes")
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-public class Cliente {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer codigo;
-	
-	@Column(nullable = false)
+@Data
+public class ClienteRequest {
+	private Integer id;
+	@NotEmpty(message = "El nombre no puede estar vacío")
 	private String nombre;
-	
+	@NotEmpty(message = "El apellido no puede estar vacío")
 	private String apellido;
 	private String domicilio;
 	private Integer localidad;
@@ -33,23 +21,12 @@ public class Cliente {
 	private String telefono2;
 	private Short condicionIva;
 	private Short enviado;
-	
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaIngreso;
-	
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaNacimiento;
-	
 	private Short listaPrecio;
-	
-	@Column(unique = true)
 	private String cuit;
-	
 	private Integer sucursal;
-	
-	@Column(unique = true)
 	private String email;
-	
 	private Double saldoCuenta;
 	private Short pais;
 	private Short empresa;
@@ -74,6 +51,4 @@ public class Cliente {
 	private Short noVender;
 	private Short formaPago;
 	private String ingresosBrutos;
-
-
 }

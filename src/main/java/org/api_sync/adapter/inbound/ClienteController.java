@@ -28,7 +28,7 @@ public class ClienteController {
 	
 	@GetMapping
 	public ResponseEntity<Page<Cliente>> getAllCustomers(
-			@PageableDefault(size = 25, sort = "apellido", direction = Sort.Direction.ASC) Pageable pageable){
+			@PageableDefault(size = 25, sort = "razon_social", direction = Sort.Direction.ASC) Pageable pageable){
 		return ResponseEntity.ok(clienteService.getAllCustomers(pageable));
 	}
 	

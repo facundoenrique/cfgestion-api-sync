@@ -20,9 +20,8 @@ public class Cliente {
 	private Integer codigo;
 	
 	@Column(nullable = false)
-	private String nombre;
-	
-	private String apellido;
+	private String razonSocial;
+//	private String apellido;
 	private String domicilio;
 	private Integer localidad;
 	private Short provincia;

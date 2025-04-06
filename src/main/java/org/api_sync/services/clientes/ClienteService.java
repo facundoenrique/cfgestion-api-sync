@@ -14,8 +14,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ClienteService {
-	private ClienteRepository clienteRepository;
-	private ClienteMapper clienteMapper;
+	private final ClienteRepository clienteRepository;
+	private final ClienteMapper clienteMapper;
 	
 	public Cliente saveCustomer(ClienteRequest clienteRequest) {
 		Cliente customer = clienteMapper.toEntity(clienteRequest);
@@ -38,7 +38,7 @@ public class ClienteService {
 		Cliente recovered = clienteRepository.findById(clienteId).orElseThrow(() -> new RuntimeException(
 				"Cliente no encontrado"));
 		recovered.setCuit(clienteRequest.getCuit());
-		recovered.setNombre(clienteRequest.getNombre());
+		recovered.setRazonSocial(clienteRequest.getRazonSocial());
 		recovered.setTelefono(clienteRequest.getTelefono());
 		recovered.setEmail(clienteRequest.getEmail());
 		recovered.setDomicilio(clienteRequest.getDomicilio());

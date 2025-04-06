@@ -7,10 +7,8 @@ import java.util.Date;
 @Data
 public class ClienteRequest {
 	private Integer id;
-	@NotEmpty(message = "El nombre no puede estar vacío")
-	private String nombre;
-	@NotEmpty(message = "El apellido no puede estar vacío")
-	private String apellido;
+	@NotEmpty(message = "La razon social no puede estar vacía")
+	private String razonSocial;
 	private String domicilio;
 	private Integer localidad;
 	private Short provincia;

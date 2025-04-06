@@ -38,7 +38,7 @@ public class ClienteService {
 		Cliente recovered = clienteRepository.findById(clienteId).orElseThrow(() -> new RuntimeException(
 				"Cliente no encontrado"));
 		recovered.setCuit(clienteRequest.getCuit());
-		recovered.setNombre(clienteRequest.getNombre());
+		recovered.setRazonSocial(clienteRequest.getRazonSocial());
 		recovered.setTelefono(clienteRequest.getTelefono());
 		recovered.setEmail(clienteRequest.getEmail());
 		recovered.setDomicilio(clienteRequest.getDomicilio());

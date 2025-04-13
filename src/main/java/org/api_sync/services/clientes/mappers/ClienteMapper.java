@@ -17,6 +17,7 @@ public class ClienteMapper {
 				       .domicilio(request.getDomicilio())
 				       .localidad(request.getLocalidad())
 				       .provincia(request.getProvincia())
+				       .condicionIva(request.getCondicionIva())
 				       .build();
 	}
 
@@ -27,6 +28,7 @@ public class ClienteMapper {
 				       .email(cliente.getEmail())
 				       .telefono(cliente.getTelefono())
 				       .domicilio(cliente.getDomicilio())
+				       .condicionIva(cliente.getCondicionIva())
 				       .build();
 	}
 }

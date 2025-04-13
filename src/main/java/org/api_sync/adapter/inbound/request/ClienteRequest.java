@@ -1,6 +1,7 @@
 package org.api_sync.adapter.inbound.request;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public class ClienteRequest {
 	private String telefono;
 	private String fax;
 	private String telefono2;
+	@NotNull(message = "Condicion iva no puede estar vacía")
 	private Short condicionIva;
 	private Short enviado;
 	private Date fechaIngreso;

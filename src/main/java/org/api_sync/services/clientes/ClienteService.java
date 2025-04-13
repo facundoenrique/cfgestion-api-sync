@@ -2,14 +2,13 @@ package org.api_sync.services.clientes;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ClienteRequest;
+import org.api_sync.adapter.inbound.responses.ClienteResponse;
 import org.api_sync.adapter.outbound.entities.Cliente;
 import org.api_sync.adapter.outbound.repository.ClienteRepository;
 import org.api_sync.services.clientes.mappers.ClienteMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +25,10 @@ public class ClienteService {
 		return clienteRepository.findAll(pageable);
 	}
 	
-	public Optional<Cliente> getCustomerById(Long id) {
-		return clienteRepository.findById(id);
+	public ClienteResponse getCustomerById(Long id) {
+		return clienteRepository.findById(id)
+				       .map(s -> clienteMapper.toResponse(s))
+				       .orElseThrow(() -> new RuntimeException("Socio no encontrado"));
 	}
 	
 	public void deleteCustomer(Long id) {

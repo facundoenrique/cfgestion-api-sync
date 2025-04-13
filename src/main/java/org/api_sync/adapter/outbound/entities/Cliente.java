@@ -1,10 +1,7 @@
 package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -14,14 +11,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
+@Getter
 public class Cliente {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer codigo;
+	private Long id;
 	
 	@Column(nullable = false)
 	private String razonSocial;
-//	private String apellido;
 	private String domicilio;
 	private Integer localidad;
 	private Short provincia;
@@ -30,6 +27,7 @@ public class Cliente {
 	private String telefono;
 	private String fax;
 	private String telefono2;
+	@Column(nullable = false)
 	private Short condicionIva;
 	private Short enviado;
 	

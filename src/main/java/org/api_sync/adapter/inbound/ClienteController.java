@@ -3,6 +3,7 @@ package org.api_sync.adapter.inbound;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ClienteRequest;
+import org.api_sync.adapter.inbound.responses.ClienteResponse;
 import org.api_sync.adapter.outbound.entities.Cliente;
 import org.api_sync.services.clientes.ClienteService;
 import org.springframework.data.domain.Page;
@@ -11,8 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/clientes")
@@ -28,12 +27,12 @@ public class ClienteController {
 	
 	@GetMapping
 	public ResponseEntity<Page<Cliente>> getAllCustomers(
-			@PageableDefault(size = 25, sort = "razon_social", direction = Sort.Direction.ASC) Pageable pageable){
+			@PageableDefault(size = 25, sort = "razonSocial", direction = Sort.Direction.ASC) Pageable pageable) {
 		return ResponseEntity.ok(clienteService.getAllCustomers(pageable));
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Optional<Cliente>> getCustomerById(@PathVariable Long id) {
+	public ResponseEntity<ClienteResponse> getCustomerById(@PathVariable Long id) {
 		return ResponseEntity.ok(clienteService.getCustomerById(id));
 	}
 	

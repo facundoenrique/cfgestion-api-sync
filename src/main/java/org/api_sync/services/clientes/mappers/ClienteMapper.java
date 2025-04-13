@@ -1,6 +1,7 @@
 package org.api_sync.services.clientes.mappers;
 
 import org.api_sync.adapter.inbound.request.ClienteRequest;
+import org.api_sync.adapter.inbound.responses.ClienteResponse;
 import org.api_sync.adapter.outbound.entities.Cliente;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,16 @@ public class ClienteMapper {
 				       .domicilio(request.getDomicilio())
 				       .localidad(request.getLocalidad())
 				       .provincia(request.getProvincia())
+				       .build();
+	}
+
+	public ClienteResponse toResponse(Cliente cliente) {
+		return ClienteResponse.builder()
+				       .razonSocial(cliente.getRazonSocial())
+				       .cuit(cliente.getCuit())
+				       .email(cliente.getEmail())
+				       .telefono(cliente.getTelefono())
+				       .domicilio(cliente.getDomicilio())
 				       .build();
 	}
 }

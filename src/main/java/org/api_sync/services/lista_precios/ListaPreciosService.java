@@ -1,5 +1,6 @@
 package org.api_sync.services.lista_precios;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
@@ -104,8 +105,11 @@ public class ListaPreciosService {
 		return Optional.empty();
 	}
 	
-	public Page<ListaPreciosDTO> listarListasDePrecios(LocalDate fechaDesde, LocalDate fechaHasta,
-	                                                         Long proveedorId, Pageable pageable) {
+	public Page<ListaPreciosDTO> listarListasDePrecios(LocalDate fechaDesde,
+	                                                   LocalDate fechaHasta,
+	                                                   Long proveedorId,
+													   String nombre,
+	                                                   Pageable pageable) {
 		Specification<ListaPrecios> spec = Specification.where(null);
 		
 		if (fechaDesde != null) {
@@ -116,6 +120,9 @@ public class ListaPreciosService {
 		}
 		if (proveedorId != null) {
 			spec = spec.and((root, query, cb) -> cb.equal(root.get("proveedor").get("id"), proveedorId));
+		}
+		if (StringUtils.isNotBlank(nombre)) {
+			spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("nombre")), "%" + nombre.toLowerCase() + "%"));
 		}
 		
 		Page<ListaPrecios> listaPreciosPage = listaPreciosRepository.findAll(spec, pageable);

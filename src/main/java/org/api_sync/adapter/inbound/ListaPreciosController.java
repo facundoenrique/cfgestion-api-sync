@@ -47,9 +47,11 @@ public class ListaPreciosController {
 			@RequestParam(required = false) LocalDate fechaDesde,
 			@RequestParam(required = false) LocalDate fechaHasta,
 			@RequestParam(required = false) Long proveedorId,
+			@RequestParam(required = false) String nombre,
 			@PageableDefault(size = 10, sort = "fechaCreacion", direction = Sort.Direction.DESC) Pageable pageable) {
 		
-		return ResponseEntity.ok(listaPreciosService.listarListasDePrecios(fechaDesde, fechaHasta, proveedorId, pageable));
+		return ResponseEntity.ok(listaPreciosService.listarListasDePrecios(fechaDesde, fechaHasta, proveedorId,
+				nombre, pageable));
 	}
 
 	@GetMapping("{id}")

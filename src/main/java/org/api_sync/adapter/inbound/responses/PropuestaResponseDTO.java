@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound.responses;
 
+import lombok.Data;
 import org.api_sync.adapter.outbound.entities.Propuesta;
 import org.api_sync.adapter.outbound.entities.PropuestaArticulo;
 
@@ -7,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
 public class PropuestaResponseDTO {
 
 	private Long id;

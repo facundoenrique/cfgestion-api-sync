@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,11 +30,11 @@ public class PropuestaController {
 
 	@GetMapping
 	public ResponseEntity<Page<PropuestaResponseDTO>> findAll(
-			@RequestParam(required = false) LocalDate fechaDesde,
-			@RequestParam(required = false) LocalDate fechaHasta,
+			@RequestParam(required = false, value = "fecha_desde") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaDesde,
+			@RequestParam(required = false, value = "fecha_hasta") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaHasta,
 			@RequestParam(required = false) Long proveedorId,
 			@RequestParam(required = false) String nombre,
-			@PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.DESC) Pageable pageable
+			@PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.ASC) Pageable pageable
 	) {
 		return ResponseEntity.ok(propuestaService.listar(fechaDesde, fechaHasta, proveedorId,
 				nombre, pageable));

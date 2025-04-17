@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -15,10 +15,10 @@ public class PropuestaRequestDTO {
 	private String nombre;
 	
 	@NotNull
-	private Date fechaInicio;
+	private LocalDate fechaInicio;
 	
 	@NotNull
-	private Date fechaFin;
+	private LocalDate fechaFin;
 	
 	@NotNull
 	private Long listaBaseId;

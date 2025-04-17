@@ -18,13 +18,13 @@ public class Propuesta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+	@Column(nullable = false)
 	private String nombre;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaInicio;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaFin;
-	@Temporal(TemporalType.TIMESTAMP)
+	@Column(nullable = false)
 	private LocalDate fechaCreacion;
 	private Long listaBaseId;
 	

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,8 @@ public class Propuesta {
 	private Date fechaInicio;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaFin;
+	@Temporal(TemporalType.TIMESTAMP)
+	private LocalDate fechaCreacion;
 	private Long listaBaseId;
 	
 	@OneToMany(mappedBy = "propuesta", cascade = CascadeType.ALL, orphanRemoval = true)

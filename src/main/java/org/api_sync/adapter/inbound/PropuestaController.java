@@ -6,7 +6,6 @@ import org.api_sync.adapter.inbound.request.PropuestaRequestDTO;
 import org.api_sync.adapter.inbound.responses.PropuestaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Propuesta;
 import org.api_sync.adapter.outbound.entities.PropuestaArticulo;
-import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.api_sync.services.proposals.PropuestaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +33,7 @@ public class PropuestaController {
 			@RequestParam(required = false) LocalDate fechaHasta,
 			@RequestParam(required = false) Long proveedorId,
 			@RequestParam(required = false) String nombre,
-			@PageableDefault(size = 10, sort = "fechaCreacion", direction = Sort.Direction.DESC) Pageable pageable
+			@PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return ResponseEntity.ok(propuestaService.listar(fechaDesde, fechaHasta, proveedorId,
 				nombre, pageable));

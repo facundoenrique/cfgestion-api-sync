@@ -35,10 +35,10 @@ public class PropuestaService {
 		Specification<Propuesta> spec = Specification.where(null);
 		
 		if (fechaDesde != null) {
-			spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaCreacion"), fechaDesde));
+			spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("fechaFin"), fechaDesde));
 		}
 		if (fechaHasta != null) {
-			spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaCreacion"), fechaHasta));
+			spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("fechaFin"), fechaHasta));
 		}
 		if (proveedorId != null) {
 			spec = spec.and((root, query, cb) -> cb.equal(root.get("proveedor").get("id"), proveedorId));
@@ -53,6 +53,7 @@ public class PropuestaService {
 	}
 	
 	public Propuesta guardarPropuesta(Propuesta propuesta) {
+		propuesta.setFechaCreacion(LocalDate.now());
 		return propuestaRepository.save(propuesta);
 	}
 }

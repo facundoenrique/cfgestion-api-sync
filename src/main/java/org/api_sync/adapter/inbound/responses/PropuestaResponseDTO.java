@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound.responses;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.api_sync.adapter.outbound.entities.Propuesta;
 import org.api_sync.adapter.outbound.entities.PropuestaArticulo;
@@ -13,7 +14,9 @@ public class PropuestaResponseDTO {
 
 	private Long id;
 	private String nombre;
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate fechaInicio;
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private LocalDate fechaFin;
 	private Long listaBaseId;
 	private List<Long> articulos;

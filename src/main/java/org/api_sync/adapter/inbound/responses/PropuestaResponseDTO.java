@@ -4,7 +4,7 @@ import lombok.Data;
 import org.api_sync.adapter.outbound.entities.Propuesta;
 import org.api_sync.adapter.outbound.entities.PropuestaArticulo;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,8 +13,8 @@ public class PropuestaResponseDTO {
 
 	private Long id;
 	private String nombre;
-	private Date fechaInicio;
-	private Date fechaFin;
+	private LocalDate fechaInicio;
+	private LocalDate fechaFin;
 	private Long listaBaseId;
 	private List<Long> articulos;
 	

@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -17,12 +17,14 @@ public class Propuesta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+	@Column(nullable = false)
 	private String nombre;
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date fechaInicio;
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date fechaFin;
+	@Column(nullable = false)
+	private LocalDate fechaInicio;
+	@Column(nullable = false)
+	private LocalDate fechaFin;
+	@Column(nullable = false)
+	private LocalDate fechaCreacion;
 	private Long listaBaseId;
 	
 	@OneToMany(mappedBy = "propuesta", cascade = CascadeType.ALL, orphanRemoval = true)

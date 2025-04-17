@@ -6,12 +6,12 @@ import org.api_sync.adapter.inbound.request.PropuestaRequestDTO;
 import org.api_sync.adapter.inbound.responses.PropuestaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Propuesta;
 import org.api_sync.adapter.outbound.entities.PropuestaArticulo;
-import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.api_sync.services.proposals.PropuestaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +30,11 @@ public class PropuestaController {
 
 	@GetMapping
 	public ResponseEntity<Page<PropuestaResponseDTO>> findAll(
-			@RequestParam(required = false) LocalDate fechaDesde,
-			@RequestParam(required = false) LocalDate fechaHasta,
+			@RequestParam(required = false, value = "fecha_desde") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaDesde,
+			@RequestParam(required = false, value = "fecha_hasta") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaHasta,
 			@RequestParam(required = false) Long proveedorId,
 			@RequestParam(required = false) String nombre,
-			@PageableDefault(size = 10, sort = "fechaCreacion", direction = Sort.Direction.DESC) Pageable pageable
+			@PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.ASC) Pageable pageable
 	) {
 		return ResponseEntity.ok(propuestaService.listar(fechaDesde, fechaHasta, proveedorId,
 				nombre, pageable));

@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "propuestas_articulos")
+@Table(name = "preventas_articulos")
 @Getter
 @Setter
-public class PropuestaArticulo {
+public class PreventaArticulo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +18,7 @@ public class PropuestaArticulo {
 	
 	@ManyToOne
 	@JoinColumn(name = "propuesta_id")
-	private Propuesta propuesta;
+	private Preventa propuesta;
 
 
 }

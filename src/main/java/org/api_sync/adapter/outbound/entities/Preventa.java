@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "propuestas")
+@Table(name = "preventas")
 @Setter
 @Getter
-public class Propuesta {
+public class Preventa {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,6 @@ public class Propuesta {
 	private Long listaBaseId;
 	
 	@OneToMany(mappedBy = "propuesta", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PropuestaArticulo> articulos = new ArrayList<>();
+	private List<PreventaArticulo> articulos = new ArrayList<>();
 
 }

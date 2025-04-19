@@ -28,10 +28,10 @@ public class RestControllerExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ProblemDetail handleDuplicateKeyException(DataIntegrityViolationException e) {
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-				HttpStatus.BAD_REQUEST, "El CUIT ya está registrado."
+				HttpStatus.BAD_REQUEST, e.getLocalizedMessage()
 		);
 		problemDetail.setTitle("Conflicto de datos");
-		problemDetail.setType(URI.create("/proveedores"));
+		problemDetail.setType(URI.create(e.getMessage()));
 		
 		problemDetail.setProperty("timestamp", System.currentTimeMillis());
 		problemDetail.setProperty("debugInfo", "Consulta los logs para más detalles.");

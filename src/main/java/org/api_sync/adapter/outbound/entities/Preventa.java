@@ -27,7 +27,7 @@ public class Preventa {
 	private LocalDate fechaCreacion;
 	private Long listaBaseId;
 	
-	@OneToMany(mappedBy = "propuesta", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "preventa", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PreventaArticulo> articulos = new ArrayList<>();
 
 }

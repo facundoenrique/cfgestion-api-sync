@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class PreventaService {
 
 	private final PreventaRepository preventaRepository;
-	private final PreventaArticuloRepository preventaArticuloRepositoy;
+	private final PreventaArticuloRepository preventaArticuloRepository;
 
 	public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
@@ -84,7 +84,7 @@ public class PreventaService {
 		preVenta.setFechaFin(dto.getFechaFin());
 		
 		// Eliminar articulos actuales
-		preventaArticuloRepositoy.deleteByPreventaId(preVenta.getId());
+		preventaArticuloRepository.deleteByPreventaId(preVenta.getId());
 		
 		// Agregar nuevos articulos
 		List<PreventaArticulo> articulos = dto.getArticulos().stream().map(item -> {
@@ -98,7 +98,12 @@ public class PreventaService {
 			return articulo;
 		}).collect(Collectors.toList());
 		
-		preventaArticuloRepositoy.saveAll(articulos);
+		//TODO: Sumar item a la lista.
+		//Obtener el id nuevo y setearlo en el articulo antes de guardarlo en los articulos de la preventa
+		
+		List<PreventaArticulo> items = preventaArticuloRepository.saveAll(articulos);
+		
+		//preVenta.setArticulos(items);
 		
 		preventaRepository.save(preVenta);
 	}

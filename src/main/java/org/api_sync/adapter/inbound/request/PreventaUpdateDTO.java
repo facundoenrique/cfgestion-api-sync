@@ -32,5 +32,6 @@ public class PreventaUpdateDTO {
 		private Integer unidadesPorVulto;
 		@NotNull
 		private Integer multiplicador;
+		private boolean manual;
 	}
 }

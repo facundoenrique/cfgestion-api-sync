@@ -5,10 +5,15 @@ import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreve
 import io.micrometer.common.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import org.api_sync.adapter.inbound.request.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.responses.ArticuloPreventaDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
+import org.api_sync.adapter.outbound.entities.PreventaArticulo;
+import org.api_sync.adapter.outbound.repository.PreventaArticuloRepository;
 import org.api_sync.adapter.outbound.repository.PreventaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +22,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PropuestaService {
+public class PreventaService {
 
 	private final PreventaRepository preventaRepository;
+	private final PreventaArticuloRepository preventaArticuloRepositoy;
 
 	public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
@@ -29,7 +35,7 @@ public class PropuestaService {
 				a -> ArticuloPreventaDTO.builder()
 								       .id(a.getArticuloId())
 								       .nombre(a.getNombre())
-								       .precio(a.getImporte())
+								       .importe(a.getImporte())
 								       .iva(a.getIva())
 								       .defecto(a.getDefecto())
 								       .multiplicador(a.getMultiplicador())
@@ -68,4 +74,33 @@ public class PropuestaService {
 		preventa.setFechaCreacion(LocalDate.now());
 		return preventaRepository.save(preventa);
 	}
+
+	public void actualizarPreVenta(Long id, PreventaUpdateDTO dto) {
+		Preventa preVenta = preventaRepository.findById(id)
+				               .orElseThrow(() -> new RuntimeException("Preventa no encontrada"));
+		
+		preVenta.setNombre(dto.getNombre());
+		preVenta.setFechaInicio(dto.getFechaInicio());
+		preVenta.setFechaFin(dto.getFechaFin());
+		
+		// Eliminar articulos actuales
+		preventaArticuloRepositoy.deleteByPreventaId(preVenta.getId());
+		
+		// Agregar nuevos articulos
+		List<PreventaArticulo> articulos = dto.getArticulos().stream().map(item -> {
+			PreventaArticulo articulo = new PreventaArticulo();
+			articulo.setPreventa(preVenta);
+			articulo.setNombre(item.getNombre());
+			articulo.setArticuloId(item.getId());
+			articulo.setImporte(item.getImporte());
+			articulo.setUnidadesPorVulto(item.getUnidadesPorVulto());
+			articulo.setMultiplicador(item.getMultiplicador());
+			return articulo;
+		}).collect(Collectors.toList());
+		
+		preventaArticuloRepositoy.saveAll(articulos);
+		
+		preventaRepository.save(preVenta);
+	}
+	
 }

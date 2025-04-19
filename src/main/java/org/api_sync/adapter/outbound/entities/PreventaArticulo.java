@@ -32,8 +32,8 @@ public class PreventaArticulo {
 	private Integer multiplicador = 1;
 	
 	@ManyToOne
-	@JoinColumn(name = "propuesta_id")
-	private Preventa propuesta;
+	@JoinColumn(name = "preventa_id")
+	private Preventa preventa;
 
 
 }

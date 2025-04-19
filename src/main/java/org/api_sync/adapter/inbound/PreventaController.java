@@ -2,11 +2,12 @@ package org.api_sync.adapter.inbound;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.api_sync.adapter.inbound.request.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.request.PropuestaRequestDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
-import org.api_sync.services.proposals.PropuestaService;
+import org.api_sync.services.proposals.PreventaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,7 +28,7 @@ import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreve
 @RequiredArgsConstructor
 public class PreventaController {
 
-	private final PropuestaService propuestaService;
+	private final PreventaService preventaService;
 
 	@GetMapping
 	public ResponseEntity<Page<PreventaResponseDTO>> findAll(
@@ -37,13 +38,13 @@ public class PreventaController {
 			@RequestParam(required = false) String nombre,
 			@PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.ASC) Pageable pageable
 	) {
-		return ResponseEntity.ok(propuestaService.listar(fechaDesde, fechaHasta, proveedorId,
+		return ResponseEntity.ok(preventaService.listar(fechaDesde, fechaHasta, proveedorId,
 				nombre, pageable));
 	}
 
 	@GetMapping("{id}")
 	public ResponseEntity<?> findById(@PathVariable Long id, @RequestParam(required = false) String attributes) {
-		PreventaResponseDTO dto = propuestaService.getListaPrecio(id);
+		PreventaResponseDTO dto = preventaService.getListaPrecio(id);
 		
 		// Si no se especificaron atributos, devuelvo todo
 		if (attributes == null) {
@@ -81,18 +82,18 @@ public class PreventaController {
 	
 	@PostMapping
 	public ResponseEntity<PreventaResponseDTO> crearPropuesta(@Valid @RequestBody PropuestaRequestDTO requestDTO) {
-		Preventa propuesta = new Preventa();
-		propuesta.setNombre(requestDTO.getNombre());
-		propuesta.setFechaInicio(requestDTO.getFechaInicio());
-		propuesta.setFechaFin(requestDTO.getFechaFin());
-		propuesta.setListaBaseId(requestDTO.getListaBaseId());
+		Preventa preventa = new Preventa();
+		preventa.setNombre(requestDTO.getNombre());
+		preventa.setFechaInicio(requestDTO.getFechaInicio());
+		preventa.setFechaFin(requestDTO.getFechaFin());
+		preventa.setListaBaseId(requestDTO.getListaBaseId());
 		
 		// Mapear artículos seleccionados
 		List<PreventaArticulo> articulos = requestDTO.getArticulos().stream()
 				                                    .map(dto -> {
 					                                    PreventaArticulo pa = new PreventaArticulo();
 					                                    pa.setArticuloId(dto.getArticuloId());
-					                                    pa.setPropuesta(propuesta);
+					                                    pa.setPreventa(preventa);
 														pa.setImporte(dto.getImporte());
 														pa.setNombre(dto.getNombre());
 														pa.setIva(dto.getIva());
@@ -102,10 +103,17 @@ public class PreventaController {
 					                                    return pa;
 				                                    }).collect(Collectors.toList());
 		
-		propuesta.setArticulos(articulos);
+		preventa.setArticulos(articulos);
 		
-		Preventa guardada = propuestaService.guardarPropuesta(propuesta);
+		Preventa guardada = preventaService.guardarPropuesta(preventa);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(toPreventaResponseDTO(guardada));
 	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<?> actualizarPreVenta(@PathVariable Long id, @RequestBody PreventaUpdateDTO dto) {
+		preventaService.actualizarPreVenta(id, dto);
+		return ResponseEntity.ok().build();
+	}
+	
 }

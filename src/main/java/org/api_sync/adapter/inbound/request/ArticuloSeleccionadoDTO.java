@@ -1,6 +1,6 @@
 package org.api_sync.adapter.inbound.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class ArticuloSeleccionadoDTO {
 	@NotNull
 	private Long articuloId;
-	@NotBlank
+	@NotEmpty(message = "El nombre no puede estar vacío")
 	private String nombre;
 	@NotNull
 	private BigDecimal importe;

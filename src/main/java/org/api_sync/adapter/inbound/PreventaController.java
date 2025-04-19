@@ -93,6 +93,12 @@ public class PreventaController {
 					                                    PreventaArticulo pa = new PreventaArticulo();
 					                                    pa.setArticuloId(dto.getArticuloId());
 					                                    pa.setPropuesta(propuesta);
+														pa.setImporte(dto.getImporte());
+														pa.setNombre(dto.getNombre());
+														pa.setIva(dto.getIva());
+														pa.setDefecto(dto.getDefecto());
+														pa.setMultiplicador(dto.getMultiplicador());
+														pa.setUnidadesPorVulto(dto.getUnidadesPorBulto());
 					                                    return pa;
 				                                    }).collect(Collectors.toList());
 		

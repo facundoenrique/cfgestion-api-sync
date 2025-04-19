@@ -1,62 +1,42 @@
 package org.api_sync.services.proposals;
 
-import io.micrometer.common.util.StringUtils;
+import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreventaResponseDTO;
 
-import java.math.BigDecimal;
+import io.micrometer.common.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.responses.ArticuloPreventaDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
-import org.api_sync.adapter.outbound.repository.ArticuloRepository;
-import org.api_sync.adapter.outbound.repository.ItemListaPreciosRepository;
 import org.api_sync.adapter.outbound.repository.PreventaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import static java.math.BigDecimal.ZERO;
-import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreventaResponseDTO;
-
 @Service
 @RequiredArgsConstructor
 public class PropuestaService {
 
 	private final PreventaRepository preventaRepository;
-	private final ArticuloRepository articuloRepository;
-	private final ItemListaPreciosRepository precioRepository;
 
 	public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
 				                                .orElseThrow(() -> new RuntimeException("Preventa no encontrada"));
 							
 		List<ArticuloPreventaDTO> items = propuesta.getArticulos().stream().map(
-				a -> {
-					return articuloRepository.findById(a.getArticuloId()).map(
-							item -> {
-								BigDecimal importe;
-								if (propuesta.getListaBaseId() != null) {
-									importe =
-											precioRepository.findByListaPreciosIdAndArticuloId(propuesta.getListaBaseId(), item.getId())
-													.get().getPrecio().getImporte();
-								} else {
-									importe = ZERO; //Despues vemos si siempre vamos a tener una lista base
-								}
-								return ArticuloPreventaDTO.builder()
-										       .id(a.getArticuloId())
-										       .nombre(item.getNombre())
-										       .precio(importe)
-										       .build();
-							}
-					).get();
-				}
+				a -> ArticuloPreventaDTO.builder()
+								       .id(a.getArticuloId())
+								       .nombre(a.getNombre())
+								       .precio(a.getImporte())
+								       .iva(a.getIva())
+								       .defecto(a.getDefecto())
+								       .multiplicador(a.getMultiplicador())
+								       .unidadesPorBulto(a.getUnidadesPorVulto())
+								       .build()
 		).toList();
-		
 		return toPreventaResponseDTO(propuesta).withArticulos(items);
-
 	}
 	
 	public Page<PreventaResponseDTO> listar(LocalDate fechaDesde,
@@ -84,8 +64,8 @@ public class PropuestaService {
 		return propuestaPage.map(PreventaResponseDTO::toPreventaResponseDTO);
 	}
 	
-	public Preventa guardarPropuesta(Preventa propuesta) {
-		propuesta.setFechaCreacion(LocalDate.now());
-		return preventaRepository.save(propuesta);
+	public Preventa guardarPropuesta(Preventa preventa) {
+		preventa.setFechaCreacion(LocalDate.now());
+		return preventaRepository.save(preventa);
 	}
 }

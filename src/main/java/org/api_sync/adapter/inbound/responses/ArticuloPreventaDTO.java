@@ -11,4 +11,8 @@ public class ArticuloPreventaDTO {
 	private Long id;
 	private String nombre;
 	private BigDecimal precio;
+	private BigDecimal iva;
+	private Integer defecto; //desde cuanto arranco
+	private Integer multiplicador; //de a cuanto multiplico
+	private Integer unidadesPorBulto;
 }

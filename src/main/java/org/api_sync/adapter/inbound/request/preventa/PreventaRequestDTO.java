@@ -1,4 +1,4 @@
-package org.api_sync.adapter.inbound.request;
+package org.api_sync.adapter.inbound.request.preventa;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class PropuestaRequestDTO {
+public class PreventaRequestDTO {
 
 	@NotBlank
 	private String nombre;

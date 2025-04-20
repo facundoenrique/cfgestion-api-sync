@@ -1,4 +1,4 @@
-package org.api_sync.adapter.inbound.request;
+package org.api_sync.adapter.inbound.request.preventa;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

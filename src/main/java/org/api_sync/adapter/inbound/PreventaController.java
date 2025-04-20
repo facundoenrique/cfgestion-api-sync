@@ -2,8 +2,9 @@ package org.api_sync.adapter.inbound;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.api_sync.adapter.inbound.request.preventa.PreventaManualRequestDTO;
 import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
-import org.api_sync.adapter.inbound.request.PropuestaRequestDTO;
+import org.api_sync.adapter.inbound.request.preventa.PreventaRequestDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
@@ -81,7 +82,7 @@ public class PreventaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<PreventaResponseDTO> crearPropuesta(@Valid @RequestBody PropuestaRequestDTO requestDTO) {
+	public ResponseEntity<PreventaResponseDTO> crearPropuesta(@Valid @RequestBody PreventaRequestDTO requestDTO) {
 		Preventa preventa = new Preventa();
 		preventa.setNombre(requestDTO.getNombre());
 		preventa.setFechaInicio(requestDTO.getFechaInicio());
@@ -106,6 +107,35 @@ public class PreventaController {
 		preventa.setArticulos(articulos);
 		
 		Preventa guardada = preventaService.guardarPropuesta(preventa);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(toPreventaResponseDTO(guardada));
+	}
+
+	@PostMapping("/manual")
+	public ResponseEntity<PreventaResponseDTO> crearPropuestaManual(@Valid @RequestBody PreventaManualRequestDTO requestDTO) {
+		Preventa preventa = new Preventa();
+		preventa.setNombre(requestDTO.getNombre());
+		preventa.setFechaInicio(requestDTO.getFechaInicio());
+		preventa.setFechaFin(requestDTO.getFechaFin());
+		
+		// Mapear artículos seleccionados
+		List<PreventaArticulo> articulos = requestDTO.getArticulos().stream()
+				                                   .map(dto -> {
+					                                   PreventaArticulo pa = new PreventaArticulo();
+					                                   pa.setPreventa(preventa);
+													   pa.setNumero(dto.getNumero());
+					                                   pa.setImporte(dto.getImporte());
+					                                   pa.setNombre(dto.getNombre());
+					                                   pa.setIva(dto.getIva());
+					                                   pa.setDefecto(dto.getDefecto());
+					                                   pa.setMultiplicador(dto.getMultiplicador());
+					                                   pa.setUnidadesPorVulto(dto.getUnidadesPorBulto());
+					                                   return pa;
+				                                   }).collect(Collectors.toList());
+		
+		preventa.setArticulos(articulos);
+		
+		Preventa guardada = preventaService.guardarPreventaManual(preventa, requestDTO.getProveedorId());
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(toPreventaResponseDTO(guardada));
 	}

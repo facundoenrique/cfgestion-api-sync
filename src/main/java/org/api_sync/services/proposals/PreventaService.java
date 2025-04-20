@@ -5,18 +5,21 @@ import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreve
 import io.micrometer.common.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.responses.ArticuloPreventaDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
+import org.api_sync.adapter.outbound.entities.Articulo;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
+import org.api_sync.adapter.outbound.repository.ArticuloRepository;
 import org.api_sync.adapter.outbound.repository.PreventaArticuloRepository;
 import org.api_sync.adapter.outbound.repository.PreventaRepository;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
+import org.api_sync.services.articulos.mappers.ArticuloMapper;
 import org.api_sync.services.exceptions.PreventaNotFoundException;
 import org.api_sync.services.lista_precios.ListaPreciosService;
 import org.springframework.data.domain.Page;
@@ -31,10 +34,12 @@ public class PreventaService {
 	private final PreventaRepository preventaRepository;
 	private final PreventaArticuloRepository preventaArticuloRepository;
 	private final ListaPreciosService listaPreciosService;
+	private final ArticuloRepository articuloRepository;
+	private final ArticuloMapper articuloMapper;
 
-	public PreventaResponseDTO getListaPrecio(Long id) {
+public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
-				                                .orElseThrow(() -> new PreventaNotFoundException());
+				                                .orElseThrow(PreventaNotFoundException::new);
 							
 		List<ArticuloPreventaDTO> items = propuesta.getArticulos().stream().map(
 				a -> ArticuloPreventaDTO.builder()
@@ -83,7 +88,7 @@ public class PreventaService {
 
 	public void actualizarPreVenta(Long id, PreventaUpdateDTO dto) {
 		Preventa preVenta = preventaRepository.findById(id)
-				               .orElseThrow(() -> new PreventaNotFoundException());
+				               .orElseThrow(PreventaNotFoundException::new);
 		
 		preVenta.setNombre(dto.getNombre());
 		preVenta.setFechaInicio(dto.getFechaInicio());
@@ -104,27 +109,39 @@ public class PreventaService {
 			articulo.setNumero(item.getNumero());
 			articulo.setIva(item.getIva());
 			return articulo;
-		}).collect(Collectors.toList());
+		}).toList();
 		
 
 		if (preVenta.getListaBaseId() != null && dto.getArticulos().stream().anyMatch(item -> item.getId() == null)) {
 			dto.getArticulos().stream().filter(item -> item.getId() == null)
 					                         .forEach(itemDTO -> {
-						                         ArticuloRequest articuloRequest = ArticuloRequest.builder()
-								                                                           .numero(itemDTO.getNumero())
-								                                                           .nombre(itemDTO.getNombre())
-								                                                           .precio(itemDTO.getImporte())
-								                                                           .iva(itemDTO.getIva())
-								                                                           .cantidad(1)
-								                                                           .eliminado(0)
-								                                                           .defecto(itemDTO.getUnidadesPorVulto())
-								                                                           .build();
+						                         ArticuloRequest.ArticuloRequestBuilder articuloRequestBuilder =
+								                         ArticuloRequest.builder()
+										                         .numero(itemDTO.getNumero())
+										                         .nombre(itemDTO.getNombre())
+										                         .precio(itemDTO.getImporte())
+										                         .iva(itemDTO.getIva())
+										                         .cantidad(1)
+										                         .eliminado(0)
+										                         .defecto(itemDTO.getUnidadesPorVulto());
+						                         Optional<Articulo> existing =
+								                         articuloRepository.findByNumero(itemDTO.getNumero());
 												 
-						                         ArticuloDTO articuloDTO = listaPreciosService.addItem(articuloRequest, preVenta.getListaBaseId());
+						                         if (existing.isPresent()) {
+							                         articuloRequestBuilder.id(existing.get().getId());
+						                         } else {
+							                        Articulo articulo =
+									                        articuloRepository.save(articuloMapper.toEntity(articuloRequestBuilder.build()));
+							                         articuloRequestBuilder.id(articulo.getId());
+						                         }
+												 
+						                         ArticuloDTO articuloDTO =
+								                         listaPreciosService.addItem(articuloRequestBuilder.build(),
+										                         preVenta.getListaBaseId());
 						
 						                         articulos.stream()
 								                         .filter(item -> item.getNumero().equals(articuloDTO.getNumero()))
-								                         .forEach(item -> item.setId(articuloDTO.getId()));
+								                         .forEach(item -> item.setArticuloId(articuloDTO.getId()));
 					                         });
 			
 		}

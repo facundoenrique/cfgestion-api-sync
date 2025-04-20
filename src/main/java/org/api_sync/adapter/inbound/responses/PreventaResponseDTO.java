@@ -16,9 +16,9 @@ public class PreventaResponseDTO {
 
 	private Long id;
 	private String nombre;
-	@JsonFormat(pattern = "yyyyMMdd")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate fechaInicio;
-	@JsonFormat(pattern = "yyyyMMdd")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate fechaFin;
 	private Long listaBaseId;
 	@With

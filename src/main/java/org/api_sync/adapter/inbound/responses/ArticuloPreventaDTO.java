@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class ArticuloPreventaDTO {
 	private Long id;
+	private String numero;
 	private String nombre;
 	private BigDecimal importe;
 	private BigDecimal iva;

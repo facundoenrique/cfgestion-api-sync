@@ -13,6 +13,8 @@ import org.api_sync.adapter.outbound.entities.*;
 import org.api_sync.adapter.outbound.repository.*;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
+import org.api_sync.services.exceptions.ListaPreciosNotFoundException;
+import org.api_sync.services.exceptions.ProveedorNotFoundException;
 import org.api_sync.services.lista_precios.dto.ListaPreciosDTO;
 import org.api_sync.services.lista_precios.mappers.ListaPreciosMapper;
 import org.api_sync.services.lista_precios.utils.CSVUtils;
@@ -58,7 +60,7 @@ public class ListaPreciosService {
 		listaDePrecios.setNombre(request.getNombre());
 		
 		if (!proveedorRepository.existsById(request.getProveedor())) {
-			throw new RuntimeException("Proveedor no encontrado");
+			throw new ProveedorNotFoundException();
 		}
 		
 		Proveedor proveedor = proveedorRepository.findById(request.getProveedor()).get();
@@ -230,14 +232,14 @@ public class ListaPreciosService {
 
 	public ListaPreciosDTO actualizarListaPrecios(Long id, ListaPreciosUpdateRequest updateRequest) {
 		ListaPrecios listaPrecios = listaPreciosRepository.findById(id)
-				                            .orElseThrow(() -> new RuntimeException("Lista de precios no encontrada"));
+				                            .orElseThrow(() -> new ListaPreciosNotFoundException());
 		
 		// Actualizar el nombre de la lista de precios
 		listaPrecios.setNombre(updateRequest.getNombre());
 		
 		// Verificar si el proveedor existe
 		Proveedor proveedor = proveedorRepository.findById(updateRequest.getProveedor())
-				                      .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+				                      .orElseThrow(() -> new ProveedorNotFoundException());
 		
 		// Actualizar el proveedor de la lista de precios
 		listaPrecios.setProveedor(proveedor);
@@ -253,7 +255,7 @@ public class ListaPreciosService {
 	private ArticuloDTO saveItemWithList(ArticuloRequest articuloRequest, Long listId) {
 		
 		ListaPrecios listaPrecios = listaPreciosRepository.findById(listId)
-				                            .orElseThrow(() -> new RuntimeException("Lista inexistente"));
+				                            .orElseThrow(() -> new ListaPreciosNotFoundException());
 		
 		Optional<Articulo> itemOptional = articuloRepository.findByNumero(articuloRequest.getNumero());
 		

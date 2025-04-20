@@ -2,7 +2,7 @@ package org.api_sync.adapter.inbound;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.api_sync.adapter.inbound.request.PreventaUpdateDTO;
+import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.request.PropuestaRequestDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
@@ -111,7 +111,7 @@ public class PreventaController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> actualizarPreVenta(@PathVariable Long id, @RequestBody PreventaUpdateDTO dto) {
+	public ResponseEntity<?> actualizarPreVenta(@PathVariable Long id, @RequestBody @Valid PreventaUpdateDTO dto) {
 		preventaService.actualizarPreVenta(id, dto);
 		return ResponseEntity.ok().build();
 	}

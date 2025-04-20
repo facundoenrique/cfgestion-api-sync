@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.api_sync.adapter.inbound.request.PreventaUpdateDTO;
+import org.api_sync.adapter.inbound.request.ArticuloRequest;
+import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.responses.ArticuloPreventaDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
 import org.api_sync.adapter.outbound.repository.PreventaArticuloRepository;
 import org.api_sync.adapter.outbound.repository.PreventaRepository;
+import org.api_sync.services.articulos.dto.ArticuloDTO;
+import org.api_sync.services.exceptions.PreventaNotFoundException;
+import org.api_sync.services.lista_precios.ListaPreciosService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,14 +30,16 @@ public class PreventaService {
 
 	private final PreventaRepository preventaRepository;
 	private final PreventaArticuloRepository preventaArticuloRepository;
+	private final ListaPreciosService listaPreciosService;
 
 	public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
-				                                .orElseThrow(() -> new RuntimeException("Preventa no encontrada"));
+				                                .orElseThrow(() -> new PreventaNotFoundException());
 							
 		List<ArticuloPreventaDTO> items = propuesta.getArticulos().stream().map(
 				a -> ArticuloPreventaDTO.builder()
 								       .id(a.getArticuloId())
+						                .numero(a.getNumero())
 								       .nombre(a.getNombre())
 								       .importe(a.getImporte())
 								       .iva(a.getIva())
@@ -77,7 +83,7 @@ public class PreventaService {
 
 	public void actualizarPreVenta(Long id, PreventaUpdateDTO dto) {
 		Preventa preVenta = preventaRepository.findById(id)
-				               .orElseThrow(() -> new RuntimeException("Preventa no encontrada"));
+				               .orElseThrow(() -> new PreventaNotFoundException());
 		
 		preVenta.setNombre(dto.getNombre());
 		preVenta.setFechaInicio(dto.getFechaInicio());
@@ -95,13 +101,36 @@ public class PreventaService {
 			articulo.setImporte(item.getImporte());
 			articulo.setUnidadesPorVulto(item.getUnidadesPorVulto());
 			articulo.setMultiplicador(item.getMultiplicador());
+			articulo.setNumero(item.getNumero());
+			articulo.setIva(item.getIva());
 			return articulo;
 		}).collect(Collectors.toList());
 		
-		//TODO: Sumar item a la lista.
-		//Obtener el id nuevo y setearlo en el articulo antes de guardarlo en los articulos de la preventa
+
+		if (preVenta.getListaBaseId() != null && dto.getArticulos().stream().anyMatch(item -> item.getId() == null)) {
+			dto.getArticulos().stream().filter(item -> item.getId() == null)
+					                         .forEach(itemDTO -> {
+						                         ArticuloRequest articuloRequest = ArticuloRequest.builder()
+								                                                           .numero(itemDTO.getNumero())
+								                                                           .nombre(itemDTO.getNombre())
+								                                                           .precio(itemDTO.getImporte())
+								                                                           .iva(itemDTO.getIva())
+								                                                           .cantidad(1)
+								                                                           .eliminado(0)
+								                                                           .defecto(itemDTO.getUnidadesPorVulto())
+								                                                           .build();
+												 
+						                         ArticuloDTO articuloDTO = listaPreciosService.addItem(articuloRequest, preVenta.getListaBaseId());
+						
+						                         articulos.stream()
+								                         .filter(item -> item.getNumero().equals(articuloDTO.getNumero()))
+								                         .forEach(item -> item.setId(articuloDTO.getId()));
+					                         });
+			
+		}
 		
-		List<PreventaArticulo> items = preventaArticuloRepository.saveAll(articulos);
+		List<PreventaArticulo> items =
+				preventaArticuloRepository.saveAll(articulos.stream().peek(item -> item.setId(null)).toList());
 		
 		//preVenta.setArticulos(items);
 		

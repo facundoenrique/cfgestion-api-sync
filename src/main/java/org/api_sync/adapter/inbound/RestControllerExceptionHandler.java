@@ -38,4 +38,19 @@ public class RestControllerExceptionHandler {
 		
 		return problemDetail;
 	}
+
+	@ExceptionHandler(RuntimeException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ProblemDetail handleDuplicateKeyException(RuntimeException e) {
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+				HttpStatus.BAD_REQUEST, e.getMessage()
+		);
+		problemDetail.setTitle("Conflicto de datos");
+		problemDetail.setType(URI.create(e.getMessage()));
+		
+		problemDetail.setProperty("timestamp", System.currentTimeMillis());
+		problemDetail.setProperty("debugInfo", "Consulta los logs para más detalles.");
+		
+		return problemDetail;
+	}
 }

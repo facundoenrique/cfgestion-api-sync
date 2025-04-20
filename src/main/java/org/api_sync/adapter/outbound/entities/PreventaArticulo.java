@@ -16,8 +16,8 @@ public class PreventaArticulo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	private Long articuloId;
+	private Long articuloId; //referencia a tabla articulos.
+	private String numero;
 	@Column(nullable = false)
 	private String nombre;
 	@Column(nullable = false)

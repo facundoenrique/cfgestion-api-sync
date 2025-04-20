@@ -12,15 +12,12 @@ import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.responses.ArticuloPreventaDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
-import org.api_sync.adapter.outbound.entities.Articulo;
-import org.api_sync.adapter.outbound.entities.Preventa;
-import org.api_sync.adapter.outbound.entities.PreventaArticulo;
-import org.api_sync.adapter.outbound.repository.ArticuloRepository;
-import org.api_sync.adapter.outbound.repository.PreventaArticuloRepository;
-import org.api_sync.adapter.outbound.repository.PreventaRepository;
+import org.api_sync.adapter.outbound.entities.*;
+import org.api_sync.adapter.outbound.repository.*;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.api_sync.services.articulos.mappers.ArticuloMapper;
 import org.api_sync.services.exceptions.PreventaNotFoundException;
+import org.api_sync.services.exceptions.ProveedorNotFoundException;
 import org.api_sync.services.lista_precios.ListaPreciosService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +31,12 @@ public class PreventaService {
 	private final PreventaRepository preventaRepository;
 	private final PreventaArticuloRepository preventaArticuloRepository;
 	private final ListaPreciosService listaPreciosService;
+	private final ListaPreciosRepository listaPreciosRepository;
+	private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
 	private final ArticuloMapper articuloMapper;
+private final PrecioRepository precioRepository;
+private final ProveedorRepository proveedorRepository;
 
 public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
@@ -83,6 +84,50 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 	
 	public Preventa guardarPropuesta(Preventa preventa) {
 		preventa.setFechaCreacion(LocalDate.now());
+		return preventaRepository.save(preventa);
+	}
+
+	public Preventa guardarPreventaManual(Preventa preventa, Long proveedorId) {
+	
+		Proveedor proveedor = proveedorRepository.findById(proveedorId)
+				                   .orElseThrow(ProveedorNotFoundException::new);
+	
+		preventa.setFechaCreacion(LocalDate.now());
+		
+		ListaPrecios lista = new ListaPrecios();
+		lista.setNombre("Lista asociada a preventa " + preventa.getNombre());
+		lista.setFechaCreacion(LocalDate.now());
+		lista.setFechaModificacion(LocalDate.now());
+		lista.setProveedor(proveedor);
+		ListaPrecios listaGuardada = listaPreciosRepository.save(lista);
+		
+		preventa.getArticulos().forEach(item -> {
+			Articulo articulo = articuloRepository.findByNumero(item.getNumero())
+					          .orElseGet(() -> articuloRepository.save(articuloMapper.toEntity(item)));
+			
+			
+			Precio precio = Precio.builder()
+					                .articulo(articulo)
+					                .importe(item.getImporte())
+					                .fechaVigencia(LocalDate.now())
+					                .build();
+			
+			Precio precioGuardado = precioRepository.save(precio);
+			
+			// Crear ItemListaPrecio
+			ItemListaPrecios itemLista = new ItemListaPrecios();
+			itemLista.setArticulo(articulo);
+			itemLista.setPrecio(precioGuardado);
+			itemLista.setListaPrecios(listaGuardada);
+			itemListaPreciosRepository.save(itemLista);
+			
+			item.setArticuloId(articulo.getId());
+			item.setPreventa(preventa);
+			preventa.setListaBaseId(listaGuardada.getId());
+		});
+		
+		//deberia guardar una lista nueva. primero probemos que esto anda correctamente.
+		
 		return preventaRepository.save(preventa);
 	}
 

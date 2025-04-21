@@ -1,14 +1,16 @@
 package org.api_sync.adapter.inbound.request;
 
-import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@Builder
 public class ListaPreciosRequest {
+	@NotNull
 	private List<ItemListaPreciosRequest> items;
+	@NotNull
 	private Long proveedor;
+	@NotNull
 	private String nombre;
 }

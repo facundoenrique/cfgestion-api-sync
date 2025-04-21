@@ -34,7 +34,6 @@ public class ListaPreciosController {
 		return ResponseEntity.ok(listaPreciosService.crearListaDePrecios(request));
 	}
 
-
 	@PatchMapping("/{id}/items")
 	public ResponseEntity<ArticuloDTO> addItem(@PathVariable Long id,
 	                                           @Valid @RequestBody ArticuloRequest articulo) {

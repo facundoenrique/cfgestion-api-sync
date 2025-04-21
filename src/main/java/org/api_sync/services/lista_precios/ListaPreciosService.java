@@ -74,7 +74,8 @@ public class ListaPreciosService {
 														.numero(itemRequest.getNumero())
 														.nombre(itemRequest.getNombre())
 														.iva(itemRequest.getIva())
-														.codUnidadMedida(itemRequest.getCodUnidadMedida())
+														.codUnidadMedida(itemRequest.getCodUnidadMedida() != null ?
+																                 itemRequest.getCodUnidadMedida() :  1)
 														.build()));
 			
 			Precio nuevoPrecio = Precio.builder()
@@ -159,11 +160,11 @@ public class ListaPreciosService {
 			}
 			
 			
-			crearListaDePrecios(ListaPreciosRequest.builder()
-					                    .items(articulos)
-					                    .proveedor(proveedorId)
-					                    .nombre(nombreLista)
-					                    .build());
+			ListaPreciosRequest listaPreciosRequest = new ListaPreciosRequest();
+			listaPreciosRequest.setItems(articulos);
+			listaPreciosRequest.setProveedor(proveedorId);
+			listaPreciosRequest.setNombre(nombreLista);
+			crearListaDePrecios(listaPreciosRequest);
 			
 		} catch (Exception e) {
 			throw new RuntimeException("Error al procesar el archivo CSV", e);

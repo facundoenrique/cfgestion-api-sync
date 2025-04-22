@@ -19,4 +19,5 @@ public class ItemListaPreciosRequest {
 	private String marca;
 	private String descripcion;
 	private BigDecimal iva;
+	private Integer unidadesPorBulto;
 }

@@ -160,28 +160,27 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 		if (preVenta.getListaBaseId() != null && dto.getArticulos().stream().anyMatch(item -> item.getId() == null)) {
 			dto.getArticulos().stream().filter(item -> item.getId() == null)
 					                         .forEach(itemDTO -> {
-						                         ArticuloRequest.ArticuloRequestBuilder articuloRequestBuilder =
-								                         ArticuloRequest.builder()
-										                         .numero(itemDTO.getNumero())
-										                         .nombre(itemDTO.getNombre())
-										                         .precio(itemDTO.getImporte())
-										                         .iva(itemDTO.getIva())
-										                         .cantidad(1)
-										                         .eliminado(0)
-										                         .defecto(itemDTO.getUnidadesPorVulto());
+												 ArticuloRequest articuloRequest = new ArticuloRequest();
+						                         articuloRequest.setNumero(itemDTO.getNumero());
+						                         articuloRequest.setNombre(itemDTO.getNombre());
+						                         articuloRequest.setPrecio(itemDTO.getImporte());
+						                         articuloRequest.setIva(itemDTO.getIva());
+						                         articuloRequest.setCantidad(1);
+						                         articuloRequest.setEliminado(0);
+						                         articuloRequest.setDefecto(itemDTO.getUnidadesPorVulto());
 						                         Optional<Articulo> existing =
 								                         articuloRepository.findByNumero(itemDTO.getNumero());
 												 
 						                         if (existing.isPresent()) {
-							                         articuloRequestBuilder.id(existing.get().getId());
+							                         articuloRequest.setId(existing.get().getId());
 						                         } else {
 							                        Articulo articulo =
-									                        articuloRepository.save(articuloMapper.toEntity(articuloRequestBuilder.build()));
-							                         articuloRequestBuilder.id(articulo.getId());
+									                        articuloRepository.save(articuloMapper.toEntity(articuloRequest));
+							                         articuloRequest.setId(articulo.getId());
 						                         }
 												 
 						                         ArticuloDTO articuloDTO =
-								                         listaPreciosService.addItem(articuloRequestBuilder.build(),
+								                         listaPreciosService.addItem(articuloRequest,
 										                         preVenta.getListaBaseId());
 						
 						                         articulos.stream()

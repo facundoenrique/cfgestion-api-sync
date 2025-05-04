@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.adapter.outbound.entities.Certificado;
+import org.api_sync.adapter.outbound.entities.Cliente;
 import org.api_sync.adapter.outbound.repository.AuthenticationRepository;
 import org.api_sync.adapter.outbound.repository.CertificadosRepository;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.util.Optional;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
@@ -22,26 +24,23 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AfipAuthentificationService {
+public class AfipAuthentificationClient {
 
     private final CertificadosRepository certificadosRepository;
     private final AuthenticationRepository authenticationRepository;
     private final AfipLoginClient afipLoginClient;
 
-    public Authentication getAuthentication(Long empresaId, Integer puntoVenta) throws Exception {
+    public Authentication getAuthentication(Cliente client, Integer puntoVenta) throws Exception {
 
         String loginTicketResponse = null;
         System.setProperty("http.proxyHost", "");
         System.setProperty("http.proxyPort", "80");
 
-        String endpoint = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
         String service = "wsfe";
         String dstDN = "cn=wsaa,o=afip,c=ar,serialNumber=CUIT 33693450239"; //ambiente de homologacion
-        endpoint = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
+        String endpoint = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
         
         String signer = "facu";
-        String p12pass = "mastermix";
-        
         
         // Get token & sign from LoginTicketResponse
 
@@ -50,20 +49,26 @@ public class AfipAuthentificationService {
         String sign = EMPTY;
         String expirationTime = EMPTY;
         
-        Authentication authentication = authenticationRepository.findByEmpresaAndPuntoVenta(empresaId, puntoVenta);
+        Optional<Authentication> authenticationOptional =
+                authenticationRepository.findByCuitAndPuntoVenta(client.getCuit(), puntoVenta);
         
-        if (authentication.expired() && authentication.isValid()) {
-            return authentication;
+        
+        if (authenticationOptional.isPresent() && !authenticationOptional.get().expired() && authenticationOptional.get().isValid()) {
+            return authenticationOptional.get();
         } else { //tengo que obtener nuevas llaves
     
             // Invoke AFIP wsaa and get LoginTicketResponse
             
-            Certificado certificado = certificadosRepository.findByEmpresaAndPuntoVenta(empresaId, puntoVenta);
+            Optional<Certificado> certificado = certificadosRepository.findByCuitAndPuntoVenta(client.getCuit(), puntoVenta);
+            
+            if (!certificado.isPresent()) {
+                throw new RuntimeException("No hay certificado para el pv: " + puntoVenta);
+            }
             
             // Create LoginTicketRequest_xml_cms
             byte[] loginTicketRequest_xml_cms = afipLoginClient.create_cms(
-                    certificado.getArchivo(),
-                    certificado.getPassword(),
+                    certificado.get().getArchivo(),
+                    certificado.get().getPassword(),
                     signer, dstDN, service);
             
             log.info("Llaves vencidas, creando nuevas");
@@ -86,6 +91,8 @@ public class AfipAuthentificationService {
                 log.debug("ExpirationTime: " + expirationTime);
                 
                 writeKeys(Authentication.builder()
+                                  .cuit(client.getCuit())
+                                  .puntoVenta(puntoVenta)
                                   .token(token)
                                   .sign(sign)
                                   .expirationTime(expirationTime)
@@ -95,6 +102,8 @@ public class AfipAuthentificationService {
 
         if (StringUtils.isNotBlank(token)) {
             return Authentication.builder()
+                           .cuit(client.getCuit())
+                           .puntoVenta(puntoVenta) //este lo uso para representar la pc
                            .token(token)
                            .sign(sign)
                            .expirationTime(expirationTime)

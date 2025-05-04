@@ -2,7 +2,6 @@ package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.Date;
 
 @Entity
@@ -16,6 +15,7 @@ public class Certificado {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@Lob
 	@Column(nullable = false)
 	private byte[] archivo;
 	@Column(nullable = false)
@@ -24,9 +24,7 @@ public class Certificado {
 	private Integer puntoVenta;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaCreado;
-
-	@ManyToOne
-	@JoinColumn(name = "empresa_id", nullable = false)
-	private Cliente cliente;
+	@Column(name = "cuit", nullable = false, length = 20)
+	private String cuit;
 
 }

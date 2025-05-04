@@ -16,7 +16,7 @@ public class Certificado {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	@Lob
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "BLOB")
 	private byte[] archivo;
 	@Column(nullable = false)
 	private String password;

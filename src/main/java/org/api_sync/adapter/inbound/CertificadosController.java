@@ -14,7 +14,7 @@ public class CertificadosController {
 
 	private final CertificadosService certificadoService;
 
-	@PostMapping("/cargar")
+	@PostMapping
 	public ResponseEntity<String> subirCertificado(
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("punto_venta") Integer puntoVenta,

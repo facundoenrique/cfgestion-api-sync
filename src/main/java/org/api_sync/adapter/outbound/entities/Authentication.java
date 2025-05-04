@@ -24,16 +24,16 @@ public class Authentication {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	@Column(name = "id", nullable = false)
 	private Long id;
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String token;
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String sign;
 	@Column(nullable = false)
 	private String expirationTime;
 	@Column(nullable = false)
 	private Integer puntoVenta;
-	@Column(nullable = false)
-	private Long empresaId;
+	@Column(name = "cuit", nullable = false, length = 20)
+	private String cuit;
 	
 	public Long getId() {
 		return id;

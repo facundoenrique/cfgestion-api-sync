@@ -47,7 +47,7 @@ public class Authentication {
 		Date dateActual = new Date();
 		DateFormat hourdateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String aux =
-				"" + expirationTime.substring(0, expirationTime.indexOf("T")) + " " + expirationTime.substring(expirationTime.indexOf("T") + 1, expirationTime.indexOf("T") + 9);
+				expirationTime.substring(0, expirationTime.indexOf("T")) + " " + expirationTime.substring(expirationTime.indexOf("T") + 1, expirationTime.indexOf("T") + 9);
 		Date expira = null;
 		try {
 			expira = hourdateFormat.parse(aux);

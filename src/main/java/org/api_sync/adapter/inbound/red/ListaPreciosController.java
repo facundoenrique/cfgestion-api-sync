@@ -1,9 +1,10 @@
-package org.api_sync.adapter.inbound;
+package org.api_sync.adapter.inbound.red;
 
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.api_sync.adapter.inbound.Response;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.inbound.request.ListaPreciosRequest;
 import org.api_sync.adapter.inbound.request.ListaPreciosUpdateRequest;
@@ -64,8 +65,8 @@ public class ListaPreciosController {
 
 	@PostMapping("/cargar")
 	public ResponseEntity<Response> cargarListaPrecios(@RequestParam("file") MultipartFile file,
-	                                                 @RequestParam("proveedor") Long proveedorId,
-	                                                 @RequestParam("nombre_lista") String nombre) {
+	                                                   @RequestParam("proveedor") Long proveedorId,
+	                                                   @RequestParam("nombre_lista") String nombre) {
 		listaPreciosService.procesarArchivo(file, proveedorId, nombre);
 		Response response = new Response("Archivo procesado correctamente", "ok");
 		log.info("Archivo procesado correctamente");

@@ -1,4 +1,4 @@
-package org.api_sync.adapter.inbound;
+package org.api_sync.adapter.inbound.gestion;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.services.afip.AfipCaeService;

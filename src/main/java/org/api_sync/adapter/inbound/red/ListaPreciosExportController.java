@@ -1,4 +1,4 @@
-package org.api_sync.adapter.inbound;
+package org.api_sync.adapter.inbound.red;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

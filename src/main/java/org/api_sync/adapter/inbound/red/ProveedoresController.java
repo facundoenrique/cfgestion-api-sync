@@ -1,4 +1,4 @@
-package org.api_sync.adapter.inbound;
+package org.api_sync.adapter.inbound.red;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

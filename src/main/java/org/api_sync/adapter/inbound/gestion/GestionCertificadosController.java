@@ -2,17 +2,20 @@ package org.api_sync.adapter.inbound.gestion;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.outbound.entities.Certificado;
-import org.api_sync.services.certificados.CertificadosService;
+import org.api_sync.services.gestion.certificados.GestionCertificadosService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/certificados")
+@RequestMapping("gestion/certificados")
 @RequiredArgsConstructor
-public class CertificadosController {
+public class GestionCertificadosController {
 
-	private final CertificadosService certificadoService;
+	private final GestionCertificadosService certificadoService;
 
 	@PostMapping
 	public ResponseEntity<String> subirCertificado(

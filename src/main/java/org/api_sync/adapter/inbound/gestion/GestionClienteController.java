@@ -1,13 +1,10 @@
-package org.api_sync.adapter.inbound.red;
+package org.api_sync.adapter.inbound.gestion;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.gestion.request.GestionClienteRequest;
-import org.api_sync.adapter.inbound.request.ClienteRequest;
 import org.api_sync.adapter.inbound.responses.ClienteResponse;
-import org.api_sync.adapter.outbound.entities.Cliente;
 import org.api_sync.adapter.outbound.entities.gestion.GestionCliente;
-import org.api_sync.services.clientes.ClienteService;
 import org.api_sync.services.gestion.clientes.GestionClienteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

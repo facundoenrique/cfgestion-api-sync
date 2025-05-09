@@ -30,90 +30,86 @@ public class AfipAuthentificationClient {
     private final AuthenticationRepository authenticationRepository;
     private final AfipLoginClient afipLoginClient;
 
-    public Authentication getAuthentication(Cliente client, Integer puntoVenta) throws Exception {
+    public Authentication getAuthentication(String cuit, Integer puntoVenta) throws Exception {
 
+        
+        Optional<Authentication> authenticationOptional =
+                authenticationRepository.findByCuitAndPuntoVenta(cuit, puntoVenta);
+                
+        if (authenticationOptional.isPresent() && !authenticationOptional.get().expired() && authenticationOptional.get().isValid()) {
+            return authenticationOptional.get();
+        } else { //tengo que obtener nuevas llaves
+            return generateNewToken(cuit, puntoVenta);
+        }
+
+    }
+
+    private Authentication generateNewToken(String cuit, Integer puntoVenta) throws Exception {
+    
+    
         String loginTicketResponse = null;
         System.setProperty("http.proxyHost", "");
         System.setProperty("http.proxyPort", "80");
-
+    
         String service = "wsfe";
         String dstDN = "cn=wsaa,o=afip,c=ar,serialNumber=CUIT 33693450239"; //ambiente de homologacion
         String endpoint = "https://wsaa.afip.gov.ar/ws/services/LoginCms";
-        
+    
         String signer = "facu";
-        
+    
         // Get token & sign from LoginTicketResponse
-
-
+    
+    
         String token = EMPTY;
         String sign = EMPTY;
         String expirationTime = EMPTY;
         
-        Optional<Authentication> authenticationOptional =
-                authenticationRepository.findByCuitAndPuntoVenta(client.getCuit(), puntoVenta);
-        
-        
-        if (authenticationOptional.isPresent() && !authenticationOptional.get().expired() && authenticationOptional.get().isValid()) {
-            return authenticationOptional.get();
-        } else { //tengo que obtener nuevas llaves
+        Optional<Certificado> certificado = certificadosRepository.findByCuitAndPuntoVenta(cuit, puntoVenta);
     
-            // Invoke AFIP wsaa and get LoginTicketResponse
-            
-            Optional<Certificado> certificado = certificadosRepository.findByCuitAndPuntoVenta(client.getCuit(), puntoVenta);
-            
-            if (!certificado.isPresent()) {
-                throw new RuntimeException("No hay certificado para el pv: " + puntoVenta);
-            }
-            
-            // Create LoginTicketRequest_xml_cms
-            byte[] loginTicketRequest_xml_cms = afipLoginClient.create_cms(
-                    certificado.get().getArchivo(),
-                    certificado.get().getPassword(),
-                    signer, dstDN, service);
-            
-            log.info("Llaves vencidas, creando nuevas");
-            loginTicketResponse = afipLoginClient.invoke_wsaa(loginTicketRequest_xml_cms, endpoint);
-            
-            if (loginTicketResponse != null) {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document document = builder.parse(new org.xml.sax.InputSource(new StringReader(loginTicketResponse)));
-    
-                XPathFactory xpathFactory = XPathFactory.newInstance();
-                XPath xpath = xpathFactory.newXPath();
-    
-                token = xpath.evaluate("/loginTicketResponse/credentials/token", document);
-                sign = xpath.evaluate("/loginTicketResponse/credentials/sign", document);
-                expirationTime = xpath.evaluate("/loginTicketResponse/header/expirationTime", document);
-    
-                log.debug("Token: " + token);
-                log.debug("Sign: " + sign);
-                log.debug("ExpirationTime: " + expirationTime);
-                
-                writeKeys(Authentication.builder()
-                                  .cuit(client.getCuit())
-                                  .puntoVenta(puntoVenta)
-                                  .token(token)
-                                  .sign(sign)
-                                  .expirationTime(expirationTime)
-                                  .build());
-            }
+        if (!certificado.isPresent()) {
+            throw new RuntimeException("No hay certificado para el pv: " + puntoVenta);
         }
-
-        if (StringUtils.isNotBlank(token)) {
-            return Authentication.builder()
-                           .cuit(client.getCuit())
-                           .puntoVenta(puntoVenta) //este lo uso para representar la pc
-                           .token(token)
-                           .sign(sign)
-                           .expirationTime(expirationTime)
-                           .build();
+    
+        // Create LoginTicketRequest_xml_cms
+        byte[] loginTicketRequest_xml_cms = afipLoginClient.create_cms(
+                certificado.get().getArchivo(),
+                certificado.get().getPassword(),
+                signer, dstDN, service);
+    
+        log.info("Llaves vencidas, creando nuevas");
+        loginTicketResponse = afipLoginClient.invoke_wsaa(loginTicketRequest_xml_cms, endpoint);
+    
+        if (loginTicketResponse != null) {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new org.xml.sax.InputSource(new StringReader(loginTicketResponse)));
+        
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPath xpath = xpathFactory.newXPath();
+        
+            token = xpath.evaluate("/loginTicketResponse/credentials/token", document);
+            sign = xpath.evaluate("/loginTicketResponse/credentials/sign", document);
+            expirationTime = xpath.evaluate("/loginTicketResponse/header/expirationTime", document);
+        
+            log.debug("Token: " + token);
+            log.debug("Sign: " + sign);
+            log.debug("ExpirationTime: " + expirationTime);
+        
+            Authentication authentication = Authentication.builder()
+                                                    .cuit(cuit)
+                                                    .puntoVenta(puntoVenta)
+                                                    .token(token)
+                                                    .sign(sign)
+                                                    .expirationTime(expirationTime)
+                                                    .build();
+            
+            writeKeys(authentication);
+            return authentication;
         }
-
+        
         throw new Exception("Token invalido");
-
     }
-
+    
     private void writeKeys(Authentication authentication) {
 
         authenticationRepository.save(authentication);

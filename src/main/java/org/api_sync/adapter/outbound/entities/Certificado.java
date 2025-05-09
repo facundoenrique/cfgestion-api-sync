@@ -2,6 +2,8 @@ package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.api_sync.domain.Origen;
+
 import java.util.Date;
 
 @Entity
@@ -26,5 +28,6 @@ public class Certificado {
 	private Date fechaCreado;
 	@Column(name = "cuit", nullable = false, length = 20)
 	private String cuit;
-
+	@Enumerated(EnumType.STRING)
+	private Origen origen;
 }

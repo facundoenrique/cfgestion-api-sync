@@ -29,8 +29,8 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, String>> login(@RequestParam String username,
 	                                                 @RequestParam String password,
-	                                                 @RequestParam String pcName,
-	                                                 @RequestParam Integer puntoVentaFacturacion) {
+	                                                 @RequestParam("pc_name") String pcName,
+	                                                 @RequestParam("punto_venta_facturacion") Integer puntoVentaFacturacion) {
 		
 		Optional<Usuario> user = usuarioService.login(username, password);
 		

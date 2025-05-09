@@ -17,7 +17,8 @@ public class AfipCaeService {
 	private final ClienteRepository clienteRepository;
 	private final EmpresaRepository empresaRepository;
 	
-	public Integer consultarUltimoComprobante(Long clientId, Integer certificadoPuntoVenta, Integer puntoVenta) {
+	public Integer consultarUltimoComprobanteByCliente(Long clientId, Integer certificadoPuntoVenta,
+	                                                  Integer puntoVenta) {
 		
 		Cliente cliente = clienteRepository.findById(clientId)
 				                  .orElseThrow(() -> new RuntimeException("No existe el cliente"));

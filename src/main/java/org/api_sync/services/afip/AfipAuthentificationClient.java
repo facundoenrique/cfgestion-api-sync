@@ -2,10 +2,8 @@ package org.api_sync.services.afip;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.adapter.outbound.entities.Certificado;
-import org.api_sync.adapter.outbound.entities.Cliente;
 import org.api_sync.adapter.outbound.repository.AuthenticationRepository;
 import org.api_sync.adapter.outbound.repository.CertificadosRepository;
 import org.springframework.stereotype.Service;
@@ -13,10 +11,10 @@ import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.util.Optional;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
+import java.io.StringReader;
+import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
@@ -64,7 +62,8 @@ public class AfipAuthentificationClient {
         String sign = EMPTY;
         String expirationTime = EMPTY;
         
-        Optional<Certificado> certificado = certificadosRepository.findByCuitAndPuntoVenta(cuit, puntoVenta);
+        Optional<Certificado> certificado
+                = certificadosRepository.findTopByCuitAndPuntoVentaOrderByFechaCreadoDesc(cuit, puntoVenta);
     
         if (!certificado.isPresent()) {
             throw new RuntimeException("No hay certificado para el pv: " + puntoVenta);

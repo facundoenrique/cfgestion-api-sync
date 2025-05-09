@@ -1,23 +1,15 @@
-package org.api_sync.adapter.outbound.entities;
+package org.api_sync.adapter.inbound.gestion.request;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "red_clientes") //tendria que ser "socios" ?
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
-public class Cliente {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@Column(nullable = false)
+@Data
+public class GestionClienteRequest {
+	private Integer id;
+	@NotEmpty(message = "La razon social no puede estar vacía")
 	private String razonSocial;
 	private String domicilio;
 	private Integer localidad;
@@ -27,29 +19,19 @@ public class Cliente {
 	private String telefono;
 	private String fax;
 	private String telefono2;
-	@Column(nullable = false)
+	@NotNull(message = "Condicion iva no puede estar vacía")
 	private Short condicionIva;
 	private Short enviado;
-	
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaIngreso;
-	
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaNacimiento;
-	
 	private Short listaPrecio;
-	
-	@Column(unique = true)
 	private String cuit;
-	
 	private Integer sucursal;
-	
-	@Column(unique = true)
 	private String email;
-	
 	private Double saldoCuenta;
 	private Short pais;
-	private Short empresa;
+	@NotNull
+	private Long empresa;
 	private Short tipoDni;
 	private String web;
 	private Integer empleado;
@@ -71,6 +53,4 @@ public class Cliente {
 	private Short noVender;
 	private Short formaPago;
 	private String ingresosBrutos;
-
-
 }

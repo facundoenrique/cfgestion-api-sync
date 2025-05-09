@@ -1,4 +1,4 @@
-package org.api_sync.adapter.outbound.entities;
+package org.api_sync.adapter.outbound.entities.gestion;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,13 +6,13 @@ import lombok.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "red_clientes") //tendria que ser "socios" ?
+@Table(name = "clientes")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
-public class Cliente {
+public class GestionCliente {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -49,7 +49,9 @@ public class Cliente {
 	
 	private Double saldoCuenta;
 	private Short pais;
-	private Short empresa;
+	@OneToOne
+	@JoinColumn(name = "empresa", nullable = false)
+	private Empresa empresa;
 	private Short tipoDni;
 	private String web;
 	private Integer empleado;

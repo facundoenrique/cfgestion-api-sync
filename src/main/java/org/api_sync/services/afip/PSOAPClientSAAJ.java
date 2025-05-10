@@ -19,9 +19,9 @@ public class PSOAPClientSAAJ {
 
     private static final String soapActionFECAESolicitar = "http://ar.gov.afip.dif.FEV1/FECAESolicitar";
     private static final String soapEndpointUrl = "https://servicios1.afip.gov.ar/wsfev1/service.asmx?WSDL";
-    private static String token;
-    private static String sign;
-    private static String cuit;
+    private final String token;
+    private final String sign;
+    private final String cuit;
     private String message;
 
 
@@ -32,36 +32,27 @@ public class PSOAPClientSAAJ {
     }
 
     // SAAJ - SOAP Client Testing
-    public CaeResponse llamarFECAESolicitar(ComprobanteRequest comprobanteRequest) {
+    public CaeDTO getCae(ComprobanteRequest comprobanteRequest) {
         log.info("Ejecutando pegada a FECAESolicitar");
-
-        //	String token2= "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8c3NvIHZlcnNpb249IjIuMCI+CiAgICA8aWQgc3JjPSJDTj13c2FhaG9tbywgTz1BRklQLCBDPUFSLCBTRVJJQUxOVU1CRVI9Q1VJVCAzMzY5MzQ1MDIzOSIgZHN0PSJDTj13c2ZlLCBPPUFGSVAsIEM9QVIiIHVuaXF1ZV9pZD0iMjg2NDQ0OTQ0MyIgZ2VuX3RpbWU9IjE1Njk5ODkyODMiIGV4cF90aW1lPSIxNTcwMDMyNTQzIi8+CiAgICA8b3BlcmF0aW9uIHR5cGU9ImxvZ2luIiB2YWx1ZT0iZ3JhbnRlZCI+CiAgICAgICAgPGxvZ2luIGVudGl0eT0iMzM2OTM0NTAyMzkiIHNlcnZpY2U9IndzZmUiIHVpZD0iU0VSSUFMTlVNQkVSPUNVSVQgMjcxNjYwODAwOTEsIENOPWxsYXZlbnVldmEiIGF1dGhtZXRob2Q9ImNtcyIgcmVnbWV0aG9kPSIyMiI+CiAgICAgICAgICAgIDxyZWxhdGlvbnM+CiAgICAgICAgICAgICAgICA8cmVsYXRpb24ga2V5PSIyNzE2NjA4MDA5MSIgcmVsdHlwZT0iNCIvPgogICAgICAgICAgICA8L3JlbGF0aW9ucz4KICAgICAgICA8L2xvZ2luPgogICAgPC9vcGVyYXRpb24+Cjwvc3NvPgo=";
-        //   String sign2= "lCrfvBIsFF28Yd/H8/LU74YvCIvuwUAm+8GpddDzDGp8j6gB/o8PhxGRBtibDPgY5N5kNzout5FPtCr3enRM0CKfT0evQlqvr0mR6zEroCVaMGtWVK+q199qFiALzmToBYaD/65u2Gr6Dth54lrUU6q6uBDAd345B5wOHB6Rlvk=";
-        //  String cuit2 = "27166080091";
 
         return callSoapWebService(soapEndpointUrl, soapActionFECAESolicitar, comprobanteRequest);
     }
 
-    public Integer llamarUltimaFE(int punto_venta) {
-
-        //produccion
-        // String soapEndpointUrl = " https://wsaa.afip.gov.ar/ws/services/service.asmx?op=FECompUltimoAutorizado";
-        //String soapAction = "http://ar.gov.afip.dif.FEV1/FECompUltimoAutorizado";
-
+    public Integer searchUltimaFacturaElectronica(int punto_venta, int tipoComprobante) {
         String soapAction = "http://ar.gov.afip.dif.FEV1/FECompUltimoAutorizado";
 
-        return callSoapWebServiceUltimaFE(soapEndpointUrl, soapAction, punto_venta);
+        return callSoapWebServiceUltimaFE(soapEndpointUrl, soapAction, punto_venta, tipoComprobante);
     }
 
 
-    private Integer callSoapWebServiceUltimaFE(String soapEndpointUrl, String soapAction, int punto_venta) {
+    private Integer callSoapWebServiceUltimaFE(String soapEndpointUrl, String soapAction, int punto_venta, int tipoComprobante) {
         try {
             // Create SOAP Connection
             SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
             SOAPConnection soapConnection = soapConnectionFactory.createConnection();
 
             // Send SOAP Message to SOAP Server
-            SOAPMessage soapResponse = soapConnection.call(createSOAPRequestUltimaFE(soapAction, punto_venta), soapEndpointUrl);
+            SOAPMessage soapResponse = soapConnection.call(createSOAPRequestUltimaFE(soapAction, punto_venta, tipoComprobante), soapEndpointUrl);
 
             // Print the SOAP Response
             soapResponse.writeTo(System.out);
@@ -91,7 +82,7 @@ public class PSOAPClientSAAJ {
     }
 
 
-    private static SOAPMessage createSOAPRequestUltimaFE(String soapAction, int punto_venta) throws Exception {
+    private SOAPMessage createSOAPRequestUltimaFE(String soapAction, int punto_venta, int tipoComprobante) throws Exception {
 
     	
     	/*
@@ -101,7 +92,7 @@ public class PSOAPClientSAAJ {
     	 */
 
         //cambie las 3 lineas anteriores por la siguiente.
-        SOAPMessage soapMessage = createMesaggeUltimaFE(punto_venta);
+        SOAPMessage soapMessage = createMesaggeUltimaFE(punto_venta, tipoComprobante);
 
         MimeHeaders headers = soapMessage.getMimeHeaders();
         headers.addHeader("SOAPAction", soapAction);
@@ -118,7 +109,7 @@ public class PSOAPClientSAAJ {
     }
 
 
-    private static SOAPMessage createMesaggeUltimaFE(int punto_venta) {
+    private SOAPMessage createMesaggeUltimaFE(int punto_venta, int tipoComprobante) {
 
 
         String soapMessageWithLeadingComment =
@@ -131,7 +122,7 @@ public class PSOAPClientSAAJ {
                 + "<Cuit>" + cuit + "</Cuit>"
                 + "</Auth>"
                 + "<PtoVta>" + punto_venta + "</PtoVta>"
-                + "<CbteTipo>6</CbteTipo>"
+                + "<CbteTipo>" + tipoComprobante + "</CbteTipo>"
                 + "</FECompUltimoAutorizado>"
                 + "</SOAP-ENV:Body>"
                 + "</SOAP-ENV:Envelope>";
@@ -227,7 +218,7 @@ public class PSOAPClientSAAJ {
         return null;
     }
 
-    private static SOAPMessage createSOAPRequestFECompConsultar(String soapAction, int punto_venta, int nroComp, int cbteTipo) throws Exception {
+    private SOAPMessage createSOAPRequestFECompConsultar(String soapAction, int punto_venta, int nroComp, int cbteTipo) throws Exception {
 
     	
     	/*
@@ -254,7 +245,7 @@ public class PSOAPClientSAAJ {
     }
 
 
-    private static SOAPMessage createMesaggeFECompConsultar(int punto_venta, int nroComp, int cbteTipo) {
+    private SOAPMessage createMesaggeFECompConsultar(int punto_venta, int nroComp, int cbteTipo) {
 
         String soapMessageWithLeadingComment =
                 "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
@@ -340,7 +331,7 @@ public class PSOAPClientSAAJ {
     }
 
 
-    private static SOAPMessage createSOAPRequestCompUltimoAutorizado(String soapAction, int punto_venta, int cbteTipo) throws Exception {
+    private SOAPMessage createSOAPRequestCompUltimoAutorizado(String soapAction, int punto_venta, int cbteTipo) throws Exception {
 
     	
     	/*
@@ -367,7 +358,7 @@ public class PSOAPClientSAAJ {
     }
 
 
-    private static SOAPMessage createMesaggeCompUltimoAutorizado(int punto_venta, int cbteTipo) {
+    private SOAPMessage createMesaggeCompUltimoAutorizado(int punto_venta, int cbteTipo) {
 
 
         String soapMessageWithLeadingComment =
@@ -405,7 +396,7 @@ public class PSOAPClientSAAJ {
     }
 
 
-    private CaeResponse callSoapWebService(String soapEndpointUrl, String soapAction, ComprobanteRequest comprobanteRequest) {
+    private CaeDTO callSoapWebService(String soapEndpointUrl, String soapAction, ComprobanteRequest comprobanteRequest) {
         String resultado = EMPTY;
         String codeError = EMPTY;
         String mesaggeError = EMPTY;
@@ -451,11 +442,11 @@ public class PSOAPClientSAAJ {
             return null;
 
         }
-        return CaeResponse.builder()
+        return CaeDTO.builder()
                        .cae(cae)
                        .caeFechaVto(caeFchVto)
                        .codeError(codeError)
-                       .mesaggeError(mesaggeError)
+                       .messageError(mesaggeError)
                        .build();
     }
 

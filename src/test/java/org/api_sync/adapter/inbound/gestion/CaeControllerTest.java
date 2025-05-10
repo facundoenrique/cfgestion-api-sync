@@ -1,6 +1,6 @@
 package org.api_sync.adapter.inbound.gestion;
 
-import org.api_sync.services.afip.AfipCaeService;
+import org.api_sync.services.afip.AfipConsultarCaeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 class CaeControllerTest {
 
     @Mock
-    private AfipCaeService afipCaeService;
+    private AfipConsultarCaeService afipCaeService;
 
     @InjectMocks
     private CaeController caeController;
@@ -31,15 +31,16 @@ class CaeControllerTest {
         Integer certificadoPuntoVenta = 1;
         Integer expectedComprobante = 12345;
 
-        when(afipCaeService.consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta, puntoVenta))
+        when(afipCaeService.consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta, puntoVenta, 0))
                 .thenReturn(expectedComprobante);
 
         // Act
-        Integer result = caeController.ultimo(empresa, puntoVenta, certificadoPuntoVenta);
+        Integer result = caeController.ultimo(empresa, puntoVenta, certificadoPuntoVenta, 0);
 
         // Assert
         assertEquals(expectedComprobante, result);
-        verify(afipCaeService, times(1)).consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta, puntoVenta);
+        verify(afipCaeService, times(1)).consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta,
+                puntoVenta, 0);
     }
 
     @Test
@@ -50,14 +51,15 @@ class CaeControllerTest {
         Integer certificadoPuntoVenta = 2;
         Integer expectedComprobante = 54321;
 
-        when(afipCaeService.consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta, puntoVenta))
+        when(afipCaeService.consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta, puntoVenta, 0))
                 .thenReturn(expectedComprobante);
 
         // Act
-        Integer result = caeController.ultimo(empresa, puntoVenta, certificadoPuntoVenta);
+        Integer result = caeController.ultimo(empresa, puntoVenta, certificadoPuntoVenta, 0);
 
         // Assert
         assertEquals(expectedComprobante, result);
-        verify(afipCaeService, times(1)).consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta, puntoVenta);
+        verify(afipCaeService, times(1)).consultarUltimoComprobanteByEmpresa(empresa, certificadoPuntoVenta,
+                puntoVenta, 0);
     }
 } 

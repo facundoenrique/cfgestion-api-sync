@@ -17,7 +17,7 @@ public class FilterConfig {
 	public FilterRegistrationBean<JwtFilter> jwtFilterRegistration() {
 		FilterRegistrationBean<JwtFilter> registration = new FilterRegistrationBean<>();
 		registration.setFilter(jwtFilter);
-		registration.addUrlPatterns("/certificados/*", "");
+		registration.addUrlPatterns("/empresas/cae/*");
 		registration.setOrder(1);
 		return registration;
 	}

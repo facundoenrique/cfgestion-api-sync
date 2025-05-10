@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class AfipCaeService {
+public class AfipConsultarCaeService {
 	private final AfipAuthentificationClient afipAuthentificationClient;
 	private final ClienteRepository clienteRepository;
 	private final EmpresaRepository empresaRepository;
 	
 	public Integer consultarUltimoComprobanteByCliente(Long clientId, Integer certificadoPuntoVenta,
-	                                                  Integer puntoVenta) {
+	                                                  Integer puntoVenta,
+													  Integer tipoComprobante) {
 		
 		Cliente cliente = clienteRepository.findById(clientId)
 				                  .orElseThrow(() -> new RuntimeException("No existe el cliente"));
@@ -28,7 +29,7 @@ public class AfipCaeService {
 			
 			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(auth.getToken(), auth.getSign(), cliente.getCuit());
 
-			Integer ultimoComprobante = psoapClientSAAJ.llamarUltimaFE(puntoVenta);
+			Integer ultimoComprobante = psoapClientSAAJ.searchUltimaFacturaElectronica(puntoVenta, tipoComprobante);
 			
 			log.info("Ultimo comprabante {} en punto de venta :{}", ultimoComprobante, puntoVenta);
 			
@@ -37,21 +38,21 @@ public class AfipCaeService {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
-		return 0;
+		return -1;
 	}
 
 	public Integer consultarUltimoComprobanteByEmpresa(Long empresaId, Integer certificadoPuntoVenta,
-	                                                  Integer puntoVenta) {
+	                                                  Integer puntoVenta, Integer tipoComprobante) {
 		
 		Empresa empresa = empresaRepository.findById(empresaId)
-				                  .orElseThrow(() -> new RuntimeException("No existe el cliente"));
+				                  .orElseThrow(() -> new RuntimeException("No existe la empresa"));
 		
 		try {
 			Authentication auth = afipAuthentificationClient.getAuthentication(empresa.getCuit(), certificadoPuntoVenta);
 			
 			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(auth.getToken(), auth.getSign(), empresa.getCuit());
 			
-			Integer ultimoComprobante = psoapClientSAAJ.llamarUltimaFE(puntoVenta);
+			Integer ultimoComprobante = psoapClientSAAJ.searchUltimaFacturaElectronica(puntoVenta, tipoComprobante);
 			
 			log.info("Ultimo comprabante {} en punto de venta :{}", ultimoComprobante, puntoVenta);
 			
@@ -60,7 +61,7 @@ public class AfipCaeService {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
-		return 0;
+		return -1;
 	}
 	
 }

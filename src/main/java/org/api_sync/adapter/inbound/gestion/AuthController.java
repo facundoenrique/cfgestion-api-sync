@@ -29,7 +29,8 @@ public class AuthController {
 			@RequestParam("password") String password,
 			@RequestParam("pc_name") String pcName,
 			@RequestParam("punto_venta") Integer puntoVenta,
-			@RequestParam("empresa_uuid") String empresaUuid) {
+			@RequestParam("empresa_uuid") String empresaUuid,
+			@RequestParam("sucursal") Integer sucursalId) {
 		
 		// Validar que los campos no estén vacíos
 		if (username == null || username.trim().isEmpty() ||
@@ -39,10 +40,10 @@ public class AuthController {
 			return ResponseEntity.badRequest().body("Todos los campos son requeridos");
 		}
 
-		Optional<Usuario> user = usuarioService.login(username, password, empresaUuid);
+		Optional<Usuario> user = usuarioService.login(username, password, empresaUuid, sucursalId);
 		
 		if (user.isPresent()) {
-			String accessToken = jwtUtil.generateAccessToken(user.get(), pcName, puntoVenta);
+			String accessToken = jwtUtil.generateAccessToken(user.get(), pcName, puntoVenta, empresaUuid, sucursalId);
 			String refreshToken = jwtUtil.generateRefreshToken(username);
 			refreshTokens.add(refreshToken);
 			
@@ -66,7 +67,7 @@ public class AuthController {
 			String username = jwtUtil.getUsername(refreshToken);
 			Usuario user = usuarioService.findBy(username);
 			
-			String newAccessToken = jwtUtil.generateAccessToken(user, "unknown", 0);
+			String newAccessToken = jwtUtil.generateAccessToken(user, "unknown", 0, "unknown", 0);
 			
 			Map<String, String> tokens = new HashMap<>();
 			tokens.put("accessToken", newAccessToken);

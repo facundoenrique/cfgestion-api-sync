@@ -12,12 +12,14 @@ import java.util.Date;
 public class JwtUtil {
 	private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-	public String generateAccessToken(Usuario usuario, String pcName, Integer puntoVenta) {
+	public String generateAccessToken(Usuario usuario, String pcName, Integer puntoVenta, String empresaUuid, Integer sucursalId) {
 		return Jwts.builder()
 				       .setSubject(usuario.getNombre())
 				       .claim("pcName", pcName)
 				       .claim("punto_venta", puntoVenta)
 				       .claim("empresa", usuario.getEmpresa())
+				       .claim("sucursal", sucursalId)
+				       .claim("empresa_uuid", empresaUuid)
 				       .setIssuedAt(new Date())
 				       .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 4)) // 4 horas
 				       .signWith(key, SignatureAlgorithm.HS256)

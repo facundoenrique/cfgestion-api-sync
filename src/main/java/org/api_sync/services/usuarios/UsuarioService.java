@@ -17,7 +17,7 @@ public class UsuarioService {
 	private final EmpresaRepository empresaRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public Optional<Usuario> login(String username, String password, String empresaUuid) {
+	public Optional<Usuario> login(String username, String password, String empresaUuid, Integer sucursalId) {
 		Optional<Empresa> empresa = empresaRepository.findByUuid(empresaUuid);
 		if (empresa.isEmpty()) {
 			return Optional.empty();

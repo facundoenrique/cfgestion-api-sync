@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.responses.CaeResponse;
 import org.api_sync.services.afip.AfipConsultarCaeService;
 import org.api_sync.services.afip.AfipGenerarCaeService;
-import org.api_sync.services.afip.ComprobanteRequest;
+import org.api_sync.services.afip.model.ComprobanteRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,6 +29,6 @@ public class CaeController {
 	                          @RequestParam("certificado_punto_venta") Integer certificadoPuntoVenta,
 	                          @RequestBody ComprobanteRequest comprobanteRequest) {
 		
-		return afipGenerarCaeService.generearCae(empresa, certificadoPuntoVenta, comprobanteRequest);
+		return afipGenerarCaeService.generarCae(empresa, certificadoPuntoVenta, comprobanteRequest);
 	}
 }

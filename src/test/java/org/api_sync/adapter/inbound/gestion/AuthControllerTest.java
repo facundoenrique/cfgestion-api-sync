@@ -58,13 +58,14 @@ class AuthControllerTest {
         String pcName = "testpc";
         Integer puntoVenta = 1;
         String empresaUuid = "test-empresa-uuid";
+        Integer sucursal = 0;
 
-        when(usuarioService.login(username, password, empresaUuid)).thenReturn(Optional.of(testUsuario));
-        when(jwtUtil.generateAccessToken(any(Usuario.class), eq(pcName), eq(puntoVenta))).thenReturn(validAccessToken);
+        when(usuarioService.login(username, password, empresaUuid, sucursal)).thenReturn(Optional.of(testUsuario));
+        when(jwtUtil.generateAccessToken(any(Usuario.class), eq(pcName), eq(puntoVenta), eq(empresaUuid), eq(sucursal))).thenReturn(validAccessToken);
         when(jwtUtil.generateRefreshToken(username)).thenReturn(validRefreshToken);
 
         // Act
-        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, empresaUuid);
+        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, empresaUuid, sucursal);
 
         // Assert
         assertNotNull(response);
@@ -73,8 +74,8 @@ class AuthControllerTest {
         assertNotNull(tokens);
         assertEquals(validAccessToken, tokens.get("accessToken"));
         assertEquals(validRefreshToken, tokens.get("refreshToken"));
-        verify(usuarioService, times(1)).login(username, password, empresaUuid);
-        verify(jwtUtil, times(1)).generateAccessToken(testUsuario, pcName, puntoVenta);
+        verify(usuarioService, times(1)).login(username, password, empresaUuid, sucursal);
+        verify(jwtUtil, times(1)).generateAccessToken(testUsuario, pcName, puntoVenta, empresaUuid, sucursal);
         verify(jwtUtil, times(1)).generateRefreshToken(username);
     }
 
@@ -86,18 +87,19 @@ class AuthControllerTest {
         String pcName = "testpc";
         Integer puntoVenta = 1;
         String empresaUuid = "test-empresa-uuid";
+        Integer sucursal = 0;
 
-        when(usuarioService.login(username, password, empresaUuid)).thenReturn(Optional.empty());
+        when(usuarioService.login(username, password, empresaUuid, sucursal)).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, empresaUuid);
+        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, empresaUuid, sucursal);
 
         // Assert
         assertNotNull(response);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Credenciales inválidas", response.getBody());
-        verify(usuarioService, times(1)).login(username, password, empresaUuid);
-        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any());
+        verify(usuarioService, times(1)).login(username, password, empresaUuid, sucursal);
+        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any(), anyString(), any());
         verify(jwtUtil, never()).generateRefreshToken(anyString());
     }
 
@@ -109,18 +111,19 @@ class AuthControllerTest {
         String pcName = "testpc";
         Integer puntoVenta = 1;
         String invalidEmpresaUuid = "invalid-empresa-uuid";
+        Integer sucursal = 0;
 
-        when(usuarioService.login(username, password, invalidEmpresaUuid)).thenReturn(Optional.empty());
+        when(usuarioService.login(username, password, invalidEmpresaUuid, sucursal)).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, invalidEmpresaUuid);
+        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, invalidEmpresaUuid, sucursal);
 
         // Assert
         assertNotNull(response);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Credenciales inválidas", response.getBody());
-        verify(usuarioService, times(1)).login(username, password, invalidEmpresaUuid);
-        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any());
+        verify(usuarioService, times(1)).login(username, password, invalidEmpresaUuid, sucursal);
+        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any(), anyString(), any());
         verify(jwtUtil, never()).generateRefreshToken(anyString());
     }
 
@@ -132,15 +135,16 @@ class AuthControllerTest {
         String pcName = "";
         Integer puntoVenta = null;
         String empresaUuid = "";
+        Integer sucursal = 0;
 
         // Act
-        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, empresaUuid);
+        ResponseEntity<?> response = authController.login(username, password, pcName, puntoVenta, empresaUuid, sucursal);
 
         // Assert
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Todos los campos son requeridos", response.getBody());
-        verify(usuarioService, never()).login(anyString(), anyString(), anyString());
+        verify(usuarioService, never()).login(anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -152,19 +156,20 @@ class AuthControllerTest {
         String pcName = "testpc";
         Integer puntoVenta = 1;
         String empresaUuid = "test-empresa-uuid";
+        Integer sucursal = 0;
 
-        when(usuarioService.login(username, password, empresaUuid)).thenReturn(Optional.of(testUsuario));
-        when(jwtUtil.generateAccessToken(any(Usuario.class), eq(pcName), eq(puntoVenta))).thenReturn(validAccessToken);
+        when(usuarioService.login(username, password, empresaUuid, sucursal)).thenReturn(Optional.of(testUsuario));
+        when(jwtUtil.generateAccessToken(any(Usuario.class), eq(pcName), eq(puntoVenta), eq(empresaUuid), eq(sucursal))).thenReturn(validAccessToken);
         when(jwtUtil.generateRefreshToken(username)).thenReturn(validRefreshToken);
 
         // Hacer login para agregar el refresh token
-        authController.login(username, password, pcName, puntoVenta, empresaUuid);
+        authController.login(username, password, pcName, puntoVenta, empresaUuid, sucursal);
 
         // Configurar el refresh
         String newAccessToken = "new.access.token";
         when(jwtUtil.getUsername(validRefreshToken)).thenReturn(username);
         when(usuarioService.findBy(username)).thenReturn(testUsuario);
-        when(jwtUtil.generateAccessToken(any(Usuario.class), eq("unknown"), eq(0))).thenReturn(newAccessToken);
+        when(jwtUtil.generateAccessToken(any(Usuario.class), eq("unknown"), eq(0), eq("unknown"), eq(0))).thenReturn(newAccessToken);
 
         // Act
         ResponseEntity<?> response = authController.refresh(validRefreshToken);
@@ -177,7 +182,7 @@ class AuthControllerTest {
         assertEquals(newAccessToken, tokens.get("accessToken"));
         verify(jwtUtil, times(1)).getUsername(validRefreshToken);
         verify(usuarioService, times(1)).findBy(username);
-        verify(jwtUtil, times(1)).generateAccessToken(testUsuario, "unknown", 0);
+        verify(jwtUtil, times(1)).generateAccessToken(testUsuario, "unknown", 0, "unknown", 0);
     }
 
     @Test
@@ -194,7 +199,7 @@ class AuthControllerTest {
         assertEquals("Token de refresco inválido", response.getBody());
         verify(jwtUtil, never()).getUsername(anyString());
         verify(usuarioService, never()).findBy(anyString());
-        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any());
+        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any(), anyString(), any());
     }
 
     @Test
@@ -212,7 +217,7 @@ class AuthControllerTest {
         assertEquals("Token de refresco inválido", response.getBody());
         verify(jwtUtil, never()).getUsername(expiredRefreshToken);
         verify(usuarioService, never()).findBy(anyString());
-        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any());
+        verify(jwtUtil, never()).generateAccessToken(any(), anyString(), any(), anyString(), any());
     }
 
     @Test
@@ -224,13 +229,14 @@ class AuthControllerTest {
         String pcName = "testpc";
         Integer puntoVenta = 1;
         String empresaUuid = "test-empresa-uuid";
+        Integer sucursal = 0;
 
-        when(usuarioService.login(username, password, empresaUuid)).thenReturn(Optional.of(testUsuario));
-        when(jwtUtil.generateAccessToken(any(Usuario.class), eq(pcName), eq(puntoVenta))).thenReturn(validAccessToken);
+        when(usuarioService.login(username, password, empresaUuid, sucursal)).thenReturn(Optional.of(testUsuario));
+        when(jwtUtil.generateAccessToken(any(Usuario.class), eq(pcName), eq(puntoVenta), eq(empresaUuid), eq(sucursal))).thenReturn(validAccessToken);
         when(jwtUtil.generateRefreshToken(username)).thenReturn(validRefreshToken);
 
         // Hacer login para agregar el refresh token
-        authController.login(username, password, pcName, puntoVenta, empresaUuid);
+        authController.login(username, password, pcName, puntoVenta, empresaUuid, sucursal);
 
         // Act
         ResponseEntity<String> response = authController.logout(validRefreshToken);

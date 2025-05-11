@@ -10,26 +10,25 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 @Service
-public class PasswordEncoder {
+public class CustomPasswordEncoder implements org.springframework.security.crypto.password.PasswordEncoder  {
     private static final int ITERATIONS = 65536;
     private static final int KEY_LENGTH = 128;
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512";
     private final SecureRandom secureRandom;
 
-    public PasswordEncoder() {
+    public CustomPasswordEncoder() {
         this.secureRandom = new SecureRandom();
     }
-
-    public String encode(String rawPassword) {
+    @Override
+    public String encode(CharSequence rawPassword) {
         try {
             byte[] salt = new byte[16];
             secureRandom.nextBytes(salt);
             
-            PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
+            PBEKeySpec spec = new PBEKeySpec(rawPassword.toString().toCharArray(), salt, ITERATIONS, KEY_LENGTH);
             SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
             byte[] hash = factory.generateSecret(spec).getEncoded();
             
-            // Combinar salt y hash en un solo string
             byte[] combined = new byte[salt.length + hash.length];
             System.arraycopy(salt, 0, combined, 0, salt.length);
             System.arraycopy(hash, 0, combined, salt.length, hash.length);
@@ -39,22 +38,21 @@ public class PasswordEncoder {
             throw new RuntimeException("Error encoding password", e);
         }
     }
-
-    public boolean matches(String rawPassword, String encodedPassword) {
+    
+    @Override
+    public boolean matches(CharSequence rawPassword, String encodedPassword) {
         try {
             byte[] combined = Base64.getDecoder().decode(encodedPassword);
             
-            // Extraer salt y hash
             byte[] salt = new byte[16];
             byte[] hash = new byte[combined.length - 16];
             System.arraycopy(combined, 0, salt, 0, salt.length);
             System.arraycopy(combined, salt.length, hash, 0, hash.length);
             
-            PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
+            PBEKeySpec spec = new PBEKeySpec(rawPassword.toString().toCharArray(), salt, ITERATIONS, KEY_LENGTH);
             SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
             byte[] testHash = factory.generateSecret(spec).getEncoded();
             
-            // Comparar hashes
             if (hash.length != testHash.length) {
                 return false;
             }
@@ -63,9 +61,10 @@ public class PasswordEncoder {
             for (int i = 0; i < hash.length; i++) {
                 diff |= hash[i] ^ testHash[i];
             }
+            
             return diff == 0;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException("Error verifying password", e);
         }
     }
-} 
+}

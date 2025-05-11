@@ -101,7 +101,6 @@ public class SoapMessageFactory {
     }
 
     private static String createFECAESolicitarBody(ComprobanteRequest comprobante) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String soapMessageWithLeadingComment =
                 "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
                 + "<ar:FECAESolicitar>"

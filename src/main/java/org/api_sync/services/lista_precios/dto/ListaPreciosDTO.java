@@ -1,13 +1,15 @@
 package org.api_sync.services.lista_precios.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.api_sync.adapter.outbound.entities.Proveedor;
 
 import java.util.List;
 
 @Builder
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ListaPreciosDTO {
 	private Long id;
 	private String nombre;

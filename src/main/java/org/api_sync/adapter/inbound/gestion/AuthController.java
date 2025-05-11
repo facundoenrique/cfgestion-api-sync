@@ -1,17 +1,14 @@
 package org.api_sync.adapter.inbound.gestion;
 
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.gestion.utils.JwtUtil;
 import org.api_sync.adapter.outbound.entities.Usuario;
 import org.api_sync.services.usuarios.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -27,41 +24,57 @@ public class AuthController {
 	private final UsuarioService usuarioService;
 	
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, String>> login(@RequestParam String username,
-	                                                 @RequestParam String password,
-	                                                 @RequestParam("pc_name") String pcName,
-	                                                 @RequestParam("punto_venta_facturacion") Integer puntoVentaFacturacion) {
+	public ResponseEntity<?> login(
+			@RequestParam("username") String username,
+			@RequestParam("password") String password,
+			@RequestParam("pc_name") String pcName,
+			@RequestParam("punto_venta") Integer puntoVenta,
+			@RequestParam("empresa_uuid") String empresaUuid,
+			@RequestParam("sucursal") Integer sucursalId) {
 		
-		Optional<Usuario> user = usuarioService.login(username, password);
+		// Validar que los campos no estén vacíos
+		if (username == null || username.trim().isEmpty() ||
+			password == null || password.trim().isEmpty() ||
+			empresaUuid == null || empresaUuid.trim().isEmpty() ||
+			puntoVenta == null) {
+			return ResponseEntity.badRequest().body("Todos los campos son requeridos");
+		}
+
+		Optional<Usuario> user = usuarioService.login(username, password, empresaUuid, sucursalId);
 		
 		if (user.isPresent()) {
-			String accessToken = jwtUtil.generateAccessToken(user.get(), pcName, puntoVentaFacturacion);
+			String accessToken = jwtUtil.generateAccessToken(user.get(), pcName, puntoVenta, empresaUuid, sucursalId);
 			String refreshToken = jwtUtil.generateRefreshToken(username);
 			refreshTokens.add(refreshToken);
-			Map<String, String> tokens = Map.of(
-					"accessToken", accessToken,
-					"refreshToken", refreshToken
-			);
+			
+			Map<String, String> tokens = new HashMap<>();
+			tokens.put("accessToken", accessToken);
+			tokens.put("refreshToken", refreshToken);
+			
 			return ResponseEntity.ok(tokens);
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
 	}
 	
 	@PostMapping("/refresh")
-	public ResponseEntity<Map<String, String>> refresh(@RequestParam String refreshToken) {
-		if (!refreshTokens.contains(refreshToken)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
+	public ResponseEntity<?> refresh(@RequestParam("refresh_token") String refreshToken) {
 		try {
+			if (!refreshTokens.contains(refreshToken)) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token de refresco inválido");
+			}
+
 			String username = jwtUtil.getUsername(refreshToken);
 			Usuario user = usuarioService.findBy(username);
-			String accessToken = jwtUtil.generateAccessToken(user, "unknown", 0);
-			Map<String, String> tokens = Map.of(
-					"accessToken", accessToken
-			);
+			
+			String newAccessToken = jwtUtil.generateAccessToken(user, "unknown", 0, "unknown", 0);
+			
+			Map<String, String> tokens = new HashMap<>();
+			tokens.put("accessToken", newAccessToken);
+			
 			return ResponseEntity.ok(tokens);
-		} catch (JwtException e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error al refrescar el token");
 		}
 	}
 	

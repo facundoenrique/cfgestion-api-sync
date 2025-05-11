@@ -1,9 +1,7 @@
 package org.api_sync.adapter.inbound.responses;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Data;
-import lombok.With;
+import lombok.*;
 import org.api_sync.adapter.outbound.entities.Preventa;
 
 import java.time.LocalDate;
@@ -11,7 +9,10 @@ import java.util.List;
 
 
 @Builder
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PreventaResponseDTO {
 
 	private Long id;

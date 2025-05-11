@@ -46,8 +46,6 @@ public class AfipAuthentificationClient {
     
     
         String loginTicketResponse = null;
-        System.setProperty("http.proxyHost", "");
-        System.setProperty("http.proxyPort", "80");
     
         String service = "wsfe";
         String dstDN = "cn=wsaa,o=afip,c=ar,serialNumber=CUIT 33693450239"; //ambiente de homologacion

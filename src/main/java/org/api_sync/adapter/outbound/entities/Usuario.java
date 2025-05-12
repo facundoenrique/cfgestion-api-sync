@@ -5,7 +5,12 @@ import lombok.*;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 
 @Entity
-@Table(name = "usuarios")
+@Table(
+		name = "usuarios",
+		uniqueConstraints = {
+				@UniqueConstraint(columnNames = {"empresa", "nombre"})
+		}
+)
 @Getter
 @Setter
 @NoArgsConstructor

@@ -30,7 +30,7 @@ public class UsuarioService {
 			return Optional.empty();
 		}
 
-		Optional<Usuario> user = usuarioRepository.findByNombre(username);
+		Optional<Usuario> user = usuarioRepository.findByNombreAndEmpresa(username, empresa.get());
 		if (user.isEmpty()) {
 			log.warn("Usuario no encontrado: {}", username);
 			return Optional.empty();
@@ -89,17 +89,17 @@ public class UsuarioService {
 
 	@Transactional
 	public Usuario crearUsuario(String nombre, String password, String empresaUuid) {
+		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
+				                  .orElseThrow(() -> {
+					                  log.error("Empresa no encontrada con UUID: {}", empresaUuid);
+					                  return new RuntimeException("Empresa no encontrada");
+				                  });
+		
 		log.info("Creando usuario: {}, empresa: {}", nombre, empresaUuid);
-		if (usuarioRepository.findByNombre(nombre).isPresent()) {
+		if (usuarioRepository.findByNombreAndEmpresa(nombre, empresa).isPresent()) {
 			log.warn("Intento de crear usuario ya existente: {}", nombre);
 			throw new RuntimeException("El usuario ya existe");
 		}
-
-		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
-			.orElseThrow(() -> {
-				log.error("Empresa no encontrada con UUID: {}", empresaUuid);
-				return new RuntimeException("Empresa no encontrada");
-			});
 
 		Usuario usuario = new Usuario();
 		usuario.setNombre(nombre);
@@ -117,18 +117,20 @@ public class UsuarioService {
 				log.error("Usuario no encontrado con ID: {}", id);
 				return new RuntimeException("Usuario no encontrado");
 			});
-
+		
+		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
+				                  .orElseThrow(() -> {
+					                  log.error("Empresa no encontrada con UUID: {}", empresaUuid);
+					                  return new RuntimeException("Empresa no encontrada");
+				                  });
+		
 		if (!usuario.getNombre().equals(nombre) && 
-			usuarioRepository.findByNombre(nombre).isPresent()) {
+			usuarioRepository.findByNombreAndEmpresa(nombre, empresa).isPresent()) {
 			log.warn("Intento de actualizar a un nombre de usuario ya en uso: {}", nombre);
 			throw new RuntimeException("El nombre de usuario ya está en uso");
 		}
 
-		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
-			.orElseThrow(() -> {
-				log.error("Empresa no encontrada con UUID: {}", empresaUuid);
-				return new RuntimeException("Empresa no encontrada");
-			});
+
 
 		usuario.setNombre(nombre);
 		if (password != null && !password.isEmpty()) {

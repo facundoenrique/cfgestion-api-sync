@@ -48,10 +48,10 @@ public class AfipConsultarCaeService {
 		}
 	}
 
-	public Integer consultarUltimoComprobanteByEmpresa(Long empresaId, Integer certificadoPuntoVenta,
+	public Integer consultarUltimoComprobanteByEmpresa(String empresaUuid, Integer certificadoPuntoVenta,
 	                                                  Integer puntoVenta, Integer tipoComprobante) {
 		
-		Empresa empresa = empresaRepository.findById(empresaId)
+		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
 				                  .orElseThrow(() -> new RuntimeException("No existe la empresa"));
 		
 		try {

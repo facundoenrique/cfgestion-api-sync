@@ -26,7 +26,7 @@ class CaeControllerTest {
     @Test
     void ultimo_ShouldReturnLastComprobante() {
         // Arrange
-        Long empresa = 1L;
+        String empresa = "uuid";
         Integer puntoVenta = 1;
         Integer certificadoPuntoVenta = 1;
         Integer expectedComprobante = 12345;
@@ -46,7 +46,7 @@ class CaeControllerTest {
     @Test
     void ultimo_WithDifferentValues_ShouldReturnLastComprobante() {
         // Arrange
-        Long empresa = 2L;
+        String empresa = "uuid";
         Integer puntoVenta = 2;
         Integer certificadoPuntoVenta = 2;
         Integer expectedComprobante = 54321;

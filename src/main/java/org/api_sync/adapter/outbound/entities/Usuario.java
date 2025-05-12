@@ -2,6 +2,7 @@ package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 
 @Entity
 @Table(name = "usuarios")
@@ -15,7 +16,11 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Integer codigo;
-	private Long empresa;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "empresa", nullable = false)
+	private Empresa empresa;
+	
 	private String nombre;
 	private String password;
 	private boolean eliminado;

@@ -3,14 +3,25 @@ package org.api_sync.adapter.inbound.gestion.utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.api_sync.adapter.outbound.entities.Usuario;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-	private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+	@Value("${jwt.secret}")
+	private String secret;
+
+	@Value("${jwt.expiration}")
+	private Long expiration;
+
+	private SecretKey getSigningKey() {
+		byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+		return Keys.hmacShaKeyFor(keyBytes);
+	}
 
 	public String generateAccessToken(Usuario usuario, String pcName, Integer puntoVenta, String empresaUuid, Integer sucursalId) {
 		return Jwts.builder()
@@ -21,8 +32,8 @@ public class JwtUtil {
 				       .claim("sucursal", sucursalId)
 				       .claim("empresa_uuid", empresaUuid)
 				       .setIssuedAt(new Date())
-				       .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 4)) // 4 horas
-				       .signWith(key, SignatureAlgorithm.HS256)
+				       .setExpiration(new Date(System.currentTimeMillis() + expiration))
+				       .signWith(getSigningKey(), SignatureAlgorithm.HS256)
 				       .compact();
 	}
 	
@@ -31,14 +42,14 @@ public class JwtUtil {
 				       .setSubject(username)
 				       .setIssuedAt(new Date())
 				       .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 3600_000)) // 7 días
-				       .signWith(key, SignatureAlgorithm.HS256)
+				       .signWith(getSigningKey(), SignatureAlgorithm.HS256)
 				       .compact();
 	}
 	
 	public boolean validateToken(String token) {
 		try {
 			Jwts.parserBuilder()
-					.setSigningKey(key)
+					.setSigningKey(getSigningKey())
 					.build()
 					.parseClaimsJws(token);
 			return true;
@@ -59,7 +70,7 @@ public class JwtUtil {
 	// Extraer claims si lo necesitás
 	public Claims extractAllClaims(String token) {
 		return Jwts.parserBuilder()
-				       .setSigningKey(key)
+				       .setSigningKey(getSigningKey())
 				       .build()
 				       .parseClaimsJws(token)
 				       .getBody();
@@ -67,12 +78,21 @@ public class JwtUtil {
 	
 	// Extraer solo el username (subject)
 	public String getUsername(String token) {
-		return extractAllClaims(token).getSubject();
+		return Jwts.parserBuilder()
+					.setSigningKey(getSigningKey())
+					.build()
+					.parseClaimsJws(token)
+					.getBody()
+					.getSubject();
 	}
 
 	public String getPcName(String token) {
-		Claims claims = extractAllClaims(token);
-		return claims.get("pcName", String.class);
+		return Jwts.parserBuilder()
+					.setSigningKey(getSigningKey())
+					.build()
+					.parseClaimsJws(token)
+					.getBody()
+					.get("pcName", String.class);
 	}
 
 }

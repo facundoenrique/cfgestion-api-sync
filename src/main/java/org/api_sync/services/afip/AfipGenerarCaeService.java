@@ -19,8 +19,8 @@ public class AfipGenerarCaeService {
 	private final EmpresaRepository empresaRepository;
 	private final AfipServiceConfig afipServiceConfig;
 
-	public CaeResponse generarCae(Long empresaId, Integer certificadoPuntoVenta, ComprobanteRequest comprobante) {
-		Empresa empresa = empresaRepository.findById(empresaId)
+	public CaeResponse generarCae(String empresaId, Integer certificadoPuntoVenta, ComprobanteRequest comprobante) {
+		Empresa empresa = empresaRepository.findByUuid(empresaId)
 				                  .orElseThrow(() -> new RuntimeException("No existe la empresa"));
 		
 		try {

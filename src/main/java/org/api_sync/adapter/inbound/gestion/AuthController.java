@@ -25,6 +25,7 @@ public class AuthController {
 	private final Set<String> refreshTokens = new HashSet<>();
 	private final UsuarioService usuarioService;
 	
+	//TOOD: Remover cuando estemos seguros que funciona todo.
 	@GetMapping("/verify-token")
 	public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String authHeader) {
 		log.info("Recibida solicitud para verificar token");

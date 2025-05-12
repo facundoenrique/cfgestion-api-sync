@@ -6,12 +6,10 @@ import org.api_sync.adapter.inbound.responses.CaeResponse;
 import org.api_sync.services.afip.AfipConsultarCaeService;
 import org.api_sync.services.afip.AfipGenerarCaeService;
 import org.api_sync.services.afip.model.ComprobanteRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Slf4j
 @RestController
@@ -22,48 +20,31 @@ public class CaeController {
 	private final AfipConsultarCaeService afipConsultarCaeService;
 	private final AfipGenerarCaeService afipGenerarCaeService;
 
-	@GetMapping("/test-auth")
-	public ResponseEntity<?> testAuth(Principal principal) {
-		log.info("Test de autenticación en CaeController");
-		Map<String, String> response = new HashMap<>();
-		
-		if (principal != null) {
-			log.info("Usuario autenticado: {}", principal.getName());
-			response.put("message", "¡Autenticación exitosa en CaeController!");
-			response.put("username", principal.getName());
-		} else {
-			log.warn("Principal es null en la solicitud");
-			response.put("message", "Error: Principal es null");
-		}
-		
-		return ResponseEntity.ok(response);
-	}
-
 	@GetMapping("/ultimo")
 	public Integer ultimo(
-			@RequestParam("empresa") String empresa,
+			@RequestParam("empresa") String empresaUuid,
 			@RequestParam("punto_venta") Integer puntoVenta,
-			@RequestParam("certificado_punto_venta") Integer certificadoPuntoVenta,
+			@RequestParam("certificado_punto_venta") Integer certificadoPuntoVenta, //Este indica que certificado usar
 			@RequestParam("tipo_comprobante") Integer tipoComprobante,
 			Principal principal) {
 		
-		log.info("Solicitud de último comprobante recibida para empresa: {} de usuario: {}", 
-				empresa, principal != null ? principal.getName() : "desconocido");
+		log.info("Solicitud de último comprobante recibida para empresa: {} de usuario: {}",
+				empresaUuid, principal != null ? principal.getName() : "desconocido");
 		
 		return afipConsultarCaeService.consultarUltimoComprobanteByEmpresa(
-				empresa, certificadoPuntoVenta, puntoVenta, tipoComprobante);
+				empresaUuid, certificadoPuntoVenta, puntoVenta, tipoComprobante);
 	}
 
 	@PostMapping
 	public CaeResponse getCae(
-			@RequestParam("empresa") Long empresa,
+			@RequestParam("empresa") String empresaUuid,
 			@RequestParam("certificado_punto_venta") Integer certificadoPuntoVenta,
 			@RequestBody ComprobanteRequest comprobanteRequest,
 			Principal principal) {
 		
-		log.info("Solicitud de CAE recibida para empresa: {} de usuario: {}", 
-				empresa, principal != null ? principal.getName() : "desconocido");
+		log.info("Solicitud de CAE recibida para empresa: {} de usuario: {}",
+				empresaUuid, principal != null ? principal.getName() : "desconocido");
 		
-		return afipGenerarCaeService.generarCae(empresa, certificadoPuntoVenta, comprobanteRequest);
+		return afipGenerarCaeService.generarCae(empresaUuid, certificadoPuntoVenta, comprobanteRequest);
 	}
 }

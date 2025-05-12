@@ -26,7 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
 	
-	@Value("${jwt.excluded.paths:/auth/login,/auth/refresh,/auth/logout,/auth/verify-token}")
+	@Value("${jwt.excluded.paths}")
 	private String excludedPathsString;
 	
 	private List<String> excludedPaths;

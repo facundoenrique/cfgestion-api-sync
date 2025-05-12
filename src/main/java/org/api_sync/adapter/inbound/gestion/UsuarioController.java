@@ -61,7 +61,7 @@ public class UsuarioController {
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Usuario> obtenerUsuarioPorNombre(
             @PathVariable @NotBlank(message = "El nombre es obligatorio") String nombre) {
-        return usuarioService.obtenerUsuarioPorNombre(nombre)
+        return usuarioService.obtenerUsuarioPorNombre(nombre) //Sumar param empresa
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }

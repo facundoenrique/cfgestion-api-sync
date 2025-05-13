@@ -28,7 +28,7 @@ public class Usuario {
 	
 	private String nombre;
 	private String password;
-	private boolean eliminado;
+	private short eliminado = 0;
 	//private Long caja; //esto hace referencia a que?
 	//private Long empleadoId; //este hace referencia a que ?
 }

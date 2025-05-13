@@ -30,7 +30,7 @@ public class UsuarioService {
 			return Optional.empty();
 		}
 
-		Optional<Usuario> user = usuarioRepository.findByNombreAndEmpresa(username, empresa.get());
+		Optional<Usuario> user = usuarioRepository.findByNombreAndEmpresaAndEliminado(username, empresa.get(), 0);
 		if (user.isEmpty()) {
 			log.warn("Usuario no encontrado: {}", username);
 			return Optional.empty();
@@ -60,7 +60,7 @@ public class UsuarioService {
 
 	public Usuario findBy(String username) {
 		log.debug("Buscando usuario por nombre: {}", username);
-		Optional<Usuario> user = usuarioRepository.findByNombre(username);
+		Optional<Usuario> user = usuarioRepository.findByNombreAndEliminado(username, 0);
 		
 		if (user.isPresent()) {
 			return user.get();
@@ -96,7 +96,7 @@ public class UsuarioService {
 				                  });
 		
 		log.info("Creando usuario: {}, empresa: {}", nombre, empresaUuid);
-		if (usuarioRepository.findByNombreAndEmpresa(nombre, empresa).isPresent()) {
+		if (usuarioRepository.findByNombreAndEmpresaAndEliminado(nombre, empresa, 0).isPresent()) {
 			log.warn("Intento de crear usuario ya existente: {}", nombre);
 			throw new RuntimeException("El usuario ya existe");
 		}

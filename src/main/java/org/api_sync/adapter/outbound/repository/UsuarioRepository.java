@@ -9,6 +9,13 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-	Optional<Usuario> findByNombre(String nombre);
-	Optional<Usuario> findByNombreAndEmpresa(String nombre, Empresa empresa);
+	/**
+	 * Se debe usar solo para rehabilitar un usuario
+	 * @param nombre
+	 * @return
+	 */
+	Optional<Usuario> findByNombre(String nombre); //Solo para habilitar user
+	Optional<Usuario> findByNombreAndEmpresa(String nombre, Empresa empresa); //Solo para habilitar user
+	Optional<Usuario> findByNombreAndEliminado(String nombre, int eliminado);
+	Optional<Usuario> findByNombreAndEmpresaAndEliminado(String nombre, Empresa empresa, int eliminado);
 }

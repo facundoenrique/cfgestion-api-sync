@@ -92,8 +92,8 @@ public class AuthController {
 				refreshTokens.add(refreshToken);
 				
 				Map<String, String> tokens = new HashMap<>();
-				tokens.put("accessToken", accessToken);
-				tokens.put("refreshToken", refreshToken);
+				tokens.put("access_token", accessToken);
+				tokens.put("refresh_token", refreshToken);
 				
 				return ResponseEntity.ok(tokens);
 			} else {

@@ -11,9 +11,11 @@ public class UsuarioRequest {
     private String nombre;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
+    @Size(min = 5, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
     @NotBlank(message = "El UUID de la empresa es obligatorio")
     private String empresa;
+    
+    private Integer codigo;
 } 

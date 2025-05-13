@@ -54,16 +54,13 @@ class UsuarioControllerTest {
         usuarioRequest.setNombre("testUser");
         usuarioRequest.setPassword("password123");
         usuarioRequest.setEmpresa("empresa-uuid");
+        usuarioRequest.setCodigo(1);
     }
 
     @Test
     void crearUsuario_ShouldReturnCreatedUsuario() {
         // Arrange
-        when(usuarioService.crearUsuario(
-                usuarioRequest.getNombre(),
-                usuarioRequest.getPassword(),
-                usuarioRequest.getEmpresa()
-        )).thenReturn(usuario);
+        when(usuarioService.crearUsuario(usuarioRequest)).thenReturn(usuario);
 
         // Act
         ResponseEntity<Usuario> response = usuarioController.crearUsuario(usuarioRequest);
@@ -71,23 +68,14 @@ class UsuarioControllerTest {
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(usuario, response.getBody());
-        verify(usuarioService, times(1)).crearUsuario(
-                usuarioRequest.getNombre(),
-                usuarioRequest.getPassword(),
-                usuarioRequest.getEmpresa()
-        );
+        verify(usuarioService, times(1)).crearUsuario(usuarioRequest);
     }
 
     @Test
     void actualizarUsuario_ShouldReturnUpdatedUsuario() {
         // Arrange
         Long usuarioId = 1L;
-        when(usuarioService.actualizarUsuario(
-                usuarioId,
-                usuarioRequest.getNombre(),
-                usuarioRequest.getPassword(),
-                usuarioRequest.getEmpresa()
-        )).thenReturn(usuario);
+        when(usuarioService.actualizarUsuario(usuarioId, usuarioRequest)).thenReturn(usuario);
 
         // Act
         ResponseEntity<Usuario> response = usuarioController.actualizarUsuario(usuarioId, usuarioRequest);
@@ -95,12 +83,7 @@ class UsuarioControllerTest {
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(usuario, response.getBody());
-        verify(usuarioService, times(1)).actualizarUsuario(
-                usuarioId,
-                usuarioRequest.getNombre(),
-                usuarioRequest.getPassword(),
-                usuarioRequest.getEmpresa()
-        );
+        verify(usuarioService, times(1)).actualizarUsuario(usuarioId, usuarioRequest);
     }
 
     @Test
@@ -159,29 +142,31 @@ class UsuarioControllerTest {
     void obtenerUsuarioPorNombre_WhenUsuarioExists_ShouldReturnUsuario() {
         // Arrange
         String nombre = "testUser";
-        when(usuarioService.obtenerUsuarioPorNombre(nombre)).thenReturn(Optional.of(usuario));
+        String empresaUuid = "empresa-uuid";
+        when(usuarioService.obtenerUsuarioPorNombre(nombre, empresaUuid)).thenReturn(Optional.of(usuario));
 
         // Act
-        ResponseEntity<Usuario> response = usuarioController.obtenerUsuarioPorNombre(nombre);
+        ResponseEntity<Usuario> response = usuarioController.obtenerUsuarioPorNombre(nombre, empresaUuid);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(usuario, response.getBody());
-        verify(usuarioService, times(1)).obtenerUsuarioPorNombre(nombre);
+        verify(usuarioService, times(1)).obtenerUsuarioPorNombre(nombre, empresaUuid);
     }
 
     @Test
     void obtenerUsuarioPorNombre_WhenUsuarioDoesNotExist_ShouldReturnNotFound() {
         // Arrange
         String nombre = "nonExistentUser";
-        when(usuarioService.obtenerUsuarioPorNombre(nombre)).thenReturn(Optional.empty());
+        String empresaUuid = "empresa-uuid";
+        when(usuarioService.obtenerUsuarioPorNombre(nombre, empresaUuid)).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<Usuario> response = usuarioController.obtenerUsuarioPorNombre(nombre);
+        ResponseEntity<Usuario> response = usuarioController.obtenerUsuarioPorNombre(nombre, empresaUuid);
 
         // Assert
         assertEquals(404, response.getStatusCodeValue());
-        verify(usuarioService, times(1)).obtenerUsuarioPorNombre(nombre);
+        verify(usuarioService, times(1)).obtenerUsuarioPorNombre(nombre, empresaUuid);
     }
 
     @Test

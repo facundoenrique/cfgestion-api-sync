@@ -2,6 +2,7 @@ package org.api_sync.services.usuarios;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.api_sync.adapter.inbound.gestion.request.UsuarioRequest;
 import org.api_sync.adapter.outbound.entities.Usuario;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 import org.api_sync.adapter.outbound.repository.UsuarioRepository;
@@ -88,23 +89,58 @@ public class UsuarioService {
 	}
 
 	@Transactional
-	public Usuario crearUsuario(String nombre, String password, String empresaUuid) {
-		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
+	public Usuario crearUsuario(UsuarioRequest usuarioRequest) {
+		Empresa empresa = empresaRepository.findByUuid(usuarioRequest.getEmpresa())
 				                  .orElseThrow(() -> {
-					                  log.error("Empresa no encontrada con UUID: {}", empresaUuid);
+					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
 					                  return new RuntimeException("Empresa no encontrada");
 				                  });
 		
-		log.info("Creando usuario: {}, empresa: {}", nombre, empresaUuid);
-		if (usuarioRepository.findByNombreAndEmpresaAndEliminado(nombre, empresa, 0).isPresent()) {
-			log.warn("Intento de crear usuario ya existente: {}", nombre);
+		log.info("Creando usuario: {}, empresa: {}", usuarioRequest.getNombre(), usuarioRequest.getEmpresa());
+		if (usuarioRepository.findByNombreAndEmpresaAndEliminado(usuarioRequest.getNombre(), empresa, 0).isPresent()) {
+			log.warn("Intento de crear usuario ya existente: {}", usuarioRequest.getNombre());
 			throw new RuntimeException("El usuario ya existe");
 		}
 
 		Usuario usuario = new Usuario();
-		usuario.setNombre(nombre);
-		usuario.setPassword(passwordEncoder.encode(password));
+		usuario.setNombre(usuarioRequest.getNombre());
+		usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
 		usuario.setEmpresa(empresa);
+		usuario.setCodigo(usuarioRequest.getCodigo());
+		
+		return usuarioRepository.save(usuario);
+	}
+
+	@Transactional
+	public Usuario actualizarUsuario(Long id, UsuarioRequest usuarioRequest) {
+		log.info("Actualizando usuario ID: {}, nuevo nombre: {}", id, usuarioRequest.getNombre());
+		Usuario usuario = usuarioRepository.findById(id)
+			.orElseThrow(() -> {
+				log.error("Usuario no encontrado con ID: {}", id);
+				return new RuntimeException("Usuario no encontrado");
+			});
+		
+		Empresa empresa = empresaRepository.findByUuid(usuarioRequest.getEmpresa())
+				                  .orElseThrow(() -> {
+					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
+					                  return new RuntimeException("Empresa no encontrada");
+				                  });
+		
+		if (!usuario.getNombre().equals(usuarioRequest.getNombre()) && 
+			usuarioRepository.findByNombreAndEmpresa(usuarioRequest.getNombre(), empresa).isPresent()) {
+			log.warn("Intento de actualizar a un nombre de usuario ya en uso: {}", usuarioRequest.getNombre());
+			throw new RuntimeException("El nombre de usuario ya está en uso");
+		}
+
+		usuario.setNombre(usuarioRequest.getNombre());
+		if (usuarioRequest.getPassword() != null && !usuarioRequest.getPassword().isEmpty()) {
+			log.debug("Actualizando contraseña del usuario");
+			usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
+		}
+		usuario.setEmpresa(empresa);
+		if (usuarioRequest.getCodigo() != null) {
+			usuario.setCodigo(usuarioRequest.getCodigo());
+		}
 		
 		return usuarioRepository.save(usuario);
 	}
@@ -130,8 +166,6 @@ public class UsuarioService {
 			throw new RuntimeException("El nombre de usuario ya está en uso");
 		}
 
-
-
 		usuario.setNombre(nombre);
 		if (password != null && !password.isEmpty()) {
 			log.debug("Actualizando contraseña del usuario");
@@ -155,6 +189,16 @@ public class UsuarioService {
 	public Optional<Usuario> obtenerUsuarioPorNombre(String nombre) {
 		log.debug("Buscando usuario por nombre: {}", nombre);
 		return usuarioRepository.findByNombre(nombre);
+	}
+
+	public Optional<Usuario> obtenerUsuarioPorNombre(String nombre, String empresaUuid) {
+		log.debug("Buscando usuario por nombre: {} y empresa UUID: {}", nombre, empresaUuid);
+		Optional<Empresa> empresa = empresaRepository.findByUuid(empresaUuid);
+		if (empresa.isEmpty()) {
+			log.warn("Empresa no encontrada con UUID: {}", empresaUuid);
+			return Optional.empty();
+		}
+		return usuarioRepository.findByNombreAndEmpresaAndEliminado(nombre, empresa.get(), 0);
 	}
 
 	@Transactional

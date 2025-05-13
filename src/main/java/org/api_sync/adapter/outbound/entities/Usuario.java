@@ -8,7 +8,7 @@ import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 @Table(
 		name = "usuarios",
 		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {"empresa", "nombre"})
+				@UniqueConstraint(columnNames = {"empresa_id", "nombre"})
 		}
 )
 @Getter
@@ -23,7 +23,7 @@ public class Usuario {
 	private Integer codigo;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "empresa", nullable = false)
+	@JoinColumn(name = "empresa_id", nullable = false)
 	private Empresa empresa;
 	
 	private String nombre;

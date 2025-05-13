@@ -24,11 +24,7 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Usuario> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
-        Usuario usuario = usuarioService.crearUsuario(
-            request.getNombre(),
-            request.getPassword(),
-            request.getEmpresa()
-        );
+        Usuario usuario = usuarioService.crearUsuario(request);
         return ResponseEntity.ok(usuario);
     }
 
@@ -36,12 +32,7 @@ public class UsuarioController {
     public ResponseEntity<Usuario> actualizarUsuario(
             @PathVariable @NotNull(message = "El ID es obligatorio") @Positive(message = "El ID debe ser positivo") Long id,
             @Valid @RequestBody UsuarioRequest request) {
-        Usuario usuario = usuarioService.actualizarUsuario(
-            id,
-            request.getNombre(),
-            request.getPassword(),
-            request.getEmpresa()
-        );
+        Usuario usuario = usuarioService.actualizarUsuario(id, request);
         return ResponseEntity.ok(usuario);
     }
 
@@ -60,8 +51,9 @@ public class UsuarioController {
 
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Usuario> obtenerUsuarioPorNombre(
-            @PathVariable @NotBlank(message = "El nombre es obligatorio") String nombre) {
-        return usuarioService.obtenerUsuarioPorNombre(nombre) //Sumar param empresa
+            @PathVariable @NotBlank(message = "El nombre es obligatorio") String nombre,
+            @RequestParam @NotBlank(message = "El UUID de la empresa es obligatorio") String empresa) {
+        return usuarioService.obtenerUsuarioPorNombre(nombre, empresa)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }

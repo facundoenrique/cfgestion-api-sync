@@ -35,6 +35,7 @@ public class CaeController {
 				empresaUuid, certificadoPuntoVenta, puntoVenta, tipoComprobante);
 	}
 
+	//TODO: a futuro recibir un DatosComprobante completo y mappearlo a esto.
 	@PostMapping
 	public CaeResponse getCae(
 			@RequestParam("empresa") String empresaUuid,

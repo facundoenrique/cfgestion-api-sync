@@ -22,9 +22,10 @@ public class GestionCertificadosService {
 	private final EmpresaRepository empresaRepository;
 	
 	
-	public Certificado guardarCertificado(MultipartFile file, Integer puntoVenta, Long clienteId, String password) throws IOException {
-		Empresa empresa = empresaRepository.findById(clienteId)
-				                  .orElseThrow(() -> new IllegalArgumentException("Empresa no encontrada con ID: " + clienteId));
+	public Certificado guardarCertificado(MultipartFile file, Integer puntoVenta, String uuid,
+	                                      String password) throws IOException {
+		Empresa empresa = empresaRepository.findByUuid(uuid)
+				                  .orElseThrow(() -> new IllegalArgumentException("Empresa no encontrada con uuid: " + uuid));
 		
 		String pass = StringUtils.isNotBlank(password) ? password : "mastermix";
 		

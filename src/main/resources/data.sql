@@ -7,8 +7,8 @@ INSERT INTO empresas (uuid, nombre, cuit, razon_social, condicion_iva)
 VALUES ('da7fd6f4-1d81-4f33-b848-b7be5bca4752', 'La Nueva Estrella', '20252155857', 'Dube Ariel Alejandro', 1);
 
 -- Insertar usuario facu (password: admin123)
-INSERT INTO usuarios (nombre, password, empresa_id, eliminado)
-VALUES ('gabriel', 'kEAQfs/kL1UxPIYMw71FhBA+wfSmKsVoZ+mKiENrmmU=', 1, 0);
+INSERT INTO usuarios (nombre, password, empresa_id, eliminado, codigo)
+VALUES ('gabriel', 'kEAQfs/kL1UxPIYMw71FhBA+wfSmKsVoZ+mKiENrmmU=', 1, 0, 1);
 
 -- Insertar usuario facu (password: admin123)
 --INSERT INTO usuarios (nombre, password, empresa_id, eliminado)

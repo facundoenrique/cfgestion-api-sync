@@ -40,7 +40,7 @@ class GestionCertificadosControllerTest {
                 "test certificate content".getBytes()
         );
         Integer puntoVenta = 1;
-        Long empresaId = 1L;
+        String empresaId = "uuid";
         String password = "test123";
 
         Certificado certificado = new Certificado();
@@ -70,7 +70,7 @@ class GestionCertificadosControllerTest {
                 "test certificate content".getBytes()
         );
         Integer puntoVenta = 1;
-        Long empresaId = 1L;
+        String empresaId = "uuid";
         String password = "test123";
 
         when(certificadoService.guardarCertificado(any(), eq(puntoVenta), eq(empresaId), eq(password)))

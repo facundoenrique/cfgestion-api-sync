@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,11 +23,7 @@ public class ComprobanteAfip {
     private String fechaProc;
     private long CAE;
 
-    private int impIva;
-    private int idIva;
-    private double baseImpIva;
-    private double alicuotaIva;
-    private double importeIva;
+    private List<ComprobanteAfipIva> iva;
 
 
     public ComprobanteAfip(int punto_venta, int nroComp, int tipoComp) {

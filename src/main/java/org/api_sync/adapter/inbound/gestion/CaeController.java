@@ -40,6 +40,10 @@ public class CaeController {
 	}
 
 	//TODO: a futuro recibir un DatosComprobante completo y mappearlo a esto.
+	//TODO: Podriamos hacernos cargo de reprocesar el comprobante si lo almacenamos en la base de datos.
+	//TODO: Es costoso hacerlo y mantenerlo? si guardamos DatosComprobante matamos 2 pagaros de un tiro.
+	//TODO: Seria muy bueno poder enviar el error de importes bien identificado y que desde la pc nos envien un mail
+	// con los logs asi lo podemos revisar en el momento
 	@PostMapping
 	public CaeResponse getCae(
 			@RequestParam("empresa") String empresaUuid,
@@ -67,7 +71,7 @@ public class CaeController {
 			throw new RuntimeException("Error en numeros a buscar");
 		}
 		
-		if (numeroFin-numeroInicio>20) {
+		if (numeroFin-numeroInicio > 20) {
 			throw new RuntimeException("El rango debe ser menor a 20 comprobantes");
 		}
 		

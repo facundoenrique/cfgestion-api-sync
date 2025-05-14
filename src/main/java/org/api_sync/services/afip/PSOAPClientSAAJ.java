@@ -27,9 +27,10 @@ import java.net.URLStreamHandler;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
-import org.api_sync.services.afip.config.AfipConstants;
 import org.api_sync.services.afip.soap.SoapMessageFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class PSOAPClientSAAJ {
@@ -211,6 +212,40 @@ public class PSOAPClientSAAJ {
             comprobante.setFechaProc(extractElementValue(doc, "FchProceso"));
             comprobante.setCAE(Long.parseLong(extractElementValue(doc, "CodAutorizacion")));
 
+            // Extraer y procesar las alícuotas de IVA
+            NodeList alicIvasList = doc.getElementsByTagName("AlicIva");
+            if (alicIvasList.getLength() > 0) {
+                List<ComprobanteAfipIva> ivaItems = new ArrayList<>();
+                
+                for (int i = 0; i < alicIvasList.getLength(); i++) {
+                    Node alicIvaNode = alicIvasList.item(i);
+                    if (alicIvaNode.getNodeType() == Node.ELEMENT_NODE) {
+                        ComprobanteAfipIva ivaItem = new ComprobanteAfipIva();
+                        
+                        NodeList childNodes = alicIvaNode.getChildNodes();
+                        for (int j = 0; j < childNodes.getLength(); j++) {
+                            Node childNode = childNodes.item(j);
+                            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                                String nodeName = childNode.getNodeName();
+                                String nodeValue = childNode.getTextContent();
+                                
+                                if ("Id".equals(nodeName)) {
+                                    ivaItem.setId(Integer.parseInt(nodeValue));
+                                } else if ("BaseImp".equals(nodeName)) {
+                                    ivaItem.setBaseImp(Double.parseDouble(nodeValue));
+                                } else if ("Importe".equals(nodeName)) {
+                                    ivaItem.setImporte(Double.parseDouble(nodeValue));
+                                }
+                            }
+                        }
+                        
+                        ivaItems.add(ivaItem);
+                    }
+                }
+                
+                comprobante.setIva(ivaItems);
+            }
+            
             return comprobante;
         } catch (Exception e) {
             log.error("Error al consultar comprobante: {}", e.getMessage());
@@ -276,83 +311,6 @@ public class PSOAPClientSAAJ {
         return soapMessage;
     }
 
-    public int llamarFECompUltimoAutorizado(int punto_venta, int cbteTipo) {
-        //produccion
-        String soapAction = "http://ar.gov.afip.dif.FEV1/FECompUltimoAutorizado";
-        return callSoapWebServiceCompUltimoAutorizado(SOAP_ENDPOINT_URL, soapAction, punto_venta, cbteTipo);
-    }
-
-    private int callSoapWebServiceCompUltimoAutorizado(String soapEndpointUrl, String soapAction, int punto_venta, int cbteTipo) {
-        try {
-            SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
-            SOAPConnection soapConnection = soapConnectionFactory.createConnection();
-
-            SOAPMessage soapResponse = soapConnection.call(createSOAPRequestCompUltimoAutorizado(soapAction, punto_venta, cbteTipo), soapEndpointUrl);
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            soapResponse.writeTo(out);
-            String strMsg = new String(out.toByteArray());
-
-            Document doc = parseXml(strMsg);
-            String cbteNro = extractElementValue(doc, "CbteNro");
-            log.info("CbteNro: {}", cbteNro);
-
-            soapConnection.close();
-            return Integer.parseInt(cbteNro);
-        } catch (Exception e) {
-            log.error("Error al consultar último comprobante autorizado: {}", e.getMessage(), e);
-            throw new AfipServiceException("Error al consultar último comprobante autorizado", e);
-        }
-    }
-
-    private SOAPMessage createSOAPRequestCompUltimoAutorizado(String soapAction, int punto_venta, int cbteTipo) throws Exception {
-        SOAPMessage soapMessage = createMesaggeCompUltimoAutorizado(punto_venta, cbteTipo);
-
-        MimeHeaders headers = soapMessage.getMimeHeaders();
-        headers.addHeader("SOAPAction", soapAction);
-
-        soapMessage.saveChanges();
-
-        /* Print the request message, just for debugging purposes */
-        System.out.println("Request SOAP Message:");
-        soapMessage.writeTo(System.out);
-        System.out.println("\n");
-
-        return soapMessage;
-    }
-
-    private SOAPMessage createMesaggeCompUltimoAutorizado(int punto_venta, int cbteTipo) {
-        String soapMessageWithLeadingComment =
-                "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
-                + "<FECompUltimoAutorizado xmlns=\"http://ar.gov.afip.dif.FEV1/\">"
-                + "<Auth>"
-                + "<Token>" + token + "</Token>"
-                + "<Sign>" + sign + "</Sign>"
-                + "<Cuit>" + cuit + "</Cuit>"
-                + "</Auth>"
-                + "<PtoVta>" + punto_venta + "</PtoVta>"
-                + "<CbteTipo>" + cbteTipo + "</CbteTipo>"
-                + "</FECompUltimoAutorizado>"
-                + "</SOAP-ENV:Body>"
-                + "</SOAP-ENV:Envelope>";
-
-        SOAPMessage soapMessage = null;
-
-        try {
-            MessageFactory messageFactory = MessageFactory.newInstance();
-            soapMessage = messageFactory.createMessage(new MimeHeaders(),
-                    new ByteArrayInputStream(
-                            soapMessageWithLeadingComment.getBytes()));
-            System.out.println(soapMessage.toString());
-            SOAPPart part = soapMessage.getSOAPPart();
-            SOAPEnvelope envelope = part.getEnvelope();
-        } catch (SOAPException | IOException e) {
-            log.error(e.getMessage(), e);
-            System.err.println("\nError occurred while sending SOAP Request to Server!\nMake sure you have the correct endpoint URL and SOAPAction!\n");
-        }
-        return soapMessage;
-    }
-
     private Document parseXml(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -393,41 +351,4 @@ public class PSOAPClientSAAJ {
                 });
     }
 
-    public String callSoapWebServiceFECompConsultar(String token, String sign, String cuit, String cbteTipo, String cbtePtoVta, String cbteNro) {
-        try {
-            String authSection = messageFactory.createAuthSection(token, sign, cuit);
-            String requestBody = messageFactory.createFECompConsultarBody(authSection, cbteTipo, cbtePtoVta, cbteNro);
-            SOAPMessage soapMessage = messageFactory.createMessage(requestBody, AfipConstants.SOAP_ACTION_FE_COMP_CONSULTAR);
-
-            SOAPMessage response = requestHandler.executeSoapRequest(
-                AfipConstants.SOAP_ENDPOINT_URL,
-                AfipConstants.SOAP_ACTION_FE_COMP_CONSULTAR,
-                soapMessage
-            );
-            return responseHandler.handleSoapResponse(response);
-
-        } catch (Exception e) {
-            log.error("Error calling FECompConsultar service", e);
-            throw new RuntimeException("Error calling FECompConsultar service: " + e.getMessage(), e);
-        }
-    }
-
-    public String callSoapWebServiceFECompUltimoAutorizado(String token, String sign, String cuit, String cbteTipo, String cbtePtoVta) {
-        try {
-            String authSection = messageFactory.createAuthSection(token, sign, cuit);
-            String requestBody = messageFactory.createFECompUltimoAutorizadoBody(authSection, cbteTipo, cbtePtoVta);
-            SOAPMessage soapMessage = messageFactory.createMessage(requestBody, AfipConstants.SOAP_ACTION_FE_COMP_ULTIMO_AUTORIZADO);
-
-            SOAPMessage response = requestHandler.executeSoapRequest(
-                AfipConstants.SOAP_ENDPOINT_URL,
-                AfipConstants.SOAP_ACTION_FE_COMP_ULTIMO_AUTORIZADO,
-                soapMessage
-            );
-            return responseHandler.handleSoapResponse(response);
-
-        } catch (Exception e) {
-            log.error("Error calling FECompUltimoAutorizado service", e);
-            throw new RuntimeException("Error calling FECompUltimoAutorizado service: " + e.getMessage(), e);
-        }
-    }
 }

@@ -329,6 +329,13 @@ class PSOAPClientSAAJTest {
                 "<ImpTrib>0.00</ImpTrib>" +
                 "<FchProceso>20240315</FchProceso>" +
                 "<CodAutorizacion>12345678901234</CodAutorizacion>" +
+                "<Iva>" +
+                "<AlicIva>" +
+                "<Id>5</Id>" +
+                "<BaseImp>82.64</BaseImp>" +
+                "<Importe>17.36</Importe>" +
+                "</AlicIva>" +
+                "</Iva>" +
                 "</FECompConsultarResult>" +
                 "</FECompConsultarResponse>" +
                 "</soap:Body>" +
@@ -355,6 +362,91 @@ class PSOAPClientSAAJTest {
         assertEquals(0.00, result.getImpTributos(), "El importe de tributos no coincide");
         assertEquals("20240315", result.getFechaProc(), "La fecha de proceso no coincide");
         assertEquals(12345678901234L, result.getCAE(), "El CAE no coincide");
+        
+        // Validar los datos de IVA
+        assertNotNull(result.getIva(), "La lista de IVA no debería ser null");
+        assertEquals(1, result.getIva().size(), "Debería haber un ítem de IVA");
+        assertEquals(5, result.getIva().get(0).getId(), "El ID de IVA no coincide");
+        assertEquals(82.64, result.getIva().get(0).getBaseImp(), "La base imponible de IVA no coincide");
+        assertEquals(17.36, result.getIva().get(0).getImporte(), "El importe de IVA no coincide");
+        
+        verify(soapConnection).close();
+    }
+
+    @Test
+    void llamarFECompConsultar_ConMultiplesIva_Success() throws Exception {
+        // Arrange
+        int puntoVenta = 1;
+        int tipoComprobante = 1;
+        int numeroComprobante = 123;
+        String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soap:Body>" +
+                "<FECompConsultarResponse xmlns=\"http://ar.gov.afip.dif.FEV1/\">" +
+                "<FECompConsultarResult>" +
+                "<Resultado>A</Resultado>" +
+                "<CbteFch>20240315</CbteFch>" +
+                "<ImpTotal>2034.04</ImpTotal>" +
+                "<ImpNeto>17758.36</ImpNeto>" +
+                "<ImpIVA>2034.04</ImpIVA>" +
+                "<ImpTrib>0.00</ImpTrib>" +
+                "<FchProceso>20240315</FchProceso>" +
+                "<CodAutorizacion>12345678901234</CodAutorizacion>" +
+                "<Iva>" +
+                "<AlicIva>" +
+                "<Id>4</Id>" +
+                "<BaseImp>17647.06</BaseImp>" +
+                "<Importe>1852.94</Importe>" +
+                "</AlicIva>" +
+                "<AlicIva>" +
+                "<Id>6</Id>" +
+                "<BaseImp>111.3</BaseImp>" +
+                "<Importe>181.1</Importe>" +
+                "</AlicIva>" +
+                "</Iva>" +
+                "</FECompConsultarResult>" +
+                "</FECompConsultarResponse>" +
+                "</soap:Body>" +
+                "</soap:Envelope>";
+
+        SOAPMessage soapMessage = createSoapMessage(xmlContent);
+        
+        // Configurar el mock de soapConnection
+        when(soapConnectionFactory.createConnection()).thenReturn(soapConnection);
+        doReturn(soapMessage).when(soapConnection).call(any(SOAPMessage.class), any(URL.class));
+
+        // Act
+        ComprobanteAfip result = client.getComprobante(puntoVenta, tipoComprobante, numeroComprobante);
+
+        // Assert
+        assertNotNull(result, "El resultado no debería ser null");
+        assertEquals(puntoVenta, result.getPunto_venta(), "El punto de venta no coincide");
+        assertEquals(numeroComprobante, result.getNroComp(), "El número de comprobante no coincide");
+        assertEquals(tipoComprobante, result.getTipoComp(), "El tipo de comprobante no coincide");
+        assertEquals("20240315", result.getCbteFch(), "La fecha del comprobante no coincide");
+        assertEquals(2034.04, result.getImpTotal(), "El importe total no coincide");
+        assertEquals(17758.36, result.getImpNeto(), "El importe neto no coincide");
+        assertEquals(2034.04, result.getImpIvas(), "El importe de IVA no coincide");
+        assertEquals(0.00, result.getImpTributos(), "El importe de tributos no coincide");
+        assertEquals("20240315", result.getFechaProc(), "La fecha de proceso no coincide");
+        assertEquals(12345678901234L, result.getCAE(), "El CAE no coincide");
+        
+        // Validar los datos de IVA - múltiples alícuotas
+        assertNotNull(result.getIva(), "La lista de IVA no debería ser null");
+        assertEquals(2, result.getIva().size(), "Debería haber dos ítems de IVA");
+        
+        // Verificar primera alícuota de IVA
+        ComprobanteAfipIva primerIva = result.getIva().get(0);
+        assertEquals(4, primerIva.getId(), "El ID del primer IVA no coincide");
+        assertEquals(17647.06, primerIva.getBaseImp(), "La base imponible del primer IVA no coincide");
+        assertEquals(1852.94, primerIva.getImporte(), "El importe del primer IVA no coincide");
+        
+        // Verificar segunda alícuota de IVA
+        ComprobanteAfipIva segundoIva = result.getIva().get(1);
+        assertEquals(6, segundoIva.getId(), "El ID del segundo IVA no coincide");
+        assertEquals(111.3, segundoIva.getBaseImp(), "La base imponible del segundo IVA no coincide");
+        assertEquals(181.1, segundoIva.getImporte(), "El importe del segundo IVA no coincide");
+        
         verify(soapConnection).close();
     }
 

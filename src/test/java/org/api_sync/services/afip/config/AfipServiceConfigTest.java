@@ -15,7 +15,7 @@ class AfipServiceConfigTest {
         assertEquals("https://servicios1.afip.gov.ar/wsfev1/service.asmx?WSDL", config.getSoapEndpointUrl());
         assertEquals("http://ar.gov.afip.dif.FEV1/FECAESolicitar", config.getSoapActionFecaeSolicitar());
         assertEquals(5000, config.getConnectionTimeout());
-        assertEquals(5000, config.getReadTimeout());
+        assertEquals(7000, config.getReadTimeout());
     }
 
     @Test

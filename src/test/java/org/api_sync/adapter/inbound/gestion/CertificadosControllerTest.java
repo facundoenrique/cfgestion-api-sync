@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound.gestion;
 
+import org.api_sync.adapter.inbound.red.CertificadosController;
 import org.api_sync.adapter.outbound.entities.Certificado;
 import org.api_sync.services.certificados.CertificadosService;
 import org.junit.jupiter.api.BeforeEach;

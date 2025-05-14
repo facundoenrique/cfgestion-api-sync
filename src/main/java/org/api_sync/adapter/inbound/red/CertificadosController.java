@@ -1,4 +1,4 @@
-package org.api_sync.adapter.inbound.gestion;
+package org.api_sync.adapter.inbound.red;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.outbound.entities.Certificado;

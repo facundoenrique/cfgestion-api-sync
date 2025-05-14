@@ -16,7 +16,7 @@ public class AfipServiceConfig {
             .soapEndpointUrl("https://servicios1.afip.gov.ar/wsfev1/service.asmx?WSDL")
             .soapActionFecaeSolicitar("http://ar.gov.afip.dif.FEV1/FECAESolicitar")
             .connectionTimeout(5000)
-            .readTimeout(5000)
+            .readTimeout(7000)
             .build();
     }
 } 

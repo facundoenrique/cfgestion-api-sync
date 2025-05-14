@@ -15,18 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -351,7 +341,7 @@ class PSOAPClientSAAJTest {
         doReturn(soapMessage).when(soapConnection).call(any(SOAPMessage.class), any(URL.class));
 
         // Act
-        ComprobanteAfip result = client.llamarFECompConsultar(puntoVenta, tipoComprobante, numeroComprobante);
+        ComprobanteAfip result = client.getComprobante(puntoVenta, tipoComprobante, numeroComprobante);
 
         // Assert
         assertNotNull(result, "El resultado no debería ser null");
@@ -398,7 +388,7 @@ class PSOAPClientSAAJTest {
         doReturn(soapMessage).when(soapConnection).call(any(SOAPMessage.class), any(URL.class));
 
         // Act
-        ComprobanteAfip result = client.llamarFECompConsultar(puntoVenta, tipoComprobante, numeroComprobante);
+        ComprobanteAfip result = client.getComprobante(puntoVenta, tipoComprobante, numeroComprobante);
 
         // Assert
         assertNull(result, "El resultado debería ser null en caso de error");

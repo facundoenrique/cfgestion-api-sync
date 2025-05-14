@@ -174,7 +174,7 @@ public class PSOAPClientSAAJ {
         return soapMessage;
     }
 
-    public ComprobanteAfip llamarFECompConsultar(int punto_venta, int cbteTipo, int cbteNro) {
+    public ComprobanteAfip getComprobante(int punto_venta, int cbteTipo, int cbteNro) {
         String soapAction = "http://ar.gov.afip.dif.FEV1/FECompConsultar";
         return callSoapWebServiceFECompConsultar(SOAP_ENDPOINT_URL, soapAction, punto_venta, cbteTipo, cbteNro);
     }

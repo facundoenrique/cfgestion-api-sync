@@ -9,6 +9,8 @@ import org.api_sync.adapter.outbound.repository.ClienteRepository;
 import org.api_sync.adapter.outbound.repository.gestion.EmpresaRepository;
 import org.api_sync.services.afip.config.AfipServiceConfig;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -33,7 +35,7 @@ public class AfipConsultarCaeService {
 				auth.getToken(), 
 				auth.getSign(), 
 				cliente.getCuit(),
-				afipServiceConfig
+				afipServiceConfig //TODO, mejorar, por como esta implementado se setea el endpoint para generar cae
 			);
 
 			Integer ultimoComprobante = psoapClientSAAJ.searchUltimaFacturaElectronica(puntoVenta, tipoComprobante);
@@ -75,5 +77,40 @@ public class AfipConsultarCaeService {
 			throw new RuntimeException("Error al consultar último comprobante", e);
 		}
 	}
-	
+
+	public List<ComprobanteAfip> consultarComprobantes(String empresaUuid,
+	                                                   Integer certificadoPuntoVenta,
+	                                                   Integer puntoVenta,
+	                                                   Integer tipoComprobante,
+	                                                   Integer numeroInicio,
+	                                                   Integer numeroFin) {
+		
+		Empresa empresa = empresaRepository.findByUuid(empresaUuid)
+				                  .orElseThrow(() -> new RuntimeException("No existe la empresa"));
+		
+		try {
+			Authentication auth = afipAuthentificationClient.getAuthentication(empresa.getCuit(), certificadoPuntoVenta);
+			
+			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(
+					auth.getToken(),
+					auth.getSign(),
+					empresa.getCuit(),
+					afipServiceConfig
+			);
+			List<ComprobanteAfip> comprobantes = new ArrayList<>();
+			
+			//TODO: Ver como pedir todos juntos, con una sola request.
+			for (int i=numeroInicio; i<=numeroFin; i++) {
+				comprobantes.add(psoapClientSAAJ.getComprobante(puntoVenta, tipoComprobante, i));
+			}
+			
+			log.info("Cantidad de comprobantes recuperados {} en punto de venta: {}", comprobantes.size(), puntoVenta);
+			
+			return comprobantes;
+			
+		} catch (Exception e) {
+			log.error("Error al consultar comprobantes: {}", e.getMessage(), e);
+			throw new RuntimeException("Error al consultar último comprobante", e);
+		}
+	}
 }

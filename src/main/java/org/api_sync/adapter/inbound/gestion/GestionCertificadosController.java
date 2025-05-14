@@ -1,5 +1,7 @@
 package org.api_sync.adapter.inbound.gestion;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.outbound.entities.Certificado;
 import org.api_sync.services.gestion.certificados.GestionCertificadosService;
@@ -20,11 +22,11 @@ public class GestionCertificadosController {
 	@PostMapping
 	public ResponseEntity<String> subirCertificado(
 			@RequestParam("file") MultipartFile file,
-			@RequestParam("punto_venta") Integer puntoVenta,
-			@RequestParam("empresa_id") Long empresaId,
+			@RequestParam("punto_venta") @NotNull(message = "punto_venta obligatorio") Integer puntoVenta,
+			@RequestParam("empresa") @NotBlank(message = "No debe estar vacio") String uuid,
 			@RequestParam("password") String password) {
 		try {
-			Certificado certificado = certificadoService.guardarCertificado(file, puntoVenta, empresaId, password);
+			Certificado certificado = certificadoService.guardarCertificado(file, puntoVenta, uuid, password);
 			return ResponseEntity.ok("Certificado guardado con ID: " + certificado.getId());
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("Error al guardar el certificado: " + e.getMessage());

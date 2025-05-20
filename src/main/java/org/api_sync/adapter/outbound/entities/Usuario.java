@@ -1,5 +1,6 @@
 package org.api_sync.adapter.outbound.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
@@ -25,6 +26,7 @@ public class Usuario {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "empresa_id", nullable = false)
 	@With
+	@JsonIgnore
 	private Empresa empresa;
 	
 	private String nombre;

@@ -83,6 +83,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		String path = request.getRequestURI();
 		String method = request.getMethod();
 		log.debug("Processing request {} {} in JwtFilter", method, path);
+		log.debug(">>> JwtFilter activo en {}", request.getRequestURI());
 		
 		// Mostrar todos los headers para depuración
 		if (log.isTraceEnabled()) {

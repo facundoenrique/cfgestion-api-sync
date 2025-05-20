@@ -22,11 +22,11 @@ import java.util.List;
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
-    @PostMapping
-    public ResponseEntity<Usuario> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
-        Usuario usuario = usuarioService.crearUsuario(request);
-        return ResponseEntity.ok(usuario);
-    }
+//    @PostMapping
+//    public ResponseEntity<Usuario> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
+//        Usuario usuario = usuarioService.crearUsuario(request);
+//        return ResponseEntity.ok(usuario);
+//    }
 
     @PutMapping("/{uuid}/usuarios/{codigo}")
     public ResponseEntity<Usuario> crearOactualizarUsuario(
@@ -42,16 +42,18 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.obtenerTodosLosUsuarios());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{uuid}/usuarios/{id}")
     public ResponseEntity<Usuario> obtenerUsuarioPorId(
+            @PathVariable @NotBlank(message = "El uuid es obligatorio") String uuid,
             @PathVariable @NotNull(message = "El ID es obligatorio") @Positive(message = "El ID debe ser positivo") Long id) {
         return usuarioService.obtenerUsuarioPorId(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/nombre/{nombre}")
+    @GetMapping("/{uuid}/nombre/{nombre}")
     public ResponseEntity<Usuario> obtenerUsuarioPorNombre(
+            @PathVariable @NotBlank(message = "El uuid es obligatorio") String uuid,
             @PathVariable @NotBlank(message = "El nombre es obligatorio") String nombre,
             @RequestParam @NotBlank(message = "El UUID de la empresa es obligatorio") String empresa) {
         return usuarioService.obtenerUsuarioPorNombre(nombre, empresa)
@@ -59,8 +61,9 @@ public class UsuarioController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{uuid}/usuarios/{id}")
     public ResponseEntity<Void> eliminarUsuario(
+            @PathVariable @NotBlank(message = "El uuid es obligatorio") String uuid,
             @PathVariable @NotNull(message = "El ID es obligatorio") @Positive(message = "El ID debe ser positivo") Long id) {
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.ok().build();

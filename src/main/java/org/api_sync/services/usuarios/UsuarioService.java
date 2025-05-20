@@ -30,13 +30,10 @@ public class UsuarioService {
 	public Optional<Usuario> login(String username, String password, String empresaUuid, Integer sucursalId) {
 		log.debug("Iniciando proceso de login para usuario: {}, empresa: {}", username, empresaUuid);
 		
-		Optional<Empresa> empresa = empresaRepository.findByUuid(empresaUuid);
-		if (empresa.isEmpty()) {
-			log.warn("Empresa no encontrada con UUID: {}", empresaUuid);
-			return Optional.empty();
-		}
+		Empresa empresa = empresaRepository.findByUuid(empresaUuid).orElseThrow(
+				() -> new RuntimeException("Empresa no encontrada con UUID: "+ empresaUuid));
 
-		Optional<Usuario> user = usuarioRepository.findByNombreAndEmpresaAndEliminado(username, empresa.get(), 0);
+		Optional<Usuario> user = usuarioRepository.findByNombreAndEmpresaAndEliminado(username, empresa, 0);
 		if (user.isEmpty()) {
 			log.warn("Usuario no encontrado: {}", username);
 			return Optional.empty();
@@ -49,8 +46,7 @@ public class UsuarioService {
 			}
 			log.debug("Resultado de verificación de contraseña para usuario {}: {}", username, passwordMatches);
 			
-			if (passwordMatches && user.get().getEmpresa().getId().equals(empresa.get().getId())) {
-				log.info("Login exitoso para usuario: {}", username);
+			if (passwordMatches && user.get().getEmpresa().getId().equals(empresa.getId())) {
 				return user;
 			}
 			
@@ -96,35 +92,35 @@ public class UsuarioService {
 		return usuarioRepository.save(usuario);
 	}
 
-	@Transactional
-	public Usuario crearUsuario(UsuarioRequest usuarioRequest) {
-		Empresa empresa = empresaRepository.findByUuid(usuarioRequest.getEmpresa())
-				                  .orElseThrow(() -> {
-					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
-					                  return new RuntimeException("Empresa no encontrada");
-				                  });
-		
-		log.info("Creando usuario: {}, empresa: {}", usuarioRequest.getNombre(), usuarioRequest.getEmpresa());
-		if (usuarioRepository.findByNombreAndEmpresaAndEliminado(usuarioRequest.getNombre(), empresa, 0).isPresent()) {
-			log.warn("Intento de crear usuario ya existente: {}", usuarioRequest.getNombre());
-			throw new RuntimeException("El usuario ya existe");
-		}
-
-		Usuario usuario = new Usuario();
-		usuario.setNombre(usuarioRequest.getNombre());
-		usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
-		usuario.setEmpresa(empresa);
-		usuario.setCodigo(usuarioRequest.getCodigo());
-		
-		return usuarioRepository.save(usuario);
-	}
+//	@Transactional
+//	public Usuario crearUsuario(UsuarioRequest usuarioRequest) {
+//		Empresa empresa = empresaRepository.findByUuid(usuarioRequest.getEmpresa())
+//				                  .orElseThrow(() -> {
+//					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
+//					                  return new RuntimeException("Empresa no encontrada");
+//				                  });
+//
+//		log.info("Creando usuario: {}, empresa: {}", usuarioRequest.getNombre(), usuarioRequest.getEmpresa());
+//		if (usuarioRepository.findByNombreAndEmpresaAndEliminado(usuarioRequest.getNombre(), empresa, 0).isPresent()) {
+//			log.warn("Intento de crear usuario ya existente: {}", usuarioRequest.getNombre());
+//			throw new RuntimeException("El usuario ya existe");
+//		}
+//
+//		Usuario usuario = new Usuario();
+//		usuario.setNombre(usuarioRequest.getNombre());
+//		usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
+//		usuario.setEmpresa(empresa);
+//		usuario.setCodigo(usuarioRequest.getCodigo());
+//
+//		return usuarioRepository.save(usuario);
+//	}
 
 	@Transactional
 	public Usuario crearOactualizarUsuario(String uuid, Integer codigo, UsuarioRequest usuarioRequest) {
 		
 		Empresa empresa = empresaRepository.findByUuid(uuid)
 				                  .orElseThrow(() -> {
-					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
+					                  log.error("Empresa no encontrada con UUID: {}", uuid);
 					                  return new RuntimeException("Empresa no encontrada");
 				                  });
 		
@@ -137,7 +133,8 @@ public class UsuarioService {
 				if (StringUtils.isBlank(usuarioRequest.getPassword())) {
 					throw new RuntimeException("El password es obligatorio para usuarios nuevos");
 				}
-				return usuarioRepository.save(usuarioRequest.toEntity().withEmpresa(empresa));
+				usuarioRequest.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
+				return usuarioRepository.save(usuarioRequest.toEntity(codigo).withEmpresa(empresa));
 			} else {
 				usuarioOptional = usuarioOptionalPorNombre;
 			}
@@ -157,9 +154,6 @@ public class UsuarioService {
 			usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
 		}
 		usuario.setEmpresa(empresa);
-		if (usuarioRequest.getCodigo() != null) {
-			usuario.setCodigo(usuarioRequest.getCodigo());
-		}
 		
 		return usuarioRepository.save(usuario);
 	}

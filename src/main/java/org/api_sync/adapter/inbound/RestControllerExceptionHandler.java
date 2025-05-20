@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -53,4 +56,16 @@ public class RestControllerExceptionHandler {
 		
 		return problemDetail;
 	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("error", ex.getClass().getSimpleName());
+		body.put("message", ex.getMessage());
+		StringWriter sw = new StringWriter();
+		ex.printStackTrace(new PrintWriter(sw));
+		body.put("stackTrace", sw.toString());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+	}
+
 }

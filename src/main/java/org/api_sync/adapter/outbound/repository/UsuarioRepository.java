@@ -18,4 +18,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	Optional<Usuario> findByNombreAndEmpresa(String nombre, Empresa empresa); //Solo para habilitar user
 	Optional<Usuario> findByNombreAndEliminado(String nombre, int eliminado);
 	Optional<Usuario> findByNombreAndEmpresaAndEliminado(String nombre, Empresa empresa, int eliminado);
+	Optional<Usuario> findByCodigoAndEmpresa(Integer codigo, Empresa empresa);
 }

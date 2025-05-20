@@ -1,5 +1,6 @@
 package org.api_sync.services.usuarios;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.gestion.request.UsuarioRequest;
@@ -7,6 +8,7 @@ import org.api_sync.adapter.outbound.entities.Usuario;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 import org.api_sync.adapter.outbound.repository.UsuarioRepository;
 import org.api_sync.adapter.outbound.repository.gestion.EmpresaRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +20,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
+	@Value("${api.validations.usePassword:true}")
+	private boolean usePassword;
 	private final UsuarioRepository usuarioRepository;
 	private final EmpresaRepository empresaRepository;
 	private final PasswordEncoder passwordEncoder;
+	
 
 	public Optional<Usuario> login(String username, String password, String empresaUuid, Integer sucursalId) {
 		log.debug("Iniciando proceso de login para usuario: {}, empresa: {}", username, empresaUuid);
@@ -38,7 +43,10 @@ public class UsuarioService {
 		}
 		
 		try {
-			boolean passwordMatches = passwordEncoder.matches(password, user.get().getPassword());
+			boolean passwordMatches = true;
+			if (usePassword) {
+				passwordMatches = passwordEncoder.matches(password, user.get().getPassword());
+			}
 			log.debug("Resultado de verificación de contraseña para usuario {}: {}", username, passwordMatches);
 			
 			if (passwordMatches && user.get().getEmpresa().getId().equals(empresa.get().getId())) {
@@ -112,20 +120,31 @@ public class UsuarioService {
 	}
 
 	@Transactional
-	public Usuario actualizarUsuario(Long id, UsuarioRequest usuarioRequest) {
-		log.info("Actualizando usuario ID: {}, nuevo nombre: {}", id, usuarioRequest.getNombre());
-		Usuario usuario = usuarioRepository.findById(id)
-			.orElseThrow(() -> {
-				log.error("Usuario no encontrado con ID: {}", id);
-				return new RuntimeException("Usuario no encontrado");
-			});
+	public Usuario crearOactualizarUsuario(String uuid, Integer codigo, UsuarioRequest usuarioRequest) {
 		
-		Empresa empresa = empresaRepository.findByUuid(usuarioRequest.getEmpresa())
+		Empresa empresa = empresaRepository.findByUuid(uuid)
 				                  .orElseThrow(() -> {
 					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
 					                  return new RuntimeException("Empresa no encontrada");
 				                  });
 		
+		log.info("Actualizando usuario CODIGO: {}, nuevo nombre: {}", codigo, usuarioRequest.getNombre());
+		Optional<Usuario> usuarioOptional = usuarioRepository.findByCodigoAndEmpresa(codigo, empresa);
+		
+		if (usuarioOptional.isEmpty()) {
+			Optional<Usuario> usuarioOptionalPorNombre = usuarioRepository.findByNombreAndEmpresa(usuarioRequest.getNombre(), empresa);
+			if (usuarioOptionalPorNombre.isEmpty()) {
+				if (StringUtils.isBlank(usuarioRequest.getPassword())) {
+					throw new RuntimeException("El password es obligatorio para usuarios nuevos");
+				}
+				return usuarioRepository.save(usuarioRequest.toEntity().withEmpresa(empresa));
+			} else {
+				usuarioOptional = usuarioOptionalPorNombre;
+			}
+		}
+		
+		Usuario usuario = usuarioOptional.get();
+			
 		if (!usuario.getNombre().equals(usuarioRequest.getNombre()) && 
 			usuarioRepository.findByNombreAndEmpresa(usuarioRequest.getNombre(), empresa).isPresent()) {
 			log.warn("Intento de actualizar a un nombre de usuario ya en uso: {}", usuarioRequest.getNombre());

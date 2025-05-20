@@ -16,7 +16,7 @@ import jakarta.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/empresas")
 @RequiredArgsConstructor
 @Validated
 public class UsuarioController {
@@ -28,11 +28,12 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(
-            @PathVariable @NotNull(message = "El ID es obligatorio") @Positive(message = "El ID debe ser positivo") Long id,
+    @PutMapping("/{uuid}/usuarios/{codigo}")
+    public ResponseEntity<Usuario> crearOactualizarUsuario(
+            @PathVariable @NotBlank(message = "El uuid es obligatorio") String uuid,
+            @PathVariable @NotNull(message = "El ID es obligatorio") @Positive(message = "El ID debe ser positivo") Integer codigo,
             @Valid @RequestBody UsuarioRequest request) {
-        Usuario usuario = usuarioService.actualizarUsuario(id, request);
+        Usuario usuario = usuarioService.crearOactualizarUsuario(uuid, codigo, request);
         return ResponseEntity.ok(usuario);
     }
 

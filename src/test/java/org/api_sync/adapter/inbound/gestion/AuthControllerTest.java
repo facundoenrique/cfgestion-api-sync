@@ -72,8 +72,8 @@ class AuthControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Map<String, String> tokens = (Map<String, String>) response.getBody();
         assertNotNull(tokens);
-        assertEquals(validAccessToken, tokens.get("accessToken"));
-        assertEquals(validRefreshToken, tokens.get("refreshToken"));
+        assertEquals(validAccessToken, tokens.get("access_token"));
+        assertEquals(validRefreshToken, tokens.get("refresh_token"));
         verify(usuarioService, times(1)).login(username, password, empresaUuid, sucursal);
         verify(jwtUtil, times(1)).generateAccessToken(testUsuario, pcName, puntoVenta, empresaUuid, sucursal);
         verify(jwtUtil, times(1)).generateRefreshToken(username);

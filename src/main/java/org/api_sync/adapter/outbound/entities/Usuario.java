@@ -24,6 +24,7 @@ public class Usuario {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "empresa_id", nullable = false)
+	@With
 	private Empresa empresa;
 	
 	private String nombre;
@@ -31,4 +32,5 @@ public class Usuario {
 	private short eliminado = 0;
 	//private Long caja; //esto hace referencia a que?
 	//private Long empleadoId; //este hace referencia a que ?
+
 }

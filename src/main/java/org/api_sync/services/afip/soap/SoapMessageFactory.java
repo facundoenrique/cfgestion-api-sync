@@ -55,41 +55,44 @@ public class SoapMessageFactory {
 
     private static String createFECAESolicitarBody(ComprobanteRequest comprobante, Authentication authentication) {
         return
-                "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
-                + "<ar:FECAESolicitar>"
-                + "<ar:Auth>"
-                + "<ar:Token>" + authentication.getToken() + "</ar:Token>"
-                + "<ar:Sign>" + authentication.getSign() + "</ar:Sign>"
-                + "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>"
-                + "</ar:Auth>"
-                + "<ar:FeCAEReq>"
-                + "<ar:FeCabReq>"
-                + "<ar:CantReg>" + comprobante.getCantReg() + "</ar:CantReg>"
-                + "<ar:PtoVta>" + comprobante.getPtoVta() + "</ar:PtoVta>"
-                + "<ar:CbteTipo>" + comprobante.getCbteTipo() + "</ar:CbteTipo>"
-                + "</ar:FeCabReq>"
-                + "<ar:FeDetReq>"
-                + "<ar:FECAEDetRequest>"
-                + generarDatosFact(comprobante)
-                + generarCompAsociados(comprobante, authentication)
-                + generarDatosTributos(comprobante)
-                + generarDatosIva(comprobante)
-                + "</ar:FECAEDetRequest>"
-                + "</ar:FeDetReq>"
-                + "</ar:FeCAEReq>"
-                + "</ar:FECAESolicitar>"
-                + "</SOAP-ENV:Body></SOAP-ENV:Envelope>";
+                "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\">"
+                        + "<SOAP-ENV:Header/>"
+                            + "<SOAP-ENV:Body>"
+                            + "<ar:FECAESolicitar>"
+                            + "<ar:Auth>"
+                                + "<ar:Token>" + authentication.getToken() + "</ar:Token>"
+                                + "<ar:Sign>" + authentication.getSign() + "</ar:Sign>"
+                                + "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>"
+                            + "</ar:Auth>"
+                            + "<ar:FeCAEReq>"
+                            + "<ar:FeCabReq>"
+                            + "<ar:CantReg>1</ar:CantReg>"
+                            + "<ar:PtoVta>" + comprobante.getPtoVta() + "</ar:PtoVta>"
+                            + "<ar:CbteTipo>" + comprobante.getCbteTipo() + "</ar:CbteTipo>"
+                            + "</ar:FeCabReq>"
+                            + "<ar:FeDetReq>"
+                            + "<ar:FECAEDetRequest>"
+                            + generarDatosFact(comprobante)
+                            + generarCompAsociados(comprobante, authentication)
+                            + generarDatosTributos(comprobante)
+                            + generarDatosIva(comprobante)
+                            + "</ar:FECAEDetRequest>"
+                            + "</ar:FeDetReq>"
+                            + "</ar:FeCAEReq>"
+                            + "</ar:FECAESolicitar>"
+                        + "</SOAP-ENV:Body>"
+                + "</SOAP-ENV:Envelope>";
     }
 
     private static String generarDatosFact(ComprobanteRequest comprobante) {
         String ret =
-                "<ar:Concepto>" + comprobante.getConcepto() + "</ar:Concepto> "
+                "<ar:Concepto>" + comprobante.getConcepto() + "</ar:Concepto>"
                 + "<ar:DocTipo>" + comprobante.getDocTipo() + "</ar:DocTipo>"
                 + "<ar:DocNro>" + comprobante.getDocNro() + "</ar:DocNro>"
                 + "<ar:CbteDesde>" + comprobante.getCbteDesde() + "</ar:CbteDesde>"
                 + "<ar:CbteHasta>" + comprobante.getCbteHasta() + "</ar:CbteHasta>"
                 + "<ar:CbteFch>" + comprobante.getCbteFch() + "</ar:CbteFch>"
-                + "<ar:ImpTotal>" + comprobante.getImpTotal() + "</ar:ImpTotal> "
+                + "<ar:ImpTotal>" + comprobante.getImpTotal() + "</ar:ImpTotal>"
                 + "<ar:ImpTotConc>" + comprobante.getImpTotConc() + "</ar:ImpTotConc>"
                 + "<ar:ImpNeto>" + comprobante.getImpNeto() + "</ar:ImpNeto>"
                 + "<ar:ImpOpEx>" + comprobante.getImpOpEx() + "</ar:ImpOpEx>"
@@ -98,9 +101,9 @@ public class SoapMessageFactory {
                 + "<ar:FchServDesde>" + (comprobante.getFchServDesde() != null ? comprobante.getFchServDesde() : "") + "</ar:FchServDesde>"
                 + "<ar:FchServHasta>" + (comprobante.getFchServHasta() != null ? comprobante.getFchServHasta() : "") + "</ar:FchServHasta>"
                 + "<ar:FchVtoPago>" + (comprobante.getFchVtoPago() != null ? comprobante.getFchVtoPago() : "") + "</ar:FchVtoPago>"
-                + "<ar:MonId>" + comprobante.getMonId() + "</ar:MonId>"
+                + "<ar:MonId>PES</ar:MonId>"
                 + (comprobante.getCondicionIVAReceptorId() > 0 ? "<ar:CondicionIVAReceptorId>" + comprobante.getCondicionIVAReceptorId() + "</ar:CondicionIVAReceptorId>" : "")
-                + "<ar:MonCotiz>" + comprobante.getMonCotiz() + "</ar:MonCotiz>";
+                + "<ar:MonCotiz>1</ar:MonCotiz>";
         return ret;
     }
 

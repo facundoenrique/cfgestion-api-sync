@@ -4,11 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.services.afip.model.ComprobanteRequest;
 import org.api_sync.services.afip.config.AfipConstants;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
 import java.io.ByteArrayInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -19,26 +14,18 @@ public class SoapMessageFactory {
     public static SOAPMessage createMessage(String soapAction, String body) throws SOAPException {
         try {
             MessageFactory messageFactory = MessageFactory.newInstance();
-            SOAPMessage message = messageFactory.createMessage();
+            SOAPMessage soapMessage = messageFactory.createMessage(new MimeHeaders(),
+                    new ByteArrayInputStream(
+                            body.getBytes()));
             
             // Set SOAP Action header
-            MimeHeaders headers = message.getMimeHeaders();
+            MimeHeaders headers = soapMessage.getMimeHeaders();
             headers.addHeader("SOAPAction", soapAction);
+            soapMessage.saveChanges();
+    
+            soapMessage.writeTo(System.out);
             
-            // Create SOAP envelope
-            SOAPEnvelope envelope = message.getSOAPPart().getEnvelope();
-            envelope.addNamespaceDeclaration("ar", "http://ar.gov.afip.dif.facturaelectronica/");
-            
-            // Set body content
-            SOAPBody soapBody = envelope.getBody();
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new ByteArrayInputStream(body.getBytes("UTF-8")));
-            Node importedNode = message.getSOAPPart().importNode(document.getDocumentElement(), true);
-            soapBody.appendChild(importedNode);
-            
-            return message;
+            return soapMessage;
         } catch (Exception e) {
             log.error("Error creating SOAP message: {}", e.getMessage(), e);
             throw new SOAPException("Error creating SOAP message", e);
@@ -49,7 +36,6 @@ public class SoapMessageFactory {
                                                           Authentication authentication) throws SOAPException {
         
         String requestBody = createFECAESolicitarBody(comprobante, authentication);
-        log.debug("requestBody: {}", requestBody);
         return createMessage(AfipConstants.SOAP_ACTION_FECAE_SOLICITAR, requestBody);
     }
 
@@ -72,10 +58,10 @@ public class SoapMessageFactory {
                             + "</ar:FeCabReq>"
                             + "<ar:FeDetReq>"
                             + "<ar:FECAEDetRequest>"
-                            + generarDatosFact(comprobante)
-                            + generarCompAsociados(comprobante, authentication)
-                            + generarDatosTributos(comprobante)
-                            + generarDatosIva(comprobante)
+                                + generarDatosFact(comprobante)
+                                + generarCompAsociados(comprobante, authentication)
+                                + generarDatosTributos(comprobante)
+                                + generarDatosIva(comprobante)
                             + "</ar:FECAEDetRequest>"
                             + "</ar:FeDetReq>"
                             + "</ar:FeCAEReq>"
@@ -126,13 +112,13 @@ public class SoapMessageFactory {
 
         String ret =
                 "<ar:CbtesAsoc>" +
-                "<ar:CbteAsoc>" +
-                "<ar:Tipo>" + tipo + "</ar:Tipo>" +
-                "<ar:PtoVta>" + comprobante.getCompAsociado().getPunto_venta() + "</ar:PtoVta>" +
-                "<ar:Nro>" + comprobante.getCompAsociado().getNumero() + "</ar:Nro>" +
-                "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>" +
-                "<ar:CbteFch>" + cbteFecha + "</ar:CbteFch>" +
-                "</ar:CbteAsoc>" +
+                    "<ar:CbteAsoc>" +
+                    "<ar:Tipo>" + tipo + "</ar:Tipo>" +
+                    "<ar:PtoVta>" + comprobante.getCompAsociado().getPunto_venta() + "</ar:PtoVta>" +
+                    "<ar:Nro>" + comprobante.getCompAsociado().getNumero() + "</ar:Nro>" +
+                    "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>" +
+                    "<ar:CbteFch>" + cbteFecha + "</ar:CbteFch>" +
+                    "</ar:CbteAsoc>" +
                 "</ar:CbtesAsoc>";
         return ret;
     }
@@ -143,13 +129,13 @@ public class SoapMessageFactory {
         }
         String ret =
                 "<ar:Tributos>"
-                + "<ar:Tributo>"
-                + "<ar:Id>" + comprobante.getIdTributo() + "</ar:Id>"
-                + "<ar:Desc>" + comprobante.getDescTributo() + "</ar:Desc>"
-                + "<ar:BaseImp>" + comprobante.getBaseImpTributo() + "</ar:BaseImp>"
-                // +"<ar:Alic>"+alicTributo+"</ar:Alic>"
-                + "<ar:Importe>" + comprobante.getImporteTributo() + "</ar:Importe>"
-                + "</ar:Tributo>"
+                    + "<ar:Tributo>"
+                    + "<ar:Id>" + comprobante.getIdTributo() + "</ar:Id>"
+                    + "<ar:Desc>" + comprobante.getDescTributo() + "</ar:Desc>"
+                    + "<ar:BaseImp>" + comprobante.getBaseImpTributo() + "</ar:BaseImp>"
+                    // +"<ar:Alic>"+alicTributo+"</ar:Alic>"
+                    + "<ar:Importe>" + comprobante.getImporteTributo() + "</ar:Importe>"
+                    + "</ar:Tributo>"
                 + "</ar:Tributos>";
 
         return ret;

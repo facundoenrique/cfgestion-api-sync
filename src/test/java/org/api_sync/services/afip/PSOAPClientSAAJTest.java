@@ -139,7 +139,6 @@ class PSOAPClientSAAJTest {
         
         when(requestHandler.executeSoapRequest(
             config.getSoapEndpointUrl(),
-            config.getSoapActionFecaeSolicitar(),
             soapMessage
         )).thenReturn(soapMessage);
         
@@ -158,7 +157,6 @@ class PSOAPClientSAAJTest {
             mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication));
             verify(requestHandler).executeSoapRequest(
                 config.getSoapEndpointUrl(),
-                config.getSoapActionFecaeSolicitar(),
                 soapMessage
             );
             verify(responseHandler).handleCaeResponse(soapMessage);
@@ -200,7 +198,6 @@ class PSOAPClientSAAJTest {
         
         when(requestHandler.executeSoapRequest(
             config.getSoapEndpointUrl(),
-            config.getSoapActionFecaeSolicitar(),
             soapMessage
         )).thenReturn(soapMessage);
         
@@ -219,7 +216,6 @@ class PSOAPClientSAAJTest {
             mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication));
             verify(requestHandler).executeSoapRequest(
                 config.getSoapEndpointUrl(),
-                config.getSoapActionFecaeSolicitar(),
                 soapMessage
             );
             verify(responseHandler).handleCaeResponse(soapMessage);
@@ -492,9 +488,6 @@ class PSOAPClientSAAJTest {
 
     private ComprobanteRequest createTestComprobanteRequest() {
         ComprobanteRequest request = new ComprobanteRequest();
-        request.setToken(TOKEN);
-        request.setSign(SIGN);
-        request.setCuit(CUIT);
         request.setPtoVta(1);
         request.setCantReg(1);
         request.setCtoVta(1);

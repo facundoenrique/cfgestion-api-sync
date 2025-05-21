@@ -10,8 +10,6 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.xml.soap.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,7 +78,7 @@ class SoapRequestHandlerTest {
         when(soapConnection.call(any(SOAPMessage.class), any(URL.class))).thenReturn(responseMessage);
 
         // Act
-        SOAPMessage result = requestHandler.executeSoapRequest(endpointUrl, soapAction, soapMessage);
+        SOAPMessage result = requestHandler.executeSoapRequest(endpointUrl, soapMessage);
 
         // Assert
         assertNotNull(result);
@@ -106,7 +104,7 @@ class SoapRequestHandlerTest {
 
         // Act & Assert
         SOAPException exception = assertThrows(SOAPException.class, () -> 
-            requestHandler.executeSoapRequest(endpointUrl, soapAction, soapMessage));
+            requestHandler.executeSoapRequest(endpointUrl, soapMessage));
         assertEquals("Test error", exception.getMessage());
         verify(soapConnection).close();
     }

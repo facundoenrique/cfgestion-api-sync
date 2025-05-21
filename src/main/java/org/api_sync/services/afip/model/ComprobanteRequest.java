@@ -1,5 +1,6 @@
 package org.api_sync.services.afip.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.api_sync.adapter.outbound.entities.DatosComprobante;
 
@@ -12,6 +13,7 @@ public class ComprobanteRequest {
     private int concepto;
     private int docTipo;
     private long docNro;
+    @JsonProperty("condicion_iva_receptor_id")
     private int condicionIVAReceptorId;
     private int cbteDesde;
     private int cbteHasta;

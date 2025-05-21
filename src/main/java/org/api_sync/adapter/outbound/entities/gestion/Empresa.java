@@ -21,7 +21,7 @@ public class Empresa {
 	@Column(nullable = false)
 	private String nombre;
 	@Column(nullable = false)
-	private String cuit;
+	private String cuit; //si alguien quiere dos empresas como el dube me va a complicar si le pongo unico al cuit
 	private String ingresosBrutos;
 	private String domicilio;
 	private LocalDate inicioActividades;
@@ -33,5 +33,6 @@ public class Empresa {
 	private String telefono;
 	private String email;
 	private String web;
+	@Column(unique = true)
 	private String uuid;
 }

@@ -15,7 +15,7 @@ public class Localidad {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String nombre;
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "provincia_id", nullable = false)
 	private Provincia provincia;
 }

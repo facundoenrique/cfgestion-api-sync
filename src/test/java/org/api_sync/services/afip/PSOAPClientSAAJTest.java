@@ -1,5 +1,6 @@
 package org.api_sync.services.afip;
 
+import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.services.afip.config.AfipServiceConfig;
 import org.api_sync.services.afip.model.CaeDTO;
 import org.api_sync.services.afip.model.ComprobanteRequest;
@@ -31,6 +32,7 @@ class PSOAPClientSAAJTest {
     private static final String TOKEN = "test-token";
     private static final String SIGN = "test-sign";
     private static final String CUIT = "12345678901";
+    private final Authentication authentication = new Authentication(1l, "token", "sign", "cuit", 1, "cuit");
 
     @Mock
     private SoapMessageFactory messageFactory;
@@ -79,7 +81,7 @@ class PSOAPClientSAAJTest {
         config = AfipServiceConfig.getDefaultConfig();
         
         // Crear el cliente con los mocks
-        client = new PSOAPClientSAAJ(TOKEN, SIGN, CUIT, config);
+        client = new PSOAPClientSAAJ(authentication, config);
         
         // Inyectar los mocks usando reflection
         java.lang.reflect.Field messageFactoryField = PSOAPClientSAAJ.class.getDeclaredField("messageFactory");
@@ -133,7 +135,7 @@ class PSOAPClientSAAJTest {
         
         // Configurar los mocks uno por uno
         MockedStatic<SoapMessageFactory> mockedMessageFactory = mockStatic(SoapMessageFactory.class);
-        mockedMessageFactory.when(() -> SoapMessageFactory.createFECAESolicitarMessage(request)).thenReturn(soapMessage);
+        mockedMessageFactory.when(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication)).thenReturn(soapMessage);
         
         when(requestHandler.executeSoapRequest(
             config.getSoapEndpointUrl(),
@@ -153,7 +155,7 @@ class PSOAPClientSAAJTest {
             assertEquals("20240315", result.getCaeFchVto(), "La fecha de vencimiento no coincide");
             
             // Verificar las llamadas a los mocks
-            mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request));
+            mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication));
             verify(requestHandler).executeSoapRequest(
                 config.getSoapEndpointUrl(),
                 config.getSoapActionFecaeSolicitar(),
@@ -169,6 +171,7 @@ class PSOAPClientSAAJTest {
     void getCae_ErrorResponse() throws Exception {
         // Arrange
         ComprobanteRequest request = createTestComprobanteRequest();
+    
         String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                 "<soap:Body>" +
@@ -193,7 +196,7 @@ class PSOAPClientSAAJTest {
 
         // Configurar los mocks uno por uno
         MockedStatic<SoapMessageFactory> mockedMessageFactory = mockStatic(SoapMessageFactory.class);
-        mockedMessageFactory.when(() -> SoapMessageFactory.createFECAESolicitarMessage(request)).thenReturn(soapMessage);
+        mockedMessageFactory.when(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication)).thenReturn(soapMessage);
         
         when(requestHandler.executeSoapRequest(
             config.getSoapEndpointUrl(),
@@ -213,7 +216,7 @@ class PSOAPClientSAAJTest {
             assertNull(result.getCaeFchVto(), "La fecha de vencimiento debería ser null en caso de error");
             
             // Verificar las llamadas a los mocks
-            mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request));
+            mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication));
             verify(requestHandler).executeSoapRequest(
                 config.getSoapEndpointUrl(),
                 config.getSoapActionFecaeSolicitar(),
@@ -233,7 +236,7 @@ class PSOAPClientSAAJTest {
 
         // Configurar los mocks uno por uno
         MockedStatic<SoapMessageFactory> mockedMessageFactory = mockStatic(SoapMessageFactory.class);
-        mockedMessageFactory.when(() -> SoapMessageFactory.createFECAESolicitarMessage(request))
+        mockedMessageFactory.when(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication))
             .thenThrow(expectedException);
 
         try {
@@ -241,7 +244,7 @@ class PSOAPClientSAAJTest {
             assertThrows(AfipServiceException.class, () -> client.getCae(request));
             
             // Verificar las llamadas a los mocks
-            mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request));
+            mockedMessageFactory.verify(() -> SoapMessageFactory.createFECAESolicitarMessage(request, authentication));
         } finally {
             mockedMessageFactory.close();
         }

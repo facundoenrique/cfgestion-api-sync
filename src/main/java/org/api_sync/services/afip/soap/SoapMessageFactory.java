@@ -1,6 +1,7 @@
 package org.api_sync.services.afip.soap;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.services.afip.model.ComprobanteRequest;
 import org.api_sync.services.afip.config.AfipConstants;
 import org.w3c.dom.Document;
@@ -10,8 +11,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
 import java.io.ByteArrayInputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
@@ -95,19 +94,21 @@ public class SoapMessageFactory {
         );
     }
 
-    public static SOAPMessage createFECAESolicitarMessage(ComprobanteRequest comprobante) throws SOAPException {
-        String requestBody = createFECAESolicitarBody(comprobante);
+    public static SOAPMessage createFECAESolicitarMessage(ComprobanteRequest comprobante,
+                                                          Authentication authentication) throws SOAPException {
+        
+        String requestBody = createFECAESolicitarBody(comprobante, authentication);
         return createMessage(AfipConstants.SOAP_ACTION_FECAE_SOLICITAR, requestBody);
     }
 
-    private static String createFECAESolicitarBody(ComprobanteRequest comprobante) {
+    private static String createFECAESolicitarBody(ComprobanteRequest comprobante, Authentication authentication) {
         String soapMessageWithLeadingComment =
                 "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
                 + "<ar:FECAESolicitar>"
                 + "<ar:Auth>"
-                + "<ar:Token>" + comprobante.getToken() + "</ar:Token>"
-                + "<ar:Sign>" + comprobante.getSign() + "</ar:Sign>"
-                + "<ar:Cuit>" + comprobante.getCuit() + "</ar:Cuit>"
+                + "<ar:Token>" + authentication.getToken() + "</ar:Token>"
+                + "<ar:Sign>" + authentication.getSign() + "</ar:Sign>"
+                + "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>"
                 + "</ar:Auth>"
                 + "<ar:FeCAEReq>"
                 + "<ar:FeCabReq>"

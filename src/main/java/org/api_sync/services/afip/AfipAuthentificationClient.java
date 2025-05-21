@@ -32,17 +32,19 @@ public class AfipAuthentificationClient {
 
         
         Optional<Authentication> authenticationOptional =
-                authenticationRepository.findByCuitAndPuntoVenta(cuit, puntoVenta);
+                authenticationRepository.findTopByCuitAndPuntoVentaOrderByExpirationTime(cuit, puntoVenta);
                 
         if (authenticationOptional.isPresent() && !authenticationOptional.get().expired() && authenticationOptional.get().isValid()) {
             return authenticationOptional.get();
-        } else { //tengo que obtener nuevas llaves
-            return generateNewToken(cuit, puntoVenta);
+        } else { //tengo que obtener nuevas llaves y borrar las que estan en la bd ya que no sirven mas
+     
+            return generateNewToken(cuit, puntoVenta,
+                    authenticationOptional.isPresent() ? authenticationOptional.get().getId() : null);
         }
 
     }
 
-    private Authentication generateNewToken(String cuit, Integer puntoVenta) throws Exception {
+    private Authentication generateNewToken(String cuit, Integer puntoVenta, Long authenticationId) throws Exception {
     
     
         String loginTicketResponse = null;
@@ -93,6 +95,9 @@ public class AfipAuthentificationClient {
             log.debug("ExpirationTime: " + expirationTime);
         
             Authentication authentication = Authentication.builder()
+                                                    .id(authenticationId) //El id es para actualizar el valor
+                                                    // existente y no estar sumaando nuevas filas a la base de datos,
+                                                    // hay que ahorrar
                                                     .cuit(cuit)
                                                     .puntoVenta(puntoVenta)
                                                     .token(token)
@@ -108,9 +113,7 @@ public class AfipAuthentificationClient {
     }
     
     private void writeKeys(Authentication authentication) {
-
         authenticationRepository.save(authentication);
-
     }
 
 }

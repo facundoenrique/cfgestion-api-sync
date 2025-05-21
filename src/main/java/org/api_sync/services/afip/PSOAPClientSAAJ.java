@@ -1,6 +1,7 @@
 package org.api_sync.services.afip;
 
 import lombok.extern.slf4j.Slf4j;
+import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.services.afip.soap.SoapResponseParser;
 import org.api_sync.services.afip.exceptions.AfipServiceException;
 import org.api_sync.services.afip.config.AfipServiceConfig;
@@ -39,9 +40,7 @@ public class PSOAPClientSAAJ {
     private static final int CONNECTION_TIMEOUT = 5000;
     private static final int READ_TIMEOUT = 5000;
 
-    private final String token;
-    private final String sign;
-    private final String cuit;
+    private final Authentication authentication;
     private final SoapMessageFactory messageFactory;
     private final SoapRequestHandler requestHandler;
     private final SoapResponseHandler responseHandler;
@@ -49,10 +48,8 @@ public class PSOAPClientSAAJ {
     private final AfipServiceConfig config;
     private String message;
 
-    public PSOAPClientSAAJ(String token, String sign, String cuit, AfipServiceConfig config) {
-        this.token = token;
-        this.sign = sign;
-        this.cuit = cuit;
+    public PSOAPClientSAAJ(Authentication authentication, AfipServiceConfig config) {
+        this.authentication = authentication;
         this.config = config;
         this.messageFactory = new SoapMessageFactory();
         this.requestHandler = new SoapRequestHandler(config);
@@ -63,8 +60,10 @@ public class PSOAPClientSAAJ {
     public CaeDTO getCae(ComprobanteRequest comprobanteRequest) {
         log.info("Ejecutando solicitud de CAE para comprobante: {}", comprobanteRequest);
         try {
+            
             // Construir el mensaje SOAP
-            SOAPMessage soapRequest = messageFactory.createFECAESolicitarMessage(comprobanteRequest);
+            SOAPMessage soapRequest = messageFactory.createFECAESolicitarMessage(
+                    comprobanteRequest, authentication);
             
             // Ejecutar la petición SOAP
             SOAPMessage soapResponse = requestHandler.executeSoapRequest(
@@ -149,9 +148,9 @@ public class PSOAPClientSAAJ {
                 "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
                 + "<FECompUltimoAutorizado xmlns=\"http://ar.gov.afip.dif.FEV1/\">"
                 + "<Auth>"
-                + "<Token>" + token + "</Token>"
-                + "<Sign>" + sign + "</Sign>"
-                + "<Cuit>" + cuit + "</Cuit>"
+                + "<Token>" + authentication.getToken() + "</Token>"
+                + "<Sign>" + authentication.getSign() + "</Sign>"
+                + "<Cuit>" + authentication.getCuit() + "</Cuit>"
                 + "</Auth>"
                 + "<PtoVta>" + punto_venta + "</PtoVta>"
                 + "<CbteTipo>" + tipoComprobante + "</CbteTipo>"
@@ -282,9 +281,9 @@ public class PSOAPClientSAAJ {
                 "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
                 + "<FECompConsultar xmlns=\"http://ar.gov.afip.dif.FEV1/\">"
                 + "<Auth>"
-                + "<Token>" + token + "</Token>"
-                + "<Sign>" + sign + "</Sign>"
-                + "<Cuit>" + cuit + "</Cuit>"
+                + "<Token>" + authentication.getToken() + "</Token>"
+                + "<Sign>" + authentication.getSign() + "</Sign>"
+                + "<Cuit>" + authentication.getCuit() + "</Cuit>"
                 + "</Auth>"
                 + "<ar:FeCompConsReq>"
                 + "<ar:CbteTipo>" + cbteTipo + "</ar:CbteTipo>"

@@ -32,9 +32,7 @@ public class AfipConsultarCaeService {
 			Authentication auth = afipAuthentificationClient.getAuthentication(cliente.getCuit(), certificadoPuntoVenta);
 			
 			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(
-				auth.getToken(), 
-				auth.getSign(), 
-				cliente.getCuit(),
+				auth,
 				afipServiceConfig //TODO, mejorar, por como esta implementado se setea el endpoint para generar cae
 			);
 
@@ -60,10 +58,8 @@ public class AfipConsultarCaeService {
 			Authentication auth = afipAuthentificationClient.getAuthentication(empresa.getCuit(), certificadoPuntoVenta);
 			
 			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(
-				auth.getToken(), 
-				auth.getSign(), 
-				empresa.getCuit(),
-				afipServiceConfig
+					auth,
+					afipServiceConfig
 			);
 			
 			Integer ultimoComprobante = psoapClientSAAJ.searchUltimaFacturaElectronica(puntoVenta, tipoComprobante);
@@ -92,9 +88,7 @@ public class AfipConsultarCaeService {
 			Authentication auth = afipAuthentificationClient.getAuthentication(empresa.getCuit(), certificadoPuntoVenta);
 			
 			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(
-					auth.getToken(),
-					auth.getSign(),
-					empresa.getCuit(),
+					auth,
 					afipServiceConfig
 			);
 			List<ComprobanteAfip> comprobantes = new ArrayList<>();

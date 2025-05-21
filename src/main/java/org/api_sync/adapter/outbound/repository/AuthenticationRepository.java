@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface AuthenticationRepository extends JpaRepository<Authentication, Long> {
-	Optional<Authentication> findByCuitAndPuntoVenta(String cuit, Integer puntoVenta);
+	Optional<Authentication> findTopByCuitAndPuntoVentaOrderByExpirationTime(String cuit, Integer puntoVenta);
 }

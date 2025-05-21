@@ -1,12 +1,20 @@
 package org.api_sync.services.afip.model;
 
-import lombok.Data;
+import lombok.*;
 import org.api_sync.adapter.outbound.entities.DatosComprobante;
 
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ComprobanteRequest {
+    @With
     private String token;
+    @With
     private String sign;
+    @With
     private String cuit;
     private int ptoVta;
     private int cantReg;//cantidad de registros que se envian. voy a usar siempre 1

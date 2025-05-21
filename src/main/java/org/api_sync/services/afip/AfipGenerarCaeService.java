@@ -27,9 +27,7 @@ public class AfipGenerarCaeService {
 			Authentication auth = afipAuthentificationClient.getAuthentication(empresa.getCuit(), certificadoPuntoVenta);
 			
 			PSOAPClientSAAJ psoapClientSAAJ = new PSOAPClientSAAJ(
-				auth.getToken(), 
-				auth.getSign(), 
-				empresa.getCuit(),
+				auth,
 				afipServiceConfig
 			);
 			

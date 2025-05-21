@@ -15,22 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class SoapMessageFactory {
-    private static final String SOAP_ENVELOPE_TEMPLATE = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-        "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-        "xmlns:ar=\"http://ar.gov.afip.dif.facturaelectronica/\">" +
-        "<soapenv:Header/>" +
-        "<soapenv:Body>" +
-        "%s" +
-        "</soapenv:Body>" +
-        "</soapenv:Envelope>";
-
-    private static final String AUTH_TEMPLATE = 
-        "<ar:Auth>" +
-        "<Token>%s</Token>" +
-        "<Sign>%s</Sign>" +
-        "<Cuit>%s</Cuit>" +
-        "</ar:Auth>";
 
     public static SOAPMessage createMessage(String soapAction, String body) throws SOAPException {
         try {
@@ -61,48 +45,16 @@ public class SoapMessageFactory {
         }
     }
 
-    public static String createAuthSection(String token, String sign, String cuit) {
-        return String.format(AUTH_TEMPLATE, token, sign, cuit);
-    }
-
-    public static String createFECompConsultarBody(String authSection, String cbteTipo, String cbtePtoVta, String cbteNro) {
-        return String.format(
-            "<ar:FECompConsultarRequest>" +
-            "%s" +
-            "<ar:FeCAEReq>" +
-            "<FeCAEReq>" +
-            "<FeCAEReq>" +
-            "<CbteTipo>%s</CbteTipo>" +
-            "<CbtePtoVta>%s</CbtePtoVta>" +
-            "<CbteNro>%s</CbteNro>" +
-            "</FeCAEReq>" +
-            "</FeCAEReq>" +
-            "</ar:FeCAEReq>" +
-            "</ar:FECompConsultarRequest>",
-            authSection, cbteTipo, cbtePtoVta, cbteNro
-        );
-    }
-
-    public static String createFECompUltimoAutorizadoBody(String authSection, String cbteTipo, String cbtePtoVta) {
-        return String.format(
-            "<ar:FECompUltimoAutorizadoRequest>" +
-            "%s" +
-            "<ar:PtoVta>%s</ar:PtoVta>" +
-            "<ar:CbteTipo>%s</ar:CbteTipo>" +
-            "</ar:FECompUltimoAutorizadoRequest>",
-            authSection, cbtePtoVta, cbteTipo
-        );
-    }
-
     public static SOAPMessage createFECAESolicitarMessage(ComprobanteRequest comprobante,
                                                           Authentication authentication) throws SOAPException {
         
         String requestBody = createFECAESolicitarBody(comprobante, authentication);
+        log.debug("requestBody: {}", requestBody);
         return createMessage(AfipConstants.SOAP_ACTION_FECAE_SOLICITAR, requestBody);
     }
 
     private static String createFECAESolicitarBody(ComprobanteRequest comprobante, Authentication authentication) {
-        String soapMessageWithLeadingComment =
+        return
                 "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ar=\"http://ar.gov.afip.dif.FEV1/\"><SOAP-ENV:Header/><SOAP-ENV:Body>"
                 + "<ar:FECAESolicitar>"
                 + "<ar:Auth>"
@@ -119,7 +71,7 @@ public class SoapMessageFactory {
                 + "<ar:FeDetReq>"
                 + "<ar:FECAEDetRequest>"
                 + generarDatosFact(comprobante)
-                + generarCompAsociados(comprobante)
+                + generarCompAsociados(comprobante, authentication)
                 + generarDatosTributos(comprobante)
                 + generarDatosIva(comprobante)
                 + "</ar:FECAEDetRequest>"
@@ -127,8 +79,6 @@ public class SoapMessageFactory {
                 + "</ar:FeCAEReq>"
                 + "</ar:FECAESolicitar>"
                 + "</SOAP-ENV:Body></SOAP-ENV:Envelope>";
-
-        return soapMessageWithLeadingComment;
     }
 
     private static String generarDatosFact(ComprobanteRequest comprobante) {
@@ -154,7 +104,7 @@ public class SoapMessageFactory {
         return ret;
     }
 
-    private static String generarCompAsociados(ComprobanteRequest comprobante) {
+    private static String generarCompAsociados(ComprobanteRequest comprobante, Authentication authentication) {
         if (comprobante.getCompAsociado() == null) {
             return StringUtils.EMPTY;
         }
@@ -177,7 +127,7 @@ public class SoapMessageFactory {
                 "<ar:Tipo>" + tipo + "</ar:Tipo>" +
                 "<ar:PtoVta>" + comprobante.getCompAsociado().getPunto_venta() + "</ar:PtoVta>" +
                 "<ar:Nro>" + comprobante.getCompAsociado().getNumero() + "</ar:Nro>" +
-                "<ar:Cuit>" + comprobante.getCuit() + "</ar:Cuit>" +
+                "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>" +
                 "<ar:CbteFch>" + cbteFecha + "</ar:CbteFch>" +
                 "</ar:CbteAsoc>" +
                 "</ar:CbtesAsoc>";

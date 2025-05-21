@@ -3,19 +3,8 @@ package org.api_sync.services.afip.model;
 import lombok.*;
 import org.api_sync.adapter.outbound.entities.DatosComprobante;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class ComprobanteRequest {
-    @With
-    private String token;
-    @With
-    private String sign;
-    @With
-    private String cuit;
     private int ptoVta;
     private int cantReg;//cantidad de registros que se envian. voy a usar siempre 1
     private int ctoVta;

@@ -35,7 +35,6 @@ import java.util.List;
 
 @Slf4j
 public class PSOAPClientSAAJ {
-    private static final String SOAP_ACTION_FECAE_SOLICITAR = "http://ar.gov.afip.dif.FEV1/FECAESolicitar";
     private static final String SOAP_ENDPOINT_URL = "https://servicios1.afip.gov.ar/wsfev1/service.asmx?WSDL";
     private static final int CONNECTION_TIMEOUT = 5000;
     private static final int READ_TIMEOUT = 5000;
@@ -68,9 +67,10 @@ public class PSOAPClientSAAJ {
             // Ejecutar la petición SOAP
             SOAPMessage soapResponse = requestHandler.executeSoapRequest(
                 config.getSoapEndpointUrl(),
-                config.getSoapActionFecaeSolicitar(),
                 soapRequest
             );
+    
+            soapResponse.writeTo(System.out);
             
             // Procesar la respuesta
             return responseHandler.handleCaeResponse(soapResponse);

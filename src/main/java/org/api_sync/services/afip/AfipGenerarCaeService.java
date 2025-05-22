@@ -38,9 +38,7 @@ public class AfipGenerarCaeService {
 			return CaeResponse.builder()
 					       .cae(caeDto.getCae())
 					       .caeFechaVto(caeDto.getCaeFchVto())
-					       .messageError(null)
-					       .codeError(null)
-					       .message(null)
+					       .responseDetails(caeDto.getAfipResponseDetails())
 					       .build();
 			
 		} catch (Exception e) {

@@ -3,6 +3,7 @@ package org.api_sync.services.afip.soap;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.services.afip.config.AfipConstants;
 import org.api_sync.services.afip.exceptions.AfipServiceException;
+import org.api_sync.services.afip.model.AfipResponseDetails;
 import org.api_sync.services.afip.model.CaeDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -50,12 +51,13 @@ public class SoapResponseHandler {
             Document doc = parseXml(strMsg);
             String error = extractElementValue(doc, AfipConstants.ELEMENT_ERROR);
             
+            CaeDTO cae = new CaeDTO();
             if (error != null && !error.isEmpty()) {
                 log.error("Error en la respuesta: {}", error);
-                throw new AfipServiceException("Error en la respuesta del servicio: " + error);
+                AfipResponseDetails afipResponseDetails = AfipSoapParser.extractErrors(strMsg);
+                cae.setAfipResponseDetails(afipResponseDetails);
+                return cae;
             }
-
-            CaeDTO cae = new CaeDTO();
             cae.setCae(extractElementValue(doc, AfipConstants.ELEMENT_COD_AUTORIZACION));
             cae.setCaeFchVto(extractElementValue(doc, AfipConstants.ELEMENT_FCH_VTO));
             cae.setCbteFch(extractElementValue(doc, AfipConstants.ELEMENT_CBTE_FCH));

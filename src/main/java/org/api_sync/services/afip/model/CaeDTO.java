@@ -18,4 +18,5 @@ public class CaeDTO {
     private String fchVtoPago;
     private String monId;
     private String monCotiz;
+    private AfipResponseDetails afipResponseDetails;
 } 

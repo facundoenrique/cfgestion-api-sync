@@ -2,6 +2,7 @@ package org.api_sync.services.afip;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.api_sync.adapter.inbound.components.EncryptionUtil;
 import org.api_sync.adapter.outbound.entities.Authentication;
 import org.api_sync.adapter.outbound.entities.Certificado;
 import org.api_sync.adapter.outbound.repository.AuthenticationRepository;
@@ -27,6 +28,7 @@ public class AfipAuthentificationClient {
     private final CertificadosRepository certificadosRepository;
     private final AuthenticationRepository authenticationRepository;
     private final AfipLoginClient afipLoginClient;
+    private final EncryptionUtil encryptionUtil;
 
     public Authentication getAuthentication(String cuit, Integer puntoVenta) throws Exception {
 
@@ -72,7 +74,7 @@ public class AfipAuthentificationClient {
         // Create LoginTicketRequest_xml_cms
         byte[] loginTicketRequest_xml_cms = afipLoginClient.create_cms(
                 certificado.get().getArchivo(),
-                certificado.get().getPassword(),
+                encryptionUtil.decrypt(certificado.get().getPassword()),
                 signer, dstDN, service);
     
         log.info("Llaves vencidas, creando nuevas");

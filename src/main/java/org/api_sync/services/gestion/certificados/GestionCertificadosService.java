@@ -2,6 +2,7 @@ package org.api_sync.services.gestion.certificados;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.api_sync.adapter.inbound.components.EncryptionUtil;
 import org.api_sync.adapter.outbound.entities.Certificado;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 import org.api_sync.adapter.outbound.repository.CertificadosRepository;
@@ -20,7 +21,7 @@ public class GestionCertificadosService {
 
 	private final CertificadosRepository certificadosRepository;
 	private final EmpresaRepository empresaRepository;
-	
+	private final EncryptionUtil encryptionUtil;
 	
 	public Certificado guardarCertificado(MultipartFile file, Integer puntoVenta, String uuid,
 	                                      String password) throws IOException {
@@ -29,11 +30,13 @@ public class GestionCertificadosService {
 		
 		String pass = StringUtils.isNotBlank(password) ? password : "mastermix";
 		
+		String encryptedPassword = encryptionUtil.encrypt(pass);
+		
 		Certificado certificado = new Certificado();
 		certificado.setArchivo(file.getBytes());
 		certificado.setPuntoVenta(puntoVenta);
 		certificado.setCuit(empresa.getCuit());
-		certificado.setPassword(pass);
+		certificado.setPassword(encryptedPassword);
 		certificado.setFechaCreado(Date.from(Instant.now()));
 		certificado.setOrigen(Origen.GESTION);
 		

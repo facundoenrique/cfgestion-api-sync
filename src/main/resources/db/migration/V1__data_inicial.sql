@@ -55,7 +55,7 @@ CREATE TABLE `articulos` (
   `marca` varchar(255) DEFAULT NULL,
   `nombre` varchar(255) DEFAULT NULL,
   `numero` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -67,7 +67,7 @@ CREATE TABLE `articulos` (
 
 CREATE TABLE `articulos_seq` (
   `next_val` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 --
@@ -90,7 +90,7 @@ CREATE TABLE `authentication` (
   `expiration_time` varchar(255) NOT NULL,
   `sign` text NOT NULL,
   `token` text NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -101,7 +101,7 @@ CREATE TABLE `authentication` (
 
 CREATE TABLE `authentication_seq` (
   `next_val` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 --
@@ -125,7 +125,7 @@ CREATE TABLE `certificados` (
   `password` varchar(255) NOT NULL,
   `archivo` blob NOT NULL,
   `origen` enum('GESTION','RED') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -136,7 +136,7 @@ CREATE TABLE `certificados` (
 
 CREATE TABLE `certificados_seq` (
   `next_val` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 --
@@ -195,7 +195,7 @@ CREATE TABLE `clientes` (
   `telefono` varchar(255) DEFAULT NULL,
   `telefono2` varchar(255) DEFAULT NULL,
   `web` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -231,7 +231,7 @@ CREATE TABLE `comprobantes` (
   `sucursal` bigint(20) NOT NULL,
   `comentario` varchar(255) DEFAULT NULL,
   `numero_trans` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -258,7 +258,7 @@ CREATE TABLE `comprobantes_detalles` (
   `detalle` varchar(255) DEFAULT NULL,
   `numero` varchar(255) NOT NULL,
   `serie` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -273,7 +273,7 @@ CREATE TABLE `comprobantes_forma_pago` (
   `tipo` int(11) NOT NULL,
   `comprobante_id` bigint(20) NOT NULL,
   `id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -288,7 +288,7 @@ CREATE TABLE `comprobantes_impuestos` (
   `neto` double NOT NULL,
   `comprobante_id` bigint(20) NOT NULL,
   `id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -313,7 +313,7 @@ CREATE TABLE `empresas` (
   `telefono` varchar(255) DEFAULT NULL,
   `uuid` varchar(255) DEFAULT NULL,
   `web` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -334,7 +334,7 @@ CREATE TABLE `impuestos` (
   `tipo` smallint(6) DEFAULT NULL,
   `tipo_iva` smallint(6) DEFAULT NULL,
   `nombre` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -348,7 +348,7 @@ CREATE TABLE `items_lista_precios` (
   `id` bigint(20) NOT NULL,
   `lista_de_precios_id` bigint(20) NOT NULL,
   `precio_id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -363,7 +363,7 @@ CREATE TABLE `listas_precios` (
   `id` bigint(20) NOT NULL,
   `proveedor_id` bigint(20) NOT NULL,
   `nombre` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -376,7 +376,7 @@ CREATE TABLE `localidades` (
   `id` int(11) NOT NULL,
   `provincia_id` int(11) NOT NULL,
   `nombre` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -401,7 +401,7 @@ CREATE TABLE `precios` (
   `importe` decimal(38,2) NOT NULL,
   `articulo_id` bigint(20) NOT NULL,
   `id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -417,7 +417,7 @@ CREATE TABLE `preventas` (
   `id` bigint(20) NOT NULL,
   `lista_base_id` bigint(20) DEFAULT NULL,
   `nombre` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -437,7 +437,7 @@ CREATE TABLE `preventas_articulos` (
   `preventa_id` bigint(20) DEFAULT NULL,
   `nombre` varchar(255) NOT NULL,
   `numero` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -457,7 +457,7 @@ CREATE TABLE `proveedores` (
   `email` varchar(255) DEFAULT NULL,
   `razon_social` varchar(255) NOT NULL,
   `telefono` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -469,7 +469,7 @@ CREATE TABLE `proveedores` (
 CREATE TABLE `provincias` (
   `codigo` int(11) NOT NULL,
   `nombre` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -521,7 +521,7 @@ CREATE TABLE `red_clientes` (
   `telefono` varchar(255) DEFAULT NULL,
   `telefono2` varchar(255) DEFAULT NULL,
   `web` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -537,7 +537,7 @@ CREATE TABLE `usuarios` (
   `id` bigint(20) NOT NULL,
   `nombre` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- --------------------------------------------------------
@@ -552,7 +552,7 @@ CREATE TABLE `vendedores` (
   `email` varchar(255) DEFAULT NULL,
   `nombre` varchar(255) DEFAULT NULL,
   `telefono` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 --

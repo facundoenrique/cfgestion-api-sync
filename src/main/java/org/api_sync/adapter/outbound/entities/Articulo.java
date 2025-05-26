@@ -11,8 +11,8 @@ import java.util.Date;
 @Entity
 @Table(name = "articulos",
 		uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"numero", "empresa_id"}),
-		@UniqueConstraint(columnNames = {"codigo", "empresa_id"})
+		@UniqueConstraint(columnNames = {"numero", "empresa"}),
+		@UniqueConstraint(columnNames = {"codigo", "empresa"})
 })
 @NoArgsConstructor
 @AllArgsConstructor

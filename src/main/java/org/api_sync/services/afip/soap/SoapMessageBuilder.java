@@ -96,13 +96,13 @@ public class SoapMessageBuilder {
             return EMPTY;
         }
 
-        int tipo = mapTipoComprobante(comprobanteRequest.getCompAsociado().getTipo_comprobante());
-        String cbteFecha = comprobanteRequest.getCompAsociado().getFecha_comprobante().replaceAll("-", EMPTY);
+        int tipo = mapTipoComprobante(comprobanteRequest.getCompAsociado().getTipoComprobante());
+        String cbteFecha = comprobanteRequest.getCompAsociado().getFechaComprobante().replaceAll("-", EMPTY);
 
         return "<ar:CbtesAsoc>" +
                "<ar:CbteAsoc>" +
                "<ar:Tipo>" + tipo + "</ar:Tipo>" +
-               "<ar:PtoVta>" + comprobanteRequest.getCompAsociado().getPunto_venta() + "</ar:PtoVta>" +
+               "<ar:PtoVta>" + comprobanteRequest.getCompAsociado().getPuntoVenta() + "</ar:PtoVta>" +
                "<ar:Nro>" + comprobanteRequest.getCompAsociado().getNumero() + "</ar:Nro>" +
                "<ar:Cuit>" + cuit + "</ar:Cuit>" +
                "<ar:CbteFch>" + cbteFecha + "</ar:CbteFch>" +

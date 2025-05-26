@@ -26,7 +26,7 @@ public class Articulo {
 	@Column(nullable = false)
 	private Integer codigo;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@JoinColumn(name = "empresa_id", nullable = false)
+	@JoinColumn(name = "empresa", nullable = false)
 	private Empresa empresa;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaCreado; //es una fecha, despues lo tengo que analizar bien para que se usa.

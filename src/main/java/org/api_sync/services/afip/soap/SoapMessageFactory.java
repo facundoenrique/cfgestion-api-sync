@@ -100,21 +100,21 @@ public class SoapMessageFactory {
         log.debug("comprobante asociado {}", comprobante.getCompAsociado());
 
         int tipo = 0;
-        if (comprobante.getCompAsociado().getTipo_comprobante() == 1) {
+        if (comprobante.getCompAsociado().getTipoComprobante() == 1) {
             tipo = 1;
-        } else if ((comprobante.getCompAsociado().getTipo_comprobante() == 5)) { // factura B de epyme
+        } else if ((comprobante.getCompAsociado().getTipoComprobante() == 5)) { // factura B de epyme
             tipo = 6;// factura b de webservice,
-        } else if ((comprobante.getCompAsociado().getTipo_comprobante() == 14)) {
+        } else if ((comprobante.getCompAsociado().getTipoComprobante() == 14)) {
             tipo = 11;// factura c, no se si es correcto ese valor
         }
 
-        String cbteFecha = comprobante.getCompAsociado().getFecha_comprobante().replaceAll("-", StringUtils.EMPTY);
+        String cbteFecha = comprobante.getCompAsociado().getFechaComprobante().replaceAll("-", StringUtils.EMPTY);
 
         String ret =
                 "<ar:CbtesAsoc>" +
                     "<ar:CbteAsoc>" +
                     "<ar:Tipo>" + tipo + "</ar:Tipo>" +
-                    "<ar:PtoVta>" + comprobante.getCompAsociado().getPunto_venta() + "</ar:PtoVta>" +
+                    "<ar:PtoVta>" + comprobante.getCompAsociado().getPuntoVenta() + "</ar:PtoVta>" +
                     "<ar:Nro>" + comprobante.getCompAsociado().getNumero() + "</ar:Nro>" +
                     "<ar:Cuit>" + authentication.getCuit() + "</ar:Cuit>" +
                     "<ar:CbteFch>" + cbteFecha + "</ar:CbteFch>" +

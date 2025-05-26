@@ -57,34 +57,6 @@ CREATE TABLE `articulos` (
   `numero` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `articulos_compuestos`
---
-
-CREATE TABLE `articulos_compuestos` (
-  `cantidad` int(11) DEFAULT NULL,
-  `id` bigint(20) NOT NULL,
-  `numero` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `articulos_compuestos_seq`
---
-
-CREATE TABLE `articulos_compuestos_seq` (
-  `next_val` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Volcado de datos para la tabla `articulos_compuestos_seq`
---
-
-INSERT INTO `articulos_compuestos_seq` (`next_val`) VALUES
-(1);
 
 -- --------------------------------------------------------
 

@@ -542,11 +542,6 @@ ALTER TABLE `articulos`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `UK185jdebvyn4rf2j1m62eic9e1` (`numero`);
 
---
--- Indices de la tabla `articulos_compuestos`
---
-ALTER TABLE `articulos_compuestos`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `authentication`

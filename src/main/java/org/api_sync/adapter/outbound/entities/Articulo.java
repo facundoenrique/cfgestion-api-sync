@@ -2,13 +2,18 @@ package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 
 @Entity
-@Table(name = "articulos", uniqueConstraints = {@UniqueConstraint(columnNames = "numero")})
+@Table(name = "articulos",
+		uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"numero", "empresa_id"}),
+		@UniqueConstraint(columnNames = {"codigo", "empresa_id"})
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,6 +23,11 @@ public class Articulo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@Column(nullable = false)
+	private Integer codigo;
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "empresa_id", nullable = false)
+	private Empresa empresa;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date fechaCreado; //es una fecha, despues lo tengo que analizar bien para que se usa.
 	
@@ -31,7 +41,7 @@ public class Articulo {
 
 	@Column(nullable = false)
 	private BigDecimal iva;
-	
+	@Column(nullable = false)
 	private String nombre;
 	
 	private String descripcion;

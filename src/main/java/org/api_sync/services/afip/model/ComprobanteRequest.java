@@ -2,7 +2,6 @@ package org.api_sync.services.afip.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.api_sync.adapter.outbound.entities.DatosComprobante;
 
 @Data
 public class ComprobanteRequest {

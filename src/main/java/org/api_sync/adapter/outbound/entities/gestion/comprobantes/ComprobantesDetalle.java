@@ -27,6 +27,7 @@ public class ComprobantesDetalle {
     private BigDecimal importeBruto;
     private double descuento;
     private String serie;
+    @Column(name = "importe_neto_r")
     private BigDecimal importeNetoR;
     private String detalle;
     private BigDecimal costo;

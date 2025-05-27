@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound.gestion.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,8 @@ public class ComprobantesDetalle {
     private BigDecimal importeBruto;
     private double descuento;
     private String serie;
-    private BigDecimal importe_neto_r;
+    @JsonProperty("importe_neto_r")
+    private BigDecimal importeNetoR;
     private String detalle;
     private BigDecimal costo;
     private double impuestoInterno;

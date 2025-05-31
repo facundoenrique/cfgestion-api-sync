@@ -41,7 +41,7 @@ public class UsuarioService {
 		
 		try {
 			boolean passwordMatches = true;
-			if (true) {
+			if (usePassword) {
 				passwordMatches = passwordEncoder.matches(password, user.get().getPassword());
 			}
 			log.debug("Resultado de verificación de contraseña para usuario {}: {}", username, passwordMatches);

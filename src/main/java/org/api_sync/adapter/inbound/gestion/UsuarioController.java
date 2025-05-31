@@ -22,12 +22,6 @@ import java.util.List;
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
-//    @PostMapping
-//    public ResponseEntity<Usuario> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
-//        Usuario usuario = usuarioService.crearUsuario(request);
-//        return ResponseEntity.ok(usuario);
-//    }
-
     @PutMapping("/{uuid}/usuarios/{codigo}")
     public ResponseEntity<Usuario> crearOactualizarUsuario(
             @PathVariable @NotBlank(message = "El uuid es obligatorio") String uuid,
@@ -61,11 +55,4 @@ public class UsuarioController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("{uuid}/usuarios/{id}")
-    public ResponseEntity<Void> eliminarUsuario(
-            @PathVariable @NotBlank(message = "El uuid es obligatorio") String uuid,
-            @PathVariable @NotNull(message = "El ID es obligatorio") @Positive(message = "El ID debe ser positivo") Long id) {
-        usuarioService.eliminarUsuario(id);
-        return ResponseEntity.ok().build();
-    }
 } 

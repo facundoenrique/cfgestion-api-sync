@@ -41,7 +41,7 @@ public class UsuarioService {
 		
 		try {
 			boolean passwordMatches = true;
-			if (usePassword) {
+			if (true) {
 				passwordMatches = passwordEncoder.matches(password, user.get().getPassword());
 			}
 			log.debug("Resultado de verificación de contraseña para usuario {}: {}", username, passwordMatches);
@@ -91,29 +91,6 @@ public class UsuarioService {
 		}
 		return usuarioRepository.save(usuario);
 	}
-
-//	@Transactional
-//	public Usuario crearUsuario(UsuarioRequest usuarioRequest) {
-//		Empresa empresa = empresaRepository.findByUuid(usuarioRequest.getEmpresa())
-//				                  .orElseThrow(() -> {
-//					                  log.error("Empresa no encontrada con UUID: {}", usuarioRequest.getEmpresa());
-//					                  return new RuntimeException("Empresa no encontrada");
-//				                  });
-//
-//		log.info("Creando usuario: {}, empresa: {}", usuarioRequest.getNombre(), usuarioRequest.getEmpresa());
-//		if (usuarioRepository.findByNombreAndEmpresaAndEliminado(usuarioRequest.getNombre(), empresa, 0).isPresent()) {
-//			log.warn("Intento de crear usuario ya existente: {}", usuarioRequest.getNombre());
-//			throw new RuntimeException("El usuario ya existe");
-//		}
-//
-//		Usuario usuario = new Usuario();
-//		usuario.setNombre(usuarioRequest.getNombre());
-//		usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
-//		usuario.setEmpresa(empresa);
-//		usuario.setCodigo(usuarioRequest.getCodigo());
-//
-//		return usuarioRepository.save(usuario);
-//	}
 
 	@Transactional
 	public Usuario crearOactualizarUsuario(String uuid, Integer codigo, UsuarioRequest usuarioRequest) {

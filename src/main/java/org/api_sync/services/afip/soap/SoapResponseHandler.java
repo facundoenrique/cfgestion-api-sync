@@ -6,15 +6,11 @@ import org.api_sync.services.afip.exceptions.AfipServiceException;
 import org.api_sync.services.afip.model.AfipResponseDetails;
 import org.api_sync.services.afip.model.CaeDTO;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.*;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayOutputStream;
-import java.io.StringReader;
 
 @Slf4j
 public class SoapResponseHandler {
@@ -41,7 +37,7 @@ public class SoapResponseHandler {
         }
     }
 
-    public CaeDTO handleCaeResponse(SOAPMessage response) throws SOAPException {
+    public CaeDTO handleCaeResponse(SOAPMessage response) throws Exception {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             response.writeTo(out);
@@ -49,15 +45,19 @@ public class SoapResponseHandler {
             log.debug("SOAP Response: {}", strMsg);
 
             Document doc = parseXml(strMsg);
-            String error = extractElementValue(doc, AfipConstants.ELEMENT_ERROR);
             
+            // Verificamos el resultado de la operación
+            String resultado = extractElementValue(doc, "Resultado");
             CaeDTO cae = new CaeDTO();
-            if (error != null && !error.isEmpty()) {
-                log.error("Error en la respuesta: {}", error);
+            
+            if ("R".equals(resultado)) {
+                log.warn("La respuesta indica un resultado rechazado (R)");
                 AfipResponseDetails afipResponseDetails = AfipSoapParser.extractErrors(strMsg);
                 cae.setAfipResponseDetails(afipResponseDetails);
                 return cae;
             }
+
+            // Si el resultado es exitoso, procesamos la respuesta
             cae.setCae(extractElementValue(doc, AfipConstants.ELEMENT_COD_AUTORIZACION));
             cae.setCaeFchVto(extractElementValue(doc, AfipConstants.ELEMENT_FCH_VTO));
             cae.setCbteFch(extractElementValue(doc, AfipConstants.ELEMENT_CBTE_FCH));
@@ -75,28 +75,22 @@ public class SoapResponseHandler {
 
             return cae;
         } catch (Exception e) {
-            log.error("Error procesando respuesta SOAP", e);
-            throw new AfipServiceException("Error procesando respuesta SOAP", e);
+            log.error("Error al procesar la respuesta SOAP", e);
+            throw e;
         }
     }
 
     private Document parseXml(String xml) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        factory.setXIncludeAware(false);
-        factory.setExpandEntityReferences(false);
-        
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(new InputSource(new StringReader(xml)));
+        javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
     }
 
     private String extractElementValue(Document doc, String elementName) {
         NodeList nodeList = doc.getElementsByTagName(elementName);
-        if (nodeList.getLength() > 0) {
-            Node node = nodeList.item(0);
-            return node.getTextContent();
+        if (nodeList != null && nodeList.getLength() > 0) {
+            return nodeList.item(0).getTextContent();
         }
         return null;
     }

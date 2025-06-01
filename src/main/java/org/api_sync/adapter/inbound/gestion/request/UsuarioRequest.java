@@ -14,12 +14,14 @@ public class UsuarioRequest {
 //    @NotBlank(message = "La contraseña es obligatoria")
 //    @Size(min = 5, message = "La contraseña debe tener al menos 6 caracteres") //solo para crear es obligatorio
     private String password;
+    private short eliminado;
     
     public Usuario toEntity(int codigo) {
         return Usuario.builder()
                        .codigo(codigo)
                        .password(this.password)
                        .nombre(this.nombre)
+                       .eliminado(this.eliminado)
                        .build();
     }
 } 

@@ -6,15 +6,20 @@ import org.api_sync.services.afip.model.ComprobanteRequest;
 import org.api_sync.services.afip.config.AfipConstants;
 import javax.xml.soap.*;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class SoapMessageFactory {
 
     public static SOAPMessage createMessage(String soapAction, String body) throws SOAPException {
+        SOAPMessage soapMessage = null;
         try {
             MessageFactory messageFactory = MessageFactory.newInstance();
-            SOAPMessage soapMessage = messageFactory.createMessage(new MimeHeaders(),
+            soapMessage = messageFactory.createMessage(new MimeHeaders(),
                     new ByteArrayInputStream(
                             body.getBytes()));
             
@@ -23,10 +28,20 @@ public class SoapMessageFactory {
             headers.addHeader("SOAPAction", soapAction);
             soapMessage.saveChanges();
     
-            soapMessage.writeTo(System.out);
+            
             
             return soapMessage;
         } catch (Exception e) {
+            if (soapMessage!=null) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                try {
+                    soapMessage.writeTo(out);
+                    log.error("SOAP Message:\n{}", out.toString(StandardCharsets.UTF_8));
+                } catch (IOException ex) {
+                    log.error(e.getMessage(), e);
+                }
+                
+            }
             log.error("Error creating SOAP message: {}", e.getMessage(), e);
             throw new SOAPException("Error creating SOAP message", e);
         }

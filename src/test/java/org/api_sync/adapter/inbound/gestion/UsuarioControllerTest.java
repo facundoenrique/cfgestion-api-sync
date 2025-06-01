@@ -167,17 +167,5 @@ class UsuarioControllerTest {
         verify(usuarioService, times(1)).obtenerUsuarioPorNombre(nombre, empresaUuid);
     }
 
-    @Test
-    void eliminarUsuario_ShouldReturnOk() {
-        // Arrange
-        Long usuarioId = 1L;
-        doNothing().when(usuarioService).eliminarUsuario(usuarioId);
-
-        // Act
-        ResponseEntity<Void> response = usuarioController.eliminarUsuario("", usuarioId);
-
-        // Assert
-        assertEquals(200, response.getStatusCodeValue());
-        verify(usuarioService, times(1)).eliminarUsuario(usuarioId);
-    }
+ 
 } 

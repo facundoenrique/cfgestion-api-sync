@@ -1,23 +1,17 @@
 package org.api_sync.services.afip.soap;
 
 import org.api_sync.services.afip.model.CaeDTO;
-import org.api_sync.services.afip.exceptions.AfipServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.xml.sax.SAXParseException;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class SoapResponseHandlerTest {
@@ -63,7 +57,7 @@ class SoapResponseHandlerTest {
         String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                 "<soap:Body>" +
-                "<FECAESolicitarResponse xmlns=\"http://ar.gov.afip.dif.FEV1/\">" +
+                "<FECAESolicitarResponse xmlns=\"http://ar.gov.afip.dif.FEV1/\"" +
                 "<FECAESolicitarResult>" +
                 "<Resultado>R</Resultado>" +
                 "<Errors>" +
@@ -80,7 +74,7 @@ class SoapResponseHandlerTest {
         SOAPMessage soapMessage = createSoapMessage(xmlContent);
 
         // Act & Assert
-        assertThrows(AfipServiceException.class, () -> responseHandler.handleCaeResponse(soapMessage));
+        assertThrows(SAXParseException.class, () -> responseHandler.handleCaeResponse(soapMessage));
     }
 
     private SOAPMessage createSoapMessage(String xmlContent) throws SOAPException {

@@ -1,4 +1,6 @@
 package org.api_sync.services.afip.soap;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.api_sync.services.afip.model.AfipErrorResponse;
 import org.api_sync.services.afip.model.AfipEventResponse;
 import org.api_sync.services.afip.model.AfipResponseDetails;
@@ -9,6 +11,7 @@ import org.xml.sax.InputSource;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AfipSoapParser {
 
 	public static AfipResponseDetails extractErrors(String xml) {
@@ -28,6 +31,15 @@ public class AfipSoapParser {
 				Element err = (Element) errNodes.item(i);
 				int code = Integer.parseInt(err.getElementsByTagName("Code").item(0).getTextContent());
 				String msg = err.getElementsByTagName("Msg").item(0).getTextContent();
+				errors.add(new AfipErrorResponse(code, msg));
+			}
+			
+			// Extraer observaciones como errores
+			NodeList obsNodes = doc.getElementsByTagName("Obs");
+			for (int i = 0; i < obsNodes.getLength(); i++) {
+				Element obs = (Element) obsNodes.item(i);
+				int code = Integer.parseInt(obs.getElementsByTagName("Code").item(0).getTextContent());
+				String msg = obs.getElementsByTagName("Msg").item(0).getTextContent();
 				errors.add(new AfipErrorResponse(code, msg));
 			}
 			

@@ -21,7 +21,7 @@ public class ItemListaPrecios {
 	
 	@ManyToOne
 	@JoinColumn(name = "articulo_id", nullable = false)
-	private Articulo articulo;
+	private RedArticulo articulo;
 
 	@OneToOne
 	@JoinColumn(name = "precio_id", nullable = false)

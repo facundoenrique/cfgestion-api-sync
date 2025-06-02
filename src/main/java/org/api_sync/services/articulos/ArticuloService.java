@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
 import org.api_sync.adapter.outbound.entities.*;
+import org.api_sync.adapter.outbound.entities.gestion.GestionArticulo;
 import org.api_sync.adapter.outbound.repository.ArticuloRepository;
 import org.api_sync.adapter.outbound.repository.ItemListaPreciosRepository;
 import org.api_sync.adapter.outbound.repository.ListaPreciosRepository;
@@ -31,7 +32,7 @@ private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final PrecioService precioService;
 	
 	public ArticuloDTO get(Long id) {
-		Articulo articulo = articuloRepository.findById(id)
+		RedArticulo articulo = articuloRepository.findById(id)
 				                    .orElseThrow(() -> new RuntimeException("Articulo no encontrado"));
 		
 		ArticuloDTO dto = articuloMapper.toDTO(articulo);
@@ -40,7 +41,7 @@ private final ItemListaPreciosRepository itemListaPreciosRepository;
 		return dto;
 	}
 
-	private Articulo updateAtributes(Articulo articulo, ArticuloRequest request) {
+	private GestionArticulo updateAtributes(GestionArticulo articulo, ArticuloRequest request) {
 		articulo.setNombre(request.getNombre());
 		articulo.setNumero(request.getNumero());
 		articulo.setEliminado(request.getEliminado());
@@ -50,7 +51,7 @@ private final ItemListaPreciosRepository itemListaPreciosRepository;
 	public ArticuloDTO actualizarArticulo(Long id,
 	                                      ArticuloRequest articuloRequest) {
 		
-		Articulo articuloRecuperado = articuloRepository.findById(id)
+		RedArticulo articuloRecuperado = articuloRepository.findById(id)
 				                              .orElseThrow(() -> new RuntimeException("Articulo no encontrado"));
 		
 		articuloRecuperado.setNombre(articuloRequest.getNombre());
@@ -70,7 +71,7 @@ private final ItemListaPreciosRepository itemListaPreciosRepository;
 		return update(articuloRecuperado);
 	}
 	
-	private ArticuloDTO update(Articulo articulo) {
+	private ArticuloDTO update(RedArticulo articulo) {
 		return articuloMapper.toDTO(articuloRepository.save(articulo));
 	}
 	

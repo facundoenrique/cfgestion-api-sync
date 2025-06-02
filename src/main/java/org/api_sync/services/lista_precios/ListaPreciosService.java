@@ -68,9 +68,9 @@ public class ListaPreciosService {
 		listaDePrecios.setProveedor(proveedor);
 		
 		List<ItemListaPrecios> items = request.getItems().stream().map(itemRequest -> {
-			Articulo articulo = articuloRepository.findByNumero(itemRequest.getNumero())
+			RedArticulo articulo = articuloRepository.findByNumero(itemRequest.getNumero())
 					                    .orElseGet(() -> articuloRepository.save(
-												Articulo.builder()
+							                    RedArticulo.builder()
 														.numero(itemRequest.getNumero())
 														.nombre(itemRequest.getNombre())
 														.iva(itemRequest.getIva())
@@ -258,9 +258,9 @@ public class ListaPreciosService {
 		ListaPrecios listaPrecios = listaPreciosRepository.findById(listId)
 				                            .orElseThrow(() -> new ListaPreciosNotFoundException());
 		
-		Optional<Articulo> itemOptional = articuloRepository.findByNumero(articuloRequest.getNumero());
+		Optional<RedArticulo> itemOptional = articuloRepository.findByNumero(articuloRequest.getNumero());
 		
-		Articulo item;
+		RedArticulo item;
 		if (itemOptional.isPresent()) {
 			//Tendria que validar que no este insertado en la lista;
 			if (listaPrecios.getItems().stream().anyMatch(
@@ -269,7 +269,7 @@ public class ListaPreciosService {
 			}
 			item = itemOptional.get();
 		} else {
-			Articulo articulo = articuloMapper.toEntity(articuloRequest);
+			RedArticulo articulo = articuloMapper.toEntity(articuloRequest);
 			articulo.setFechaCreado(Date.from(Instant.now()));
 			item = articuloRepository.save(articulo);
 		}

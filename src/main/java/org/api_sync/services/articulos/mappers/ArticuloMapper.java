@@ -1,7 +1,7 @@
 package org.api_sync.services.articulos.mappers;
 
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
-import org.api_sync.adapter.outbound.entities.Articulo;
+import org.api_sync.adapter.outbound.entities.RedArticulo;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
 import org.api_sync.services.articulos.dto.ArticuloDTO;
 import org.springframework.stereotype.Component;
@@ -11,8 +11,8 @@ import java.time.Instant;
 
 @Component
 public class ArticuloMapper {
-	public Articulo toEntity(ArticuloRequest request) {
-		Articulo articulo = new Articulo();
+	public RedArticulo toEntity(ArticuloRequest request) {
+		RedArticulo articulo = new RedArticulo();
 		articulo.setIva(request.getIva());
 		articulo.setNumero(request.getNumero());
 		articulo.setNombre(request.getNombre());
@@ -22,7 +22,7 @@ public class ArticuloMapper {
 		return articulo;
 	}
 	
-	public ArticuloDTO toDTO(Articulo articulo) {
+	public ArticuloDTO toDTO(RedArticulo articulo) {
 		ArticuloDTO dto = new ArticuloDTO();
 		dto.setId(articulo.getId());
 		dto.setNumero(articulo.getNumero());
@@ -33,8 +33,8 @@ public class ArticuloMapper {
 		return dto;
 	}
 	
-	public Articulo toEntity(PreventaArticulo articulo) {
-		return Articulo.builder()
+	public RedArticulo toEntity(PreventaArticulo articulo) {
+		return RedArticulo.builder()
 				       .id(articulo.getArticuloId())
 				       .numero(articulo.getNumero())
 				       .nombre(articulo.getNombre())

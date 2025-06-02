@@ -102,7 +102,7 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 		ListaPrecios listaGuardada = listaPreciosRepository.save(lista);
 		
 		preventa.getArticulos().forEach(item -> {
-			Articulo articulo = articuloRepository.findByNumero(item.getNumero())
+			RedArticulo articulo = articuloRepository.findByNumero(item.getNumero())
 					          .orElseGet(() -> articuloRepository.save(articuloMapper.toEntity(item)));
 			
 			
@@ -168,13 +168,13 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 						                         articuloRequest.setCantidad(1);
 						                         articuloRequest.setEliminado(0);
 						                         articuloRequest.setDefecto(itemDTO.getUnidadesPorVulto());
-						                         Optional<Articulo> existing =
+						                         Optional<RedArticulo> existing =
 								                         articuloRepository.findByNumero(itemDTO.getNumero());
 												 
 						                         if (existing.isPresent()) {
 							                         articuloRequest.setId(existing.get().getId());
 						                         } else {
-							                        Articulo articulo =
+							                         RedArticulo articulo =
 									                        articuloRepository.save(articuloMapper.toEntity(articuloRequest));
 							                         articuloRequest.setId(articulo.getId());
 						                         }

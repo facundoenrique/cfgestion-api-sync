@@ -1,8 +1,7 @@
-package org.api_sync.adapter.outbound.entities;
+package org.api_sync.adapter.outbound.entities.gestion;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,7 +18,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Articulo {
+public class GestionArticulo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;

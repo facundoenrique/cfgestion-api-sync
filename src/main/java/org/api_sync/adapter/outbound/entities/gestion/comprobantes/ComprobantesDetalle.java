@@ -2,7 +2,7 @@ package org.api_sync.adapter.outbound.entities.gestion.comprobantes;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.api_sync.adapter.outbound.entities.Articulo;
+import org.api_sync.adapter.outbound.entities.gestion.GestionArticulo;
 
 import java.math.BigDecimal;
 
@@ -18,7 +18,7 @@ public class ComprobantesDetalle {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "articulo", nullable = false)
-    private Articulo articulo;
+    private GestionArticulo articulo;
     @Column(nullable = false)
     private double cantidad;
     @Column(nullable = false)

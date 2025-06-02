@@ -41,7 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
 			excludedPaths = Arrays.asList(excludedPathsString.split(","));
 		} else {
-			excludedPaths = Collections.singletonList("/auth");
+			excludedPaths = List.of("/auth", "/red");
 		}
 		log.info("Excluded paths for JWT filter: {}", excludedPaths);
 	}
@@ -56,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
 				excludedPaths = Arrays.asList(excludedPathsString.split(","));
 			} else {
-				excludedPaths = Collections.singletonList("/auth");
+				excludedPaths = List.of("/auth", "/red");
 			}
 			log.info("Initialized excluded paths in shouldNotFilter: {}", excludedPaths);
 		}
@@ -72,7 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		}
 		
 		// Por defecto, excluimos las rutas de auth
-		return path.startsWith("/auth/");
+		return path.startsWith("/auth/") || path.startsWith("/red/");
 	}
 	
 	@Override

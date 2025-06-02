@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreventaResponseDTO;
 
 @RestController
-@RequestMapping("/preventas")
+@RequestMapping("/red/preventas")
 @RequiredArgsConstructor
 public class PreventaController {
 

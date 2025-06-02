@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/listas-de-precios")
+@RequestMapping("/red/listas-de-precios")
 @RequiredArgsConstructor
 public class ListaPreciosController {
 

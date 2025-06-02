@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/red/clientes")
 @RequiredArgsConstructor
 public class ClienteController {
 

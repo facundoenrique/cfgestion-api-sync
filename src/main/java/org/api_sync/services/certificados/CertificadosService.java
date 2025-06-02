@@ -22,6 +22,7 @@ public class CertificadosService {
 	private final ClienteRepository clienteRepository;
 	
 	
+	//Aca tengo que usar el de empresa, o no ? porque necesito por cliente? nada que ver
 	public Certificado guardarCertificado(MultipartFile file, Integer puntoVenta, Long clienteId, String password) throws IOException {
 		Cliente cliente = clienteRepository.findById(clienteId)
 				                  .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrada con ID: " + clienteId));

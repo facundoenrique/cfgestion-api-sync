@@ -42,13 +42,14 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/auth/login"),
                     new AntPathRequestMatcher("/auth/refresh"),
                     new AntPathRequestMatcher("/auth/logout"),
-                    new AntPathRequestMatcher("/auth/verify-token")
+                    new AntPathRequestMatcher("/auth/verify-token"),
+                    new AntPathRequestMatcher("/red/**")
                 ).permitAll();
                 
                 // Todas las demás rutas requieren autenticación
                 auth.anyRequest().authenticated();
                 
-                log.info("Request matchers configured: public routes set to [/auth/login, /auth/refresh, /auth/logout, /auth/verify-token]");
+                log.info("Request matchers configured: public routes set to [/auth/login, /auth/refresh, /auth/logout, /auth/verify-token, /red/**]");
             })
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

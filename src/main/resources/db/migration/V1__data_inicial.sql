@@ -57,8 +57,6 @@ CREATE TABLE `articulos` (
   `numero` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
-
 -- --------------------------------------------------------
 
 --
@@ -75,6 +73,59 @@ CREATE TABLE `articulos_seq` (
 --
 
 INSERT INTO `articulos_seq` (`next_val`) VALUES
+(1);
+
+--
+-- Estructura de tabla para la tabla `red_articulos`
+--
+
+CREATE TABLE `red_articulos` (
+  `cantidad` double NOT NULL,
+  `cod_unidad_medida` int(11) NOT NULL,
+  `comision` int(11) NOT NULL,
+  `compuesto` int(11) NOT NULL,
+  `defecto` int(11) NOT NULL,
+  `descuento` double NOT NULL,
+  `eliminado` int(11) NOT NULL,
+  `enviado` int(11) NOT NULL,
+  `familia` int(11) NOT NULL,
+  `gan1` double NOT NULL,
+  `imagen` int(11) NOT NULL,
+  `iva` decimal(38,2) NOT NULL,
+  `maximo` int(11) NOT NULL,
+  `minimo` int(11) NOT NULL,
+  `moneda` int(11) NOT NULL,
+  `no_stock` int(11) NOT NULL,
+  `redondeo` int(11) NOT NULL,
+  `subfamilia` int(11) NOT NULL,
+  `tipo` int(11) NOT NULL,
+  `fecha_creado` datetime(6) DEFAULT NULL,
+  `id` bigint(20) NOT NULL,
+  `codigo` bigint(20),
+  `empresa` bigint(20),
+  `descripcion` varchar(255) DEFAULT NULL,
+  `marca` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `numero` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `articulos_seq`
+--
+
+CREATE TABLE `red_articulos_seq` (
+  `next_val` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Volcado de datos para la tabla `articulos_seq`
+--
+
+INSERT INTO `red_articulos_seq` (`next_val`) VALUES
 (1);
 
 -- --------------------------------------------------------
@@ -865,7 +916,7 @@ ALTER TABLE `comprobantes_impuestos`
 ALTER TABLE `items_lista_precios`
   ADD CONSTRAINT `FK4ivx35mi6lnmeihbhkkk1l97k` FOREIGN KEY (`lista_de_precios_id`) REFERENCES `listas_precios` (`id`),
   ADD CONSTRAINT `FKc3bmm245rbggaxu4mx8yt10rq` FOREIGN KEY (`precio_id`) REFERENCES `precios` (`id`),
-  ADD CONSTRAINT `FKjg2ay4uquouks7qp20uos3ri4` FOREIGN KEY (`articulo_id`) REFERENCES `articulos` (`id`);
+  ADD CONSTRAINT `FKjg2ay4uquouks7qp20uos3ri4` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`);
 
 --
 -- Filtros para la tabla `listas_precios`
@@ -883,7 +934,7 @@ ALTER TABLE `localidades`
 -- Filtros para la tabla `precios`
 --
 ALTER TABLE `precios`
-  ADD CONSTRAINT `FKdn0lgdxrv8qjcgljm7ltdt9ew` FOREIGN KEY (`articulo_id`) REFERENCES `articulos` (`id`);
+  ADD CONSTRAINT `FKdn0lgdxrv8qjcgljm7ltdt9ew` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`);
 
 --
 -- Filtros para la tabla `preventas_articulos`

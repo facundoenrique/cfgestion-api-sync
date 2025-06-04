@@ -8,7 +8,7 @@ import org.api_sync.adapter.inbound.request.preventa.PreventaRequestDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
-import org.api_sync.services.proposals.PreventaService;
+import org.api_sync.services.preventas.PreventaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

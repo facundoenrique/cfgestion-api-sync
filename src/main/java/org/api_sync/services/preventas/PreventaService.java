@@ -1,4 +1,4 @@
-package org.api_sync.services.proposals;
+package org.api_sync.services.preventas;
 
 import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreventaResponseDTO;
 
@@ -35,12 +35,12 @@ public class PreventaService {
 	private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
 	private final ArticuloMapper articuloMapper;
-private final PrecioRepository precioRepository;
-private final ProveedorRepository proveedorRepository;
+	private final PrecioRepository precioRepository;
+	private final ProveedorRepository proveedorRepository;
 
 public PreventaResponseDTO getListaPrecio(Long id) {
 		Preventa propuesta = preventaRepository.findById(id)
-				                                .orElseThrow(PreventaNotFoundException::new);
+				                     .orElseThrow(() -> new PreventaNotFoundException(id));
 							
 		List<ArticuloPreventaDTO> items = propuesta.getArticulos().stream().map(
 				a -> ArticuloPreventaDTO.builder()
@@ -133,7 +133,7 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 
 	public void actualizarPreVenta(Long id, PreventaUpdateDTO dto) {
 		Preventa preVenta = preventaRepository.findById(id)
-				               .orElseThrow(PreventaNotFoundException::new);
+				               .orElseThrow(() -> new PreventaNotFoundException(id));
 		
 		preVenta.setNombre(dto.getNombre());
 		preVenta.setFechaInicio(dto.getFechaInicio());

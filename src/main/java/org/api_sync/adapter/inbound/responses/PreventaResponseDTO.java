@@ -2,6 +2,7 @@ package org.api_sync.adapter.inbound.responses;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import org.api_sync.adapter.outbound.entities.EstadoPreventa;
 import org.api_sync.adapter.outbound.entities.Preventa;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ public class PreventaResponseDTO {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate fechaFin;
 	private Long listaBaseId;
+	private EstadoPreventa estado;
 	@With
 	private List<ArticuloPreventaDTO> articulos;
 	
@@ -32,6 +34,7 @@ public class PreventaResponseDTO {
 				       .listaBaseId(propuesta.getListaBaseId())
 				       .fechaInicio(propuesta.getFechaInicio())
 				       .fechaFin(propuesta.getFechaFin())
+				       .estado(propuesta.getEstado())
 				       .build();
 	}
 	

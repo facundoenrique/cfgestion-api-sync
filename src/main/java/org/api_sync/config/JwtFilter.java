@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.AntPathMatcher;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
+	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 	
 	@Value("${jwt.excluded.paths}")
 	private String excludedPathsString;
@@ -40,8 +42,12 @@ public class JwtFilter extends OncePerRequestFilter {
 		super.initFilterBean();
 		if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
 			excludedPaths = Arrays.asList(excludedPathsString.split(","));
+			// Limpiar los paths de espacios en blanco
+			excludedPaths = excludedPaths.stream()
+				.map(String::trim)
+				.toList();
 		} else {
-			excludedPaths = List.of("/auth", "/red");
+			excludedPaths = List.of("/auth/**", "/red/**");
 		}
 		log.info("Excluded paths for JWT filter: {}", excludedPaths);
 	}
@@ -55,24 +61,26 @@ public class JwtFilter extends OncePerRequestFilter {
 		if (excludedPaths == null) {
 			if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
 				excludedPaths = Arrays.asList(excludedPathsString.split(","));
+				excludedPaths = excludedPaths.stream()
+					.map(String::trim)
+					.toList();
 			} else {
-				excludedPaths = List.of("/auth", "/red");
+				excludedPaths = List.of("/auth/**", "/red/**");
 			}
 			log.info("Initialized excluded paths in shouldNotFilter: {}", excludedPaths);
 		}
 		
-		// Verificar si el path actual debe ser excluido
+		// Verificar si el path actual debe ser excluido usando AntPathMatcher
 		if (excludedPaths != null) {
 			for (String excludedPath : excludedPaths) {
-				if (path.startsWith(excludedPath.trim())) {
-					log.info("Path {} is excluded from filtering", path);
+				if (pathMatcher.match(excludedPath, path)) {
+					log.info("Path {} matches excluded pattern {}", path, excludedPath);
 					return true;
 				}
 			}
 		}
 		
-		// Por defecto, excluimos las rutas de auth
-		return path.startsWith("/auth/") || path.startsWith("/red/");
+		return false;
 	}
 	
 	@Override

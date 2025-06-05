@@ -27,6 +27,10 @@ public class Preventa {
 	private LocalDate fechaCreacion;
 	private Long listaBaseId;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private EstadoPreventa estado = EstadoPreventa.ABIERTA;
+	
 	@OneToMany(mappedBy = "preventa", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PreventaArticulo> articulos = new ArrayList<>();
 

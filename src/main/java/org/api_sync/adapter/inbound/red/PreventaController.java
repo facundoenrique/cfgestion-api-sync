@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.preventa.PreventaManualRequestDTO;
 import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.request.preventa.PreventaRequestDTO;
+import org.api_sync.adapter.inbound.request.preventa.PreventaEstadoDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
@@ -27,10 +28,11 @@ import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreve
 @RestController
 @RequestMapping("/red/preventas")
 @RequiredArgsConstructor
-public class PreventaController {
+public class PreventaController implements PreventaApi {
 
 	private final PreventaService preventaService;
 
+	@Override
 	@GetMapping
 	public ResponseEntity<Page<PreventaResponseDTO>> findAll(
 			@RequestParam(required = false, value = "fecha_desde") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaDesde,
@@ -43,21 +45,19 @@ public class PreventaController {
 				nombre, pageable));
 	}
 
+	@Override
 	@GetMapping("{id}")
 	public ResponseEntity<?> findById(@PathVariable Long id, @RequestParam(required = false) String attributes) {
 		PreventaResponseDTO dto = preventaService.getListaPrecio(id);
 		
-		// Si no se especificaron atributos, devuelvo todo
 		if (attributes == null) {
 			return ResponseEntity.ok(dto);
 		}
 		
-		// Parseo los atributos pedidos
 		Set<String> requestedAttributes = Arrays.stream(attributes.split(","))
 				                                  .map(String::trim)
 				                                  .collect(Collectors.toSet());
 		
-		// Creo un mapa dinámico con solo los atributos pedidos
 		Map<String, Object> response = new HashMap<>();
 		response.put("id", dto.getId());
 		response.put("lista_base_id", dto.getListaBaseId());
@@ -71,16 +71,10 @@ public class PreventaController {
 		response.put("fecha_inicio", dto.getFechaInicio().toString());
 		response.put("fecha_fin", dto.getFechaFin().toString());
 		
-		
-//		if (requestedAttributes.contains("proveedor")) {
-//			response.put("proveedor", dto.get());
-//		}
-		
-		
 		return ResponseEntity.ok(response);
-
 	}
 	
+	@Override
 	@PostMapping
 	public ResponseEntity<PreventaResponseDTO> crearPropuesta(@Valid @RequestBody PreventaRequestDTO requestDTO) {
 		Preventa preventa = new Preventa();
@@ -89,7 +83,6 @@ public class PreventaController {
 		preventa.setFechaFin(requestDTO.getFechaFin());
 		preventa.setListaBaseId(requestDTO.getListaBaseId());
 		
-		// Mapear artículos seleccionados
 		List<PreventaArticulo> articulos = requestDTO.getArticulos().stream()
 				                                    .map(dto -> {
 					                                    PreventaArticulo pa = new PreventaArticulo();
@@ -111,6 +104,7 @@ public class PreventaController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(toPreventaResponseDTO(guardada));
 	}
 
+	@Override
 	@PostMapping("/manual")
 	public ResponseEntity<PreventaResponseDTO> crearPropuestaManual(@Valid @RequestBody PreventaManualRequestDTO requestDTO) {
 		Preventa preventa = new Preventa();
@@ -118,7 +112,6 @@ public class PreventaController {
 		preventa.setFechaInicio(requestDTO.getFechaInicio());
 		preventa.setFechaFin(requestDTO.getFechaFin());
 		
-		// Mapear artículos seleccionados
 		List<PreventaArticulo> articulos = requestDTO.getArticulos().stream()
 				                                   .map(dto -> {
 					                                   PreventaArticulo pa = new PreventaArticulo();
@@ -140,10 +133,17 @@ public class PreventaController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(toPreventaResponseDTO(guardada));
 	}
 
+	@Override
 	@PutMapping("/{id}")
 	public ResponseEntity<?> actualizarPreVenta(@PathVariable Long id, @RequestBody @Valid PreventaUpdateDTO dto) {
 		preventaService.actualizarPreVenta(id, dto);
 		return ResponseEntity.ok().build();
 	}
-	
+
+	@Override
+	@PutMapping("/{id}/estado")
+	public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody @Valid PreventaEstadoDTO dto) {
+		preventaService.actualizarEstado(id, dto.getEstado());
+		return ResponseEntity.ok().build();
+	}
 }

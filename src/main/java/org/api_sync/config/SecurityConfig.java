@@ -30,12 +30,12 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("Configuring security filter chain");
         
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> {
                 // Rutas públicas (no requieren autenticación)
                 auth.requestMatchers(
@@ -43,13 +43,18 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/auth/refresh"),
                     new AntPathRequestMatcher("/auth/logout"),
                     new AntPathRequestMatcher("/auth/verify-token"),
-                    new AntPathRequestMatcher("/red/**")
+                    new AntPathRequestMatcher("/red/**"),
+                    // Swagger UI v3 (OpenAPI)
+                    new AntPathRequestMatcher("/v3/api-docs/**"),
+                    new AntPathRequestMatcher("/swagger-ui/**"),
+                    new AntPathRequestMatcher("/swagger-ui.html"),
+                    new AntPathRequestMatcher("/api-docs/**")
                 ).permitAll();
                 
                 // Todas las demás rutas requieren autenticación
                 auth.anyRequest().authenticated();
                 
-                log.info("Request matchers configured: public routes set to [/auth/login, /auth/refresh, /auth/logout, /auth/verify-token, /red/**]");
+                log.info("Request matchers configured: public routes set to [/auth/login, /auth/refresh, /auth/logout, /auth/verify-token, /red/**, /swagger-ui/**, /api-docs/**, /v3/api-docs/**]");
             })
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

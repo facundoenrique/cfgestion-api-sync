@@ -156,46 +156,19 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 			return articulo;
 		}).toList();
 		
-
-		if (preVenta.getListaBaseId() != null && dto.getArticulos().stream().anyMatch(item -> item.getId() == null)) {
-			dto.getArticulos().stream().filter(item -> item.getId() == null)
-					                         .forEach(itemDTO -> {
-												 ArticuloRequest articuloRequest = new ArticuloRequest();
-						                         articuloRequest.setNumero(itemDTO.getNumero());
-						                         articuloRequest.setNombre(itemDTO.getNombre());
-						                         articuloRequest.setPrecio(itemDTO.getImporte());
-						                         articuloRequest.setIva(itemDTO.getIva());
-						                         articuloRequest.setCantidad(1);
-						                         articuloRequest.setEliminado(0);
-						                         articuloRequest.setDefecto(itemDTO.getUnidadesPorVulto());
-						                         Optional<RedArticulo> existing =
-								                         articuloRepository.findByNumero(itemDTO.getNumero());
-												 
-						                         if (existing.isPresent()) {
-							                         articuloRequest.setId(existing.get().getId());
-						                         } else {
-							                         RedArticulo articulo =
-									                        articuloRepository.save(articuloMapper.toEntity(articuloRequest));
-							                         articuloRequest.setId(articulo.getId());
-						                         }
-												 
-						                         ArticuloDTO articuloDTO =
-								                         listaPreciosService.addItem(articuloRequest,
-										                         preVenta.getListaBaseId());
-						
-						                         articulos.stream()
-								                         .filter(item -> item.getNumero().equals(articuloDTO.getNumero()))
-								                         .forEach(item -> item.setArticuloId(articuloDTO.getId()));
-					                         });
-			
-		}
-		
-		List<PreventaArticulo> items =
-				preventaArticuloRepository.saveAll(articulos.stream().peek(item -> item.setId(null)).toList());
-		
-		//preVenta.setArticulos(items);
-		
+		preVenta.setArticulos(articulos);
 		preventaRepository.save(preVenta);
 	}
-	
+
+	public void actualizarEstado(Long id, EstadoPreventa nuevoEstado) {
+		Preventa preventa = preventaRepository.findById(id)
+				               .orElseThrow(() -> new PreventaNotFoundException(id));
+		
+		if (preventa.getEstado() == nuevoEstado) {
+			throw new IllegalStateException("La preventa ya está en estado " + nuevoEstado);
+		}
+		
+		preventa.setEstado(nuevoEstado);
+		preventaRepository.save(preventa);
+	}
 }

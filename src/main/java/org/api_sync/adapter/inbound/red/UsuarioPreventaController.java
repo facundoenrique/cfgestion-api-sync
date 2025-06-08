@@ -36,7 +36,7 @@ public class UsuarioPreventaController {
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioPreventaResponseDTO> findById(
             @PathVariable Long id,
-            @RequestParam Long usuarioId) {
+            @RequestParam(name = "usuario_id") Long usuarioId) {
         return ResponseEntity.ok(usuarioPreventaService.obtenerPreventaConPedido(id, usuarioId));
     }
 } 

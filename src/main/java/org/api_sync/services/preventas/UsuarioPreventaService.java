@@ -101,7 +101,7 @@ public class UsuarioPreventaService {
                         "nombre", articulo.getNombre(),
                         "importe", articulo.getImporte(),
                         "iva", articulo.getIva(),
-                        "defecto", articulo.getDefecto(),
+                        "defecto", articulo.getDefecto() !=null ? articulo.getDefecto() : 1,
                         "multiplicador", articulo.getMultiplicador(),
                         "unidades_por_bulto", articulo.getUnidadesPorBulto(),
                         "cantidad_pedida", pedido.map(p -> obtenerCantidadPedida(p, articulo.getId())).orElse(0)

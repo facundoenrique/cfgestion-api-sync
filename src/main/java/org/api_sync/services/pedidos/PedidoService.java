@@ -55,16 +55,24 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido crearPedido(Long preventaId, Long usuarioId) {
+    public Pedido crearPedido(Long preventaId, Integer usuarioId, String empresaId) {
         log.info("Creando pedido para preventa {} y usuario {}", preventaId, usuarioId);
+        
+        Empresa empresa = empresaRepository.findByUuid(empresaId)
+                                  .orElseThrow(() -> new EmpresaNotFoundException(empresaId));
+        
+        Usuario usuario = usuarioRepository.findByCodigoAndEmpresa(usuarioId, empresa)
+                                  .orElseThrow(() -> new UsuarioNotFoundException(usuarioId));
         
         Preventa preventa = preventaRepository.findById(preventaId)
             .orElseThrow(() -> new PreventaNotFoundException(preventaId));
-            
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-            .orElseThrow(() -> new UsuarioNotFoundException(usuarioId));
+        
+        // Verificar si ya existe un pedido para este usuario en esta preventa
+        Optional<Pedido> pedidoExistente = pedidoRepository.findByPreventaIdAndUsuario(preventaId, usuario, Pageable.unpaged())
+            .stream()
+            .findFirst();
 
-        if (pedidoRepository.existsByPreventaAndUsuario(preventa, usuario)) {
+        if (pedidoExistente.isPresent()) {
             throw new PedidoAlreadyExistsException(preventaId, usuarioId);
         }
 
@@ -72,19 +80,26 @@ public class PedidoService {
         pedido.setPreventa(preventa);
         pedido.setUsuario(usuario);
         pedido.setFechaCreacion(LocalDateTime.now());
-        pedido.setParticipa(true);
+        pedido.setEstadoParticipacion(EstadoParticipacion.PENDIENTE);
 
         return pedidoRepository.save(pedido);
     }
 
     @Transactional
-    public Pedido actualizarItem(Long pedidoId, Long preventaArticuloId, Integer cantidad, Long usuarioId) {
+    public Pedido actualizarItem(Long pedidoId, Long preventaArticuloId, Integer cantidad, Integer usuarioCodigo,
+                                 String empresaId) {
         log.info("Actualizando item {} del pedido {} con cantidad {}", preventaArticuloId, pedidoId, cantidad);
         
         Pedido pedido = pedidoRepository.findByIdWithItems(pedidoId)
             .orElseThrow(() -> new PedidoNotFoundException(pedidoId));
+        
+        Empresa empresa = empresaRepository.findByUuid(empresaId)
+                                  .orElseThrow(() -> new EmpresaNotFoundException(empresaId));
+        
+        Usuario usuario = usuarioRepository.findByCodigoAndEmpresa(usuarioCodigo, empresa)
+                                  .orElseThrow(() -> new UsuarioNotFoundException(usuarioCodigo));
             
-        validarPropiedadPedido(pedido, usuarioId);
+        validarPropiedadPedido(pedido, usuario.getId());
             
         PreventaArticulo preventaArticulo = preventaArticuloRepository.findById(preventaArticuloId)
             .orElseThrow(() -> new PreventaArticuloNotFoundException(preventaArticuloId));
@@ -93,10 +108,29 @@ public class PedidoService {
             throw new PreventaArticuloNotInPreventaException(preventaArticuloId, pedido.getPreventa().getId());
         }
 
-        pedidoRepository.upsertPedidoItem(pedidoId, preventaArticuloId, cantidad);
-        
-        return pedidoRepository.findByIdWithItems(pedidoId)
-            .orElseThrow(() -> new PedidoNotFoundException(pedidoId));
+        // Buscar si el item ya existe en el pedido
+        Optional<PedidoItem> itemExistente = pedido.getItems().stream()
+            .filter(item -> item.getPreventaArticulo().getId().equals(preventaArticuloId))
+            .findFirst();
+
+        if (itemExistente.isPresent()) {
+            // Actualizar cantidad existente
+            PedidoItem item = itemExistente.get();
+            item.setCantidad(cantidad);
+            item.setPrecioUnitario(preventaArticulo.getImporte().doubleValue());
+            item.setSubtotal(preventaArticulo.getImporte().doubleValue() * cantidad);
+        } else {
+            // Crear nuevo item
+            PedidoItem nuevoItem = new PedidoItem();
+            nuevoItem.setPedido(pedido);
+            nuevoItem.setPreventaArticulo(preventaArticulo);
+            nuevoItem.setCantidad(cantidad);
+            nuevoItem.setPrecioUnitario(preventaArticulo.getImporte().doubleValue());
+            nuevoItem.setSubtotal(preventaArticulo.getImporte().doubleValue() * cantidad);
+            pedido.getItems().add(nuevoItem);
+        }
+
+        return pedidoRepository.save(pedido);
     }
 
     @Transactional
@@ -108,14 +142,14 @@ public class PedidoService {
 
         validarPropiedadPedido(pedido, usuarioId);
 
-        pedido.setParticipa(false);
-        pedidoRepository.deleteAllPedidoItems(pedidoId);
+        pedido.setEstadoParticipacion(EstadoParticipacion.NO_PARTICIPA);
+        pedido.getItems().clear();
         
         return pedidoRepository.save(pedido);
     }
 
     @Transactional
-    public Pedido marcarParticipacion(Long pedidoId, Long usuarioId) {
+    public Pedido marcarParticipacion(Long pedidoId, Long usuarioId, EstadoParticipacion participa) {
         log.info("Marcando pedido {} como participante", pedidoId);
         
         Pedido pedido = pedidoRepository.findByIdWithItems(pedidoId)
@@ -123,7 +157,7 @@ public class PedidoService {
 
         validarPropiedadPedido(pedido, usuarioId);
 
-        pedido.setParticipa(true);
+        pedido.setEstadoParticipacion(participa);
         return pedidoRepository.save(pedido);
     }
 
@@ -149,6 +183,7 @@ public class PedidoService {
             
         validarPropiedadPedido(pedido, usuarioId);
         
-        pedidoRepository.deletePedidoItem(pedidoId, itemId);
+        pedido.getItems().removeIf(item -> item.getId().equals(itemId));
+        pedidoRepository.save(pedido);
     }
 } 

@@ -29,7 +29,7 @@ public class UsuarioPedidoController {
             @PathVariable Long pedidoId,
             @RequestParam(name="preventa_articulo_id") Long preventaArticuloId,
             @RequestParam Integer cantidad,
-            @RequestParam(name="usuario_codigo")  Integer usuarioCodigo,
+            @RequestParam(name="usuario_codigo") Integer usuarioCodigo,
             @RequestParam(name = "empresa_id") String empresaId) {
         return ResponseEntity.ok(pedidoService.actualizarItem(pedidoId, preventaArticuloId, cantidad, usuarioCodigo, empresaId));
     }
@@ -55,8 +55,7 @@ public class UsuarioPedidoController {
             @RequestParam String empresaId,
             @RequestParam Integer usuarioCodigo,
             Pageable pageable) {
-        return ResponseEntity.ok(pedidoService.obtenerPedidosPorPreventa(preventaId, usuarioCodigo, empresaId,
-                pageable));
+        return ResponseEntity.ok(pedidoService.obtenerPedidosPorPreventa(preventaId, pageable));
     }
 
     @GetMapping("/usuario/{usuarioId}")

@@ -2,6 +2,7 @@ package org.api_sync.adapter.outbound.repository;
 
 import org.api_sync.adapter.outbound.entities.Pedido;
 import org.api_sync.adapter.outbound.entities.PedidoItem;
+import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +22,9 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     Page<Pedido> findByPreventaIdAndUsuario(Long preventaId, Usuario usuario, Pageable pageable);
     Page<Pedido> findByUsuarioId(Long usuarioId, Pageable pageable);
     
-    Page<Pedido> findByPreventaIdAndUsuarioId(Long preventaId, Long usuarioId, Pageable pageable);
-
+    Page<Pedido> findByPreventaIdAndUsuarioId(Preventa preventa, Usuario usuario, Pageable pageable);
+    Pedido findByPreventaAndUsuario(Preventa preventa, Usuario usuario);
+    
     @Query("SELECT p FROM Pedido p LEFT JOIN FETCH p.items WHERE p.id = :id")
     Optional<Pedido> findByIdWithItems(@Param("id") Long id);
 

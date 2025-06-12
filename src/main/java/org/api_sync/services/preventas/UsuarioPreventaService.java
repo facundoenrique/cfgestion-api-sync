@@ -58,7 +58,7 @@ private final EmpresaRepository empresaRepository;
         UsuarioPreventaResponseDTO response = enriquecerPreventaConPedido(empresaId, preventa, usuarioCodigo);
 
         // Enriquecer con artículos y cantidades pedidas
-        response.setArticulos(enriquecerArticulosConCantidadesPedidas(preventa, usuarioCodigo, empresaId));
+        response.setArticulos(enriquecerArticulosConCantidadesPedidas(preventa, usuarioCodigo));
 
         return response;
     }
@@ -81,7 +81,7 @@ private final EmpresaRepository empresaRepository;
                                   .orElseThrow(() -> new UsuarioNotFoundException(usuarioCodigo));
         
         // Buscar pedido del usuario
-        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), usuario, Pageable.unpaged())
+        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), Pageable.unpaged())
                 .getContent()
                 .stream()
                 .filter(p -> p.getUsuario().getCodigo().equals(usuarioCodigo))
@@ -105,18 +105,10 @@ private final EmpresaRepository empresaRepository;
     }
 
     private List<Map<String, Object>> enriquecerArticulosConCantidadesPedidas(PreventaResponseDTO preventa,
-                                                                              Integer usuarioCodigo,
-                                                                              String empresaId) {
-    
-    
-        Empresa empresa = empresaRepository.findByUuid(empresaId)
-                                  .orElseThrow(() -> new RuntimeException(""));
-    
-        Usuario usuario = usuarioRepository.findByCodigoAndEmpresa(usuarioCodigo, empresa)
-                                  .orElseThrow(() -> new UsuarioNotFoundException(usuarioCodigo));
+                                                                              Integer usuarioCodigo) {
     
         // Buscar pedido del usuario
-        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), usuario, Pageable.unpaged())
+        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), Pageable.unpaged())
                 .getContent()
                 .stream()
                 .filter(p -> p.getUsuario().getCodigo().equals(usuarioCodigo))

@@ -1,7 +1,7 @@
 package org.api_sync.adapter.inbound.red;
 
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
-import org.api_sync.services.proposals.PreventaService;
+import org.api_sync.services.preventas.PreventaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

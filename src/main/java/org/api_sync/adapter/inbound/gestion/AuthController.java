@@ -3,7 +3,7 @@ package org.api_sync.adapter.inbound.gestion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.gestion.utils.JwtUtil;
-import org.api_sync.adapter.outbound.entities.Usuario;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 import org.api_sync.services.usuarios.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

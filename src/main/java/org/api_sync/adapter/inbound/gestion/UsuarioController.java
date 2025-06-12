@@ -2,7 +2,7 @@ package org.api_sync.adapter.inbound.gestion;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.gestion.request.UsuarioRequest;
-import org.api_sync.adapter.outbound.entities.Usuario;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 import org.api_sync.services.usuarios.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

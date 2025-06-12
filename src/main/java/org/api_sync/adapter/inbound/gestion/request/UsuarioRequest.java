@@ -3,7 +3,7 @@ package org.api_sync.adapter.inbound.gestion.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.api_sync.adapter.outbound.entities.Usuario;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 
 @Data
 public class UsuarioRequest {

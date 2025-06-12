@@ -4,7 +4,7 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.inbound.gestion.request.UsuarioRequest;
-import org.api_sync.adapter.outbound.entities.Usuario;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 import org.api_sync.adapter.outbound.repository.UsuarioRepository;
 import org.api_sync.adapter.outbound.repository.gestion.EmpresaRepository;

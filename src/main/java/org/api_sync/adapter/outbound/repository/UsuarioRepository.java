@@ -1,6 +1,6 @@
 package org.api_sync.adapter.outbound.repository;
 
-import org.api_sync.adapter.outbound.entities.Usuario;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.AntPathMatcher;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
+	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 	
 	@Value("${jwt.excluded.paths}")
 	private String excludedPathsString;
@@ -40,8 +42,12 @@ public class JwtFilter extends OncePerRequestFilter {
 		super.initFilterBean();
 		if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
 			excludedPaths = Arrays.asList(excludedPathsString.split(","));
+			// Limpiar los paths de espacios en blanco
+			excludedPaths = excludedPaths.stream()
+				.map(String::trim)
+				.toList();
 		} else {
-			excludedPaths = List.of("/auth", "/red");
+			excludedPaths = List.of("/auth/**", "/red/**");
 		}
 		log.info("Excluded paths for JWT filter: {}", excludedPaths);
 	}
@@ -49,30 +55,28 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getRequestURI();
-		log.debug("Checking path: {} for filtering", path);
+		log.info("JwtFilter - Checking path: {}", path);
 		
-		// Si excludedPaths no está inicializado aún, inicializarlo
-		if (excludedPaths == null) {
-			if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
-				excludedPaths = Arrays.asList(excludedPathsString.split(","));
-			} else {
-				excludedPaths = List.of("/auth", "/red");
-			}
-			log.info("Initialized excluded paths in shouldNotFilter: {}", excludedPaths);
-		}
+		// Lista de patrones que no requieren autenticación
+		List<String> publicPaths = List.of(
+			"/red/",
+			"/auth/",
+			"/v3/api-docs/",
+			"/swagger-ui/",
+			"/swagger-ui.html",
+			"/api-docs/"
+		);
 		
-		// Verificar si el path actual debe ser excluido
-		if (excludedPaths != null) {
-			for (String excludedPath : excludedPaths) {
-				if (path.startsWith(excludedPath.trim())) {
-					log.info("Path {} is excluded from filtering", path);
-					return true;
-				}
+		// Verificar si el path comienza con alguno de los patrones públicos
+		for (String publicPath : publicPaths) {
+			if (path.startsWith(publicPath)) {
+				log.info("JwtFilter - Path {} is public (starts with {})", path, publicPath);
+				return true;
 			}
 		}
 		
-		// Por defecto, excluimos las rutas de auth
-		return path.startsWith("/auth/") || path.startsWith("/red/");
+		log.info("JwtFilter - Path {} requires authentication", path);
+		return false;
 	}
 	
 	@Override

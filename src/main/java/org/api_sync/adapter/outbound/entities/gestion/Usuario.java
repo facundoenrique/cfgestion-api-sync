@@ -1,4 +1,4 @@
-package org.api_sync.adapter.outbound.entities;
+package org.api_sync.adapter.outbound.entities.gestion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

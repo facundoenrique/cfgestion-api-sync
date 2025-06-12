@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound;
 
+import org.api_sync.services.exceptions.PedidoNotOwnedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -27,26 +28,26 @@ public class RestControllerExceptionHandler {
 		return ResponseEntity.badRequest().body(errors);
 	}
 
+	@ExceptionHandler(PedidoNotOwnedException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ProblemDetail handlePedidoNotOwnedException(PedidoNotOwnedException e) {
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+				HttpStatus.FORBIDDEN, e.getMessage()
+		);
+		problemDetail.setTitle("Acceso denegado");
+		problemDetail.setType(URI.create("about:blank"));
+		
+		problemDetail.setProperty("timestamp", System.currentTimeMillis());
+		problemDetail.setProperty("error", "PedidoNotOwnedException");
+		
+		return problemDetail;
+	}
+
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ProblemDetail handleDuplicateKeyException(DataIntegrityViolationException e) {
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
 				HttpStatus.BAD_REQUEST, e.getLocalizedMessage()
-		);
-		problemDetail.setTitle("Conflicto de datos");
-		problemDetail.setType(URI.create(e.getMessage()));
-		
-		problemDetail.setProperty("timestamp", System.currentTimeMillis());
-		problemDetail.setProperty("debugInfo", "Consulta los logs para más detalles.");
-		
-		return problemDetail;
-	}
-
-	@ExceptionHandler(RuntimeException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ProblemDetail handleDuplicateKeyException(RuntimeException e) {
-		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-				HttpStatus.BAD_REQUEST, e.getMessage()
 		);
 		problemDetail.setTitle("Conflicto de datos");
 		problemDetail.setType(URI.create(e.getMessage()));

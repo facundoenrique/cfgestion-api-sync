@@ -5,9 +5,12 @@ import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
 import org.api_sync.adapter.inbound.responses.UsuarioPreventaResponseDTO;
 import org.api_sync.adapter.outbound.entities.Pedido;
 import org.api_sync.adapter.outbound.entities.PedidoItem;
-import org.api_sync.services.exceptions.PreventaNotFoundException;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
+import org.api_sync.adapter.outbound.entities.gestion.Empresa;
+import org.api_sync.adapter.outbound.repository.UsuarioRepository;
+import org.api_sync.adapter.outbound.repository.gestion.EmpresaRepository;
+import org.api_sync.services.exceptions.UsuarioNotFoundException;
 import org.api_sync.services.pedidos.PedidoService;
-import org.api_sync.services.preventas.PreventaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,10 +29,13 @@ public class UsuarioPreventaService {
 
     private final PreventaService preventaService;
     private final PedidoService pedidoService;
+    private final UsuarioRepository usuarioRepository;
+private final EmpresaRepository empresaRepository;
 
-    @Transactional(readOnly = true)
+@Transactional(readOnly = true)
     public Page<UsuarioPreventaResponseDTO> listarPreventasConPedidos(
-            Long usuarioId,
+            String empresaId,
+            Integer usuarioCodigo,
             LocalDate fechaDesde,
             LocalDate fechaHasta,
             Long proveedorId,
@@ -40,24 +46,27 @@ public class UsuarioPreventaService {
         Page<PreventaResponseDTO> preventas = preventaService.listar(fechaDesde, fechaHasta, proveedorId, nombre, pageable);
 
         // Enriquecer con información de pedidos
-        return preventas.map(preventa -> enriquecerPreventaConPedido(preventa, usuarioId));
+        return preventas.map(preventa -> enriquecerPreventaConPedido(empresaId, preventa, usuarioCodigo));
     }
 
     @Transactional(readOnly = true)
-    public UsuarioPreventaResponseDTO obtenerPreventaConPedido(Long preventaId, Long usuarioId) {
+    public UsuarioPreventaResponseDTO obtenerPreventaConPedido(String empresaId, Long preventaId, Integer usuarioCodigo) {
         // Obtener preventa
         PreventaResponseDTO preventa = preventaService.getListaPrecio(preventaId);
         
         // Crear DTO de respuesta
-        UsuarioPreventaResponseDTO response = enriquecerPreventaConPedido(preventa, usuarioId);
+        UsuarioPreventaResponseDTO response = enriquecerPreventaConPedido(empresaId, preventa, usuarioCodigo);
 
         // Enriquecer con artículos y cantidades pedidas
-        response.setArticulos(enriquecerArticulosConCantidadesPedidas(preventa, usuarioId));
+        response.setArticulos(enriquecerArticulosConCantidadesPedidas(preventa, usuarioCodigo, empresaId));
 
         return response;
     }
 
-    private UsuarioPreventaResponseDTO enriquecerPreventaConPedido(PreventaResponseDTO preventa, Long usuarioId) {
+    private UsuarioPreventaResponseDTO enriquecerPreventaConPedido(String empresaId,
+                                                                   PreventaResponseDTO preventa,
+                                                                   Integer usuarioCodigo) {
+        
         UsuarioPreventaResponseDTO dto = new UsuarioPreventaResponseDTO();
         dto.setId(preventa.getId());
         dto.setNombre(preventa.getNombre());
@@ -65,33 +74,52 @@ public class UsuarioPreventaService {
         dto.setFechaFin(preventa.getFechaFin());
         dto.setListaBaseId(preventa.getListaBaseId());
 
+        Empresa empresa = empresaRepository.findByUuid(empresaId)
+                                  .orElseThrow(() -> new RuntimeException(""));
+        
+        Usuario usuario = usuarioRepository.findByCodigoAndEmpresa(usuarioCodigo, empresa)
+                                  .orElseThrow(() -> new UsuarioNotFoundException(usuarioCodigo));
+        
         // Buscar pedido del usuario
-        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), Pageable.unpaged())
+        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), usuario, Pageable.unpaged())
                 .getContent()
                 .stream()
-                .filter(p -> p.getUsuario().getId().equals(usuarioId))
+                .filter(p -> p.getUsuario().getCodigo().equals(usuarioCodigo))
                 .findFirst();
 
         if (pedido.isPresent()) {
             Pedido p = pedido.get();
             dto.setTienePedido(true);
+            dto.setPedidoId(pedido.get().getId());
             dto.setEstadoParticipacion(p.getEstadoParticipacion());
             dto.setMontoTotal(calcularMontoTotal(p));
+            dto.setUnidadesPedidas(calcularUnidadesPedidas(p));
         } else {
             dto.setTienePedido(false);
             dto.setEstadoParticipacion(null);
             dto.setMontoTotal(BigDecimal.ZERO);
+            dto.setUnidadesPedidas(0);
         }
 
         return dto;
     }
 
-    private List<Map<String, Object>> enriquecerArticulosConCantidadesPedidas(PreventaResponseDTO preventa, Long usuarioId) {
+    private List<Map<String, Object>> enriquecerArticulosConCantidadesPedidas(PreventaResponseDTO preventa,
+                                                                              Integer usuarioCodigo,
+                                                                              String empresaId) {
+    
+    
+        Empresa empresa = empresaRepository.findByUuid(empresaId)
+                                  .orElseThrow(() -> new RuntimeException(""));
+    
+        Usuario usuario = usuarioRepository.findByCodigoAndEmpresa(usuarioCodigo, empresa)
+                                  .orElseThrow(() -> new UsuarioNotFoundException(usuarioCodigo));
+    
         // Buscar pedido del usuario
-        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), Pageable.unpaged())
+        Optional<Pedido> pedido = pedidoService.obtenerPedidosPorPreventa(preventa.getId(), usuario, Pageable.unpaged())
                 .getContent()
                 .stream()
-                .filter(p -> p.getUsuario().getId().equals(usuarioId))
+                .filter(p -> p.getUsuario().getCodigo().equals(usuarioCodigo))
                 .findFirst();
 
         return preventa.getArticulos().stream()
@@ -117,6 +145,13 @@ public class UsuarioPreventaService {
                 .map(PedidoItem::getCantidad)
                 .findFirst()
                 .orElse(0);
+    }
+
+    private Integer calcularUnidadesPedidas(Pedido pedido) {
+        return pedido.getItems().stream()
+                       .map(PedidoItem::getCantidad)
+                       .findFirst()
+                       .orElse(0);
     }
 
     private BigDecimal calcularMontoTotal(Pedido pedido) {

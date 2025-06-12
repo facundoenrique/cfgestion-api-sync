@@ -55,31 +55,27 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getRequestURI();
-		log.debug("Checking path: {} for filtering", path);
+		log.info("JwtFilter - Checking path: {}", path);
 		
-		// Si excludedPaths no está inicializado aún, inicializarlo
-		if (excludedPaths == null) {
-			if (excludedPathsString != null && !excludedPathsString.isEmpty()) {
-				excludedPaths = Arrays.asList(excludedPathsString.split(","));
-				excludedPaths = excludedPaths.stream()
-					.map(String::trim)
-					.toList();
-			} else {
-				excludedPaths = List.of("/auth/**", "/red/**");
-			}
-			log.info("Initialized excluded paths in shouldNotFilter: {}", excludedPaths);
-		}
+		// Lista de patrones que no requieren autenticación
+		List<String> publicPaths = List.of(
+			"/red/",
+			"/auth/",
+			"/v3/api-docs/",
+			"/swagger-ui/",
+			"/swagger-ui.html",
+			"/api-docs/"
+		);
 		
-		// Verificar si el path actual debe ser excluido usando AntPathMatcher
-		if (excludedPaths != null) {
-			for (String excludedPath : excludedPaths) {
-				if (pathMatcher.match(excludedPath, path)) {
-					log.info("Path {} matches excluded pattern {}", path, excludedPath);
-					return true;
-				}
+		// Verificar si el path comienza con alguno de los patrones públicos
+		for (String publicPath : publicPaths) {
+			if (path.startsWith(publicPath)) {
+				log.info("JwtFilter - Path {} is public (starts with {})", path, publicPath);
+				return true;
 			}
 		}
 		
+		log.info("JwtFilter - Path {} requires authentication", path);
 		return false;
 	}
 	

@@ -18,7 +18,9 @@ public class UsuarioPreventaResponseDTO {
     private LocalDate fechaFin;
     private Long listaBaseId;
     private boolean tienePedido;
+    private Long pedidoId;
     private EstadoParticipacion estadoParticipacion;
     private BigDecimal montoTotal;
+    private Integer unidadesPedidas;
     private List<Map<String, Object>> articulos;
 } 

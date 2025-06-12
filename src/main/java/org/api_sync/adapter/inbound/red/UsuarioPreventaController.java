@@ -22,7 +22,8 @@ public class UsuarioPreventaController {
 
     @GetMapping
     public ResponseEntity<Page<UsuarioPreventaResponseDTO>> findAll(
-            @RequestParam Long usuarioId,
+            @RequestParam(name = "empresa_id") String empresaId,
+            @RequestParam(name = "usuario_codigo") Integer usuarioCodigo,
             @RequestParam(required = false, value = "fecha_desde") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaDesde,
             @RequestParam(required = false, value = "fecha_hasta") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaHasta,
             @RequestParam(required = false) Long proveedorId,
@@ -30,13 +31,14 @@ public class UsuarioPreventaController {
             @PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return ResponseEntity.ok(usuarioPreventaService.listarPreventasConPedidos(
-                usuarioId, fechaDesde, fechaHasta, proveedorId, nombre, pageable));
+                empresaId, usuarioCodigo, fechaDesde, fechaHasta, proveedorId, nombre, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioPreventaResponseDTO> findById(
+            @RequestParam(name = "empresa_id") String empresaId,
             @PathVariable Long id,
-            @RequestParam(name = "usuario_id") Long usuarioId) {
-        return ResponseEntity.ok(usuarioPreventaService.obtenerPreventaConPedido(id, usuarioId));
+            @RequestParam(name = "usuario_codigo") Integer usuarioCodigo) {
+        return ResponseEntity.ok(usuarioPreventaService.obtenerPreventaConPedido(empresaId, id, usuarioCodigo));
     }
 } 

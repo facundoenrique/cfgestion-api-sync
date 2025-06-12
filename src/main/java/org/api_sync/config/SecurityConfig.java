@@ -37,24 +37,16 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> {
-                // Rutas públicas (no requieren autenticación)
-                auth.requestMatchers(
-                    new AntPathRequestMatcher("/auth/login"),
-                    new AntPathRequestMatcher("/auth/refresh"),
-                    new AntPathRequestMatcher("/auth/logout"),
-                    new AntPathRequestMatcher("/auth/verify-token"),
-                    new AntPathRequestMatcher("/red/**"),
-                    // Swagger UI v3 (OpenAPI)
-                    new AntPathRequestMatcher("/v3/api-docs/**"),
-                    new AntPathRequestMatcher("/swagger-ui/**"),
-                    new AntPathRequestMatcher("/swagger-ui.html"),
-                    new AntPathRequestMatcher("/api-docs/**")
-                ).permitAll();
+                // Configurar las rutas públicas primero
+                auth.requestMatchers("/red/**").permitAll();
+                auth.requestMatchers("/auth/**").permitAll();
+                auth.requestMatchers("/v3/api-docs/**").permitAll();
+                auth.requestMatchers("/swagger-ui/**").permitAll();
+                auth.requestMatchers("/swagger-ui.html").permitAll();
+                auth.requestMatchers("/api-docs/**").permitAll();
                 
                 // Todas las demás rutas requieren autenticación
                 auth.anyRequest().authenticated();
-                
-                log.info("Request matchers configured: public routes set to [/auth/login, /auth/refresh, /auth/logout, /auth/verify-token, /red/**, /swagger-ui/**, /api-docs/**, /v3/api-docs/**]");
             })
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -63,20 +55,21 @@ public class SecurityConfig {
             .exceptionHandling(exceptions -> 
                 exceptions
                     .authenticationEntryPoint((request, response, authException) -> {
-                        log.error("Authentication error: {} for path: {}", authException.getMessage(), request.getRequestURI());
+                        String path = request.getRequestURI();
+                        log.error("Authentication error for path {}: {}", path, authException.getMessage());
                         response.setContentType("application/json;charset=UTF-8");
                         response.setStatus(401);
-                        response.getWriter().write("{\"error\":\"No autenticado\",\"message\":\"" + authException.getMessage() + "\"}");
+                        response.getWriter().write("{\"error\":\"No autenticado\",\"message\":\"" + authException.getMessage() + "\",\"path\":\"" + path + "\"}");
                     })
                     .accessDeniedHandler((request, response, accessDeniedException) -> {
-                        log.error("Access denied: {} for path: {}", accessDeniedException.getMessage(), request.getRequestURI());
+                        String path = request.getRequestURI();
+                        log.error("Access denied for path {}: {}", path, accessDeniedException.getMessage());
                         response.setContentType("application/json;charset=UTF-8");
                         response.setStatus(403);
-                        response.getWriter().write("{\"error\":\"Acceso denegado\",\"message\":\"" + accessDeniedException.getMessage() + "\"}");
+                        response.getWriter().write("{\"error\":\"Acceso denegado\",\"message\":\"" + accessDeniedException.getMessage() + "\",\"path\":\"" + path + "\"}");
                     })
             );
 
-        log.info("Security filter chain configured successfully");
         return http.build();
     }
 

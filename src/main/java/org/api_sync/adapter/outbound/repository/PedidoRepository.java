@@ -2,6 +2,7 @@ package org.api_sync.adapter.outbound.repository;
 
 import org.api_sync.adapter.outbound.entities.Pedido;
 import org.api_sync.adapter.outbound.entities.PedidoItem;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,7 @@ import java.util.Optional;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     
     Page<Pedido> findByPreventaId(Long preventaId, Pageable pageable);
-    
+    Page<Pedido> findByPreventaIdAndUsuario(Long preventaId, Usuario usuario, Pageable pageable);
     Page<Pedido> findByUsuarioId(Long usuarioId, Pageable pageable);
     
     Page<Pedido> findByPreventaIdAndUsuarioId(Long preventaId, Long usuarioId, Pageable pageable);

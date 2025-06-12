@@ -3,6 +3,7 @@ package org.api_sync.adapter.outbound.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.api_sync.adapter.outbound.entities.gestion.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class Pedido {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    private Usuario usuario; //esto deberia estar asociado a un cliente en lugar de un usuario ?
 
     @Column(nullable = false)
     private LocalDateTime fechaCreacion;

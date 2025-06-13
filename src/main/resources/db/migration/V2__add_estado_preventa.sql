@@ -8,7 +8,7 @@ CREATE TABLE `red_articulos` (
   `comision` int(11) NOT NULL,
   `compuesto` int(11) NOT NULL,
   `defecto` int(11) NOT NULL,
-  `descuento` double NOT NULL,Add commentMore actions
+  `descuento` double NOT NULL,
   `eliminado` int(11) NOT NULL,
   `enviado` int(11) NOT NULL,
   `familia` int(11) NOT NULL,
@@ -29,7 +29,8 @@ CREATE TABLE `red_articulos` (
   `descripcion` varchar(255) DEFAULT NULL,
   `marca` varchar(255) DEFAULT NULL,
   `nombre` varchar(255) DEFAULT NULL,
-  `numero` varchar(255) NOT NULL
+  `numero` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -50,7 +51,8 @@ CREATE TABLE `red_articulos_seq` (
 
 INSERT INTO `red_articulos_seq` (`next_val`) VALUES
 (1);
-Add comment
+
+
 -- Estructura de tabla para la tabla `pedidos`
 --
 
@@ -122,25 +124,34 @@ CREATE TABLE `pedidos_proveedor_items` (
   PRIMARY KEY (`id`),
   KEY `FK_pedidos_proveedor_items_articulo` (`articulo_id`),
   KEY `FK_pedidos_proveedor_items_pedido` (`pedido_proveedor_id`),
-  CONSTRAINT `FK_pedidos_proveedor_items_articulo` FOREIGN KEY (`articulo_id`) REFERENCES `articulos` (`id`),
+  CONSTRAINT `FK_pedidos_proveedor_items_articulo` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`),
   CONSTRAINT `FK_pedidos_proveedor_items_pedido` FOREIGN KEY (`pedido_proveedor_id`) REFERENCES `pedidos_proveedor` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ALTER TABLE `items_lista_precios`
-  ADD CONSTRAINT `FK4ivx35mi6lnmeihbhkkk1l97k` FOREIGN KEY (`lista_de_precios_id`) REFERENCES `listas_precios` (`id`),
-  ADD CONSTRAINT `FKc3bmm245rbggaxu4mx8yt10rq` FOREIGN KEY (`precio_id`) REFERENCES `precios` (`id`),
-  ADD CONSTRAINT `FKjg2ay4uquouks7qp20uos3ri4` FOREIGN KEY (`articulo_id`) REFERENCES `articulos` (`id`);
-  ADD CONSTRAINT `FKjg2ay4uquouks7qp20uos3ri4` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`);
+-- Crear tabla items_lista_precios si no existe
+CREATE TABLE IF NOT EXISTS `items_lista_precios` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `articulo_id` bigint(20) NOT NULL,
+  `lista_de_precios_id` bigint(20) NOT NULL,
+  `precio_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_items_lista_precios_articulo` (`articulo_id`),
+  KEY `FK_items_lista_precios_lista` (`lista_de_precios_id`),
+  KEY `FK_items_lista_precios_precio` (`precio_id`),
+  CONSTRAINT `FK_items_lista_precios_articulo` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`),
+  CONSTRAINT `FK_items_lista_precios_lista` FOREIGN KEY (`lista_de_precios_id`) REFERENCES `listas_precios` (`id`),
+  CONSTRAINT `FK_items_lista_precios_precio` FOREIGN KEY (`precio_id`) REFERENCES `precios` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Filtros para la tabla `listas_precios`Add commentMore actions
-@@ -883,7 +934,7 @@ ALTER TABLE `localidades`
--- Filtros para la tabla `precios`
---
-ALTER TABLE `precios`
-  ADD CONSTRAINT `FKdn0lgdxrv8qjcgljm7ltdt9ew` FOREIGN KEY (`articulo_id`) REFERENCES `articulos` (`id`);
-  ADD CONSTRAINT `FKdn0lgdxrv8qjcgljm7ltdt9ew` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`);
+-- Crear tabla precios si no existe
+CREATE TABLE IF NOT EXISTS `precios` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `articulo_id` bigint(20) NOT NULL,
+  `importe` decimal(19,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_precios_articulo` (`articulo_id`),
+  CONSTRAINT `FK_precios_articulo` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
-
+-- Agregar columna estado a preventas
 ALTER TABLE preventas ADD COLUMN estado VARCHAR(20) NOT NULL DEFAULT 'ABIERTA';

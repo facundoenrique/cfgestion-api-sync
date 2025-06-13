@@ -152,6 +152,3 @@ CREATE TABLE IF NOT EXISTS `precios` (
   KEY `FK_precios_articulo` (`articulo_id`),
   CONSTRAINT `FK_precios_articulo` FOREIGN KEY (`articulo_id`) REFERENCES `red_articulos` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Agregar columna estado a preventas
-ALTER TABLE preventas ADD COLUMN estado VARCHAR(20) NOT NULL DEFAULT 'ABIERTA';

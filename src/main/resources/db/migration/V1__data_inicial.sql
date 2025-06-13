@@ -416,7 +416,8 @@ CREATE TABLE `preventas` (
   `fecha_inicio` date NOT NULL,
   `id` bigint(20) NOT NULL,
   `lista_base_id` bigint(20) DEFAULT NULL,
-  `nombre` varchar(255) NOT NULL
+  `nombre` varchar(255) NOT NULL,
+  `estado` VARCHAR(20) NOT NULL DEFAULT 'ABIERTA'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 

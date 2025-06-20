@@ -6,6 +6,7 @@ import io.micrometer.common.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.request.ArticuloRequest;
@@ -29,8 +30,6 @@ import org.springframework.stereotype.Service;
 public class PreventaService {
 
 	private final PreventaRepository preventaRepository;
-	private final PreventaArticuloRepository preventaArticuloRepository;
-	private final ListaPreciosService listaPreciosService;
 	private final ListaPreciosRepository listaPreciosRepository;
 	private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
@@ -44,8 +43,8 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 							
 		List<ArticuloPreventaDTO> items = propuesta.getArticulos().stream().map(
 				a -> ArticuloPreventaDTO.builder()
-								       .id(a.getArticuloId())
-						                .numero(a.getNumero())
+								       .id(a.getId())
+						               .numero(a.getNumero())
 								       .nombre(a.getNombre())
 								       .importe(a.getImporte())
 								       .iva(a.getIva())
@@ -79,7 +78,14 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 		
 		Page<Preventa> propuestaPage = preventaRepository.findAll(spec, pageable);
 		
-		return propuestaPage.map(PreventaResponseDTO::toPreventaResponseDTO);
+		
+		return propuestaPage
+				       .map(PreventaResponseDTO::toPreventaResponseDTO)
+				       .map(preventa -> {
+					       listaPreciosRepository.findById(preventa.getListaBaseId())
+							       .ifPresent(listaPrecios -> preventa.setProveedor(listaPrecios.getProveedor().getRazonSocial()));
+						   return preventa;
+				       });
 	}
 	
 	public Preventa guardarPropuesta(Preventa preventa) {
@@ -139,8 +145,8 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 		preVenta.setFechaInicio(dto.getFechaInicio());
 		preVenta.setFechaFin(dto.getFechaFin());
 		
-		// Eliminar articulos actuales
-		preventaArticuloRepository.deleteByPreventaId(preVenta.getId());
+		// Limpiar la colección actual
+		preVenta.getArticulos().clear();
 		
 		// Agregar nuevos articulos
 		List<PreventaArticulo> articulos = dto.getArticulos().stream().map(item -> {
@@ -154,9 +160,9 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 			articulo.setNumero(item.getNumero());
 			articulo.setIva(item.getIva());
 			return articulo;
-		}).toList();
+		}).collect(Collectors.toList());
 		
-		preVenta.setArticulos(articulos);
+		preVenta.getArticulos().addAll(articulos);
 		preventaRepository.save(preVenta);
 	}
 
@@ -171,4 +177,5 @@ public PreventaResponseDTO getListaPrecio(Long id) {
 		preventa.setEstado(nuevoEstado);
 		preventaRepository.save(preventa);
 	}
+
 }

@@ -2,6 +2,8 @@ package org.api_sync.adapter.inbound.red;
 
 import lombok.RequiredArgsConstructor;
 import org.api_sync.adapter.inbound.responses.UsuarioPreventaResponseDTO;
+import org.api_sync.adapter.inbound.responses.PedidoConItemsDTO;
+import org.api_sync.adapter.outbound.entities.EstadoPreventa;
 import org.api_sync.services.preventas.UsuarioPreventaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/red/usuario/preventas")
@@ -28,10 +31,11 @@ public class UsuarioPreventaController {
             @RequestParam(required = false, value = "fecha_hasta") @DateTimeFormat(pattern = "yyyyMMdd") LocalDate fechaHasta,
             @RequestParam(required = false) Long proveedorId,
             @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) EstadoPreventa estado,
             @PageableDefault(size = 10, sort = "fechaFin", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return ResponseEntity.ok(usuarioPreventaService.listarPreventasConPedidos(
-                empresaId, usuarioCodigo, fechaDesde, fechaHasta, proveedorId, nombre, pageable));
+                empresaId, usuarioCodigo, fechaDesde, fechaHasta, proveedorId, nombre, pageable, estado));
     }
 
     @GetMapping("/{id}")
@@ -41,4 +45,10 @@ public class UsuarioPreventaController {
             @RequestParam(name = "usuario_codigo") Integer usuarioCodigo) {
         return ResponseEntity.ok(usuarioPreventaService.obtenerPreventaConPedido(empresaId, id, usuarioCodigo));
     }
+
+    @GetMapping("/preventas/{preventaId}/pedidos")
+    public ResponseEntity<List<PedidoConItemsDTO>> getPedidosPorPreventa(@PathVariable Long preventaId) {
+        return ResponseEntity.ok(usuarioPreventaService.listarPedidosConItemsPorPreventa(preventaId));
+    }
+
 } 

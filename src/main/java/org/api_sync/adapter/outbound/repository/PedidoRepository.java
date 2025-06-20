@@ -23,7 +23,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     Page<Pedido> findByUsuarioId(Long usuarioId, Pageable pageable);
     
     Page<Pedido> findByPreventaIdAndUsuarioId(Preventa preventa, Usuario usuario, Pageable pageable);
-    Pedido findByPreventaAndUsuario(Preventa preventa, Usuario usuario);
+    Optional<Pedido> findByPreventaAndUsuario(Preventa preventa, Usuario usuario);
     
     @Query("SELECT p FROM Pedido p LEFT JOIN FETCH p.items WHERE p.id = :id")
     Optional<Pedido> findByIdWithItems(@Param("id") Long id);
@@ -34,4 +34,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT pi FROM PedidoItem pi WHERE pi.pedido.id = :pedidoId")
     Page<PedidoItem> findPedidoItems(@Param("pedidoId") Long pedidoId, Pageable pageable);
+
+    List<Pedido> findByPreventaId(Long preventaId);
 } 

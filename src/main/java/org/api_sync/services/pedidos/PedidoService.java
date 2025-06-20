@@ -5,18 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.api_sync.adapter.outbound.entities.*;
 import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 import org.api_sync.adapter.outbound.entities.gestion.Usuario;
-import org.api_sync.adapter.outbound.repository.PedidoRepository;
-import org.api_sync.adapter.outbound.repository.PreventaArticuloRepository;
-import org.api_sync.adapter.outbound.repository.PreventaRepository;
-import org.api_sync.adapter.outbound.repository.UsuarioRepository;
+import org.api_sync.adapter.outbound.repository.*;
 import org.api_sync.adapter.outbound.repository.gestion.EmpresaRepository;
 import org.api_sync.services.exceptions.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.api_sync.adapter.inbound.responses.PedidoConItemsDTO;
+import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -28,6 +28,8 @@ public class PedidoService {
     private final PreventaRepository preventaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PreventaArticuloRepository preventaArticuloRepository;
+    private final UsuarioRelacionRepository usuarioRelacionRepository;
+    private final ClienteRepository clienteRepository;
 
     private void validarPropiedadPedido(Pedido pedido, Long usuarioId) {
         if (!pedido.getUsuario().getId().equals(usuarioId)) {
@@ -84,6 +86,17 @@ public class PedidoService {
 
         return pedidoRepository.save(pedido);
     }
+    
+    @Transactional
+    private Pedido crearPedido(Preventa preventa, Usuario usuario) {
+        Pedido pedido = new Pedido();
+        pedido.setPreventa(preventa);
+        pedido.setUsuario(usuario);
+        pedido.setFechaCreacion(LocalDateTime.now());
+        pedido.setEstadoParticipacion(EstadoParticipacion.PENDIENTE);
+        
+        return pedidoRepository.save(pedido);
+    }
 
     @Transactional
     public Pedido actualizarItem(Long pedidoId, Long preventaArticuloId, Integer cantidad, Integer usuarioCodigo,
@@ -130,6 +143,7 @@ public class PedidoService {
             pedido.getItems().add(nuevoItem);
         }
 
+        pedido.setEstadoParticipacion(EstadoParticipacion.PARTICIPA);
         return pedidoRepository.save(pedido);
     }
 
@@ -149,16 +163,26 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido marcarParticipacion(Long pedidoId, Long usuarioId, EstadoParticipacion participa) {
-        log.info("Marcando pedido {} como participante", pedidoId);
+    public Pedido marcarParticipacion(Long preventaId, Long usuarioId, EstadoParticipacion participa, String empresaId) {
+        log.info("Marcando pedido de preventa {} como participante", preventaId);
         
-        Pedido pedido = pedidoRepository.findByIdWithItems(pedidoId)
-            .orElseThrow(() -> new PedidoNotFoundException(pedidoId));
+        Preventa preventa = preventaRepository.findById(preventaId)
+                 .orElseThrow(() -> new PreventaNotFoundException(preventaId));
+        
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNotFoundException(usuarioId));
+        
+        Empresa empresa = empresaRepository.findByUuid(empresaId)
+                                  .orElseThrow(() -> new EmpresaNotFoundException(empresaId));
+        
+        Pedido pedido = pedidoRepository.findByPreventaAndUsuario(preventa, usuario)
+                                .orElse(crearPedido(preventa, usuario));
 
         validarPropiedadPedido(pedido, usuarioId);
 
         pedido.setEstadoParticipacion(participa);
-        return pedidoRepository.save(pedido);
+        pedidoRepository.save(pedido);
+        return pedido;
     }
 
     @Transactional
@@ -171,6 +195,7 @@ public class PedidoService {
         validarPropiedadPedido(pedido, usuarioId);
             
         pedido.setFechaConfirmacion(LocalDateTime.now());
+        pedido.setEstadoParticipacion(EstadoParticipacion.CONFIRMADO);
         return pedidoRepository.save(pedido);
     }
 
@@ -185,5 +210,41 @@ public class PedidoService {
         
         pedido.getItems().removeIf(item -> item.getId().equals(itemId));
         pedidoRepository.save(pedido);
+    }
+
+    public List<Pedido> listarPedidosPorPreventa(Long preventaId) {
+        return pedidoRepository.findByPreventaId(preventaId);
+    }
+
+    public List<Pedido> findByPreventaId(Long preventaId) {
+        return pedidoRepository.findByPreventaId(preventaId);
+    }
+
+    public List<PedidoConItemsDTO> listarPedidosConItemsPorPreventa(Long preventaId) {
+        List<Pedido> pedidos = findByPreventaId(preventaId);
+        return pedidos.stream().map(pedido -> {
+            List<PedidoConItemsDTO.ItemPedidoDTO> items = pedido.getItems().stream().map(item ->
+                PedidoConItemsDTO.ItemPedidoDTO.builder()
+                    .preventaArticuloId(item.getPreventaArticulo().getId())
+                    .nombre(item.getPreventaArticulo().getNombre())
+                    .importe(item.getPreventaArticulo().getImporte())
+                    .cantidadPedida(item.getCantidad())
+                    .build()
+            ).collect(Collectors.toList());
+
+            // Get the client name through UsuarioRelacion
+            String nombreCliente = usuarioRelacionRepository
+                .findByUsuarioIdAndTipoRelacion(pedido.getUsuario().getId(), UsuarioRelacion.TipoRelacion.CLIENTE)
+                .flatMap(relacion -> clienteRepository.findById(relacion.getEntidadId()))
+                .map(Cliente::getRazonSocial)
+                .orElse(pedido.getUsuario().getNombre()); // Fallback to user name if client not found
+
+            return PedidoConItemsDTO.builder()
+                    .pedidoId(pedido.getId())
+                    .usuarioCodigo(pedido.getUsuario().getCodigo())
+                    .usuarioNombre(nombreCliente)
+                    .items(items)
+                    .build();
+        }).collect(Collectors.toList());
     }
 } 

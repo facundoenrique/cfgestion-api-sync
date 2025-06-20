@@ -26,6 +26,7 @@ public class PreventaResponseDTO {
 	private EstadoPreventa estado;
 	@With
 	private List<ArticuloPreventaDTO> articulos;
+	private String proveedor;
 	
 	public static PreventaResponseDTO toPreventaResponseDTO(Preventa propuesta) {
 		return PreventaResponseDTO.builder()

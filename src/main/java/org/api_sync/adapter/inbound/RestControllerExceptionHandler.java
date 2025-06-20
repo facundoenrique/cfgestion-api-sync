@@ -1,5 +1,6 @@
 package org.api_sync.adapter.inbound;
 
+import lombok.extern.slf4j.Slf4j;
 import org.api_sync.services.exceptions.PedidoNotOwnedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class RestControllerExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -58,14 +60,41 @@ public class RestControllerExceptionHandler {
 		return problemDetail;
 	}
 
+	@ExceptionHandler(UnsupportedOperationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ProblemDetail handleUnsupportedOperationException(UnsupportedOperationException e) {
+		log.error("Operación no soportada: {}", e.getMessage(), e);
+		
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+				HttpStatus.BAD_REQUEST, 
+				"La operación solicitada no está soportada: " + e.getMessage()
+		);
+		problemDetail.setTitle("Operación no soportada");
+		problemDetail.setType(URI.create("about:blank"));
+		
+		problemDetail.setProperty("timestamp", System.currentTimeMillis());
+		problemDetail.setProperty("error", "UnsupportedOperationException");
+		
+		return problemDetail;
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+		log.error("Error no manejado: {}", ex.getMessage(), ex);
+		
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("error", ex.getClass().getSimpleName());
 		body.put("message", ex.getMessage());
-		StringWriter sw = new StringWriter();
-		ex.printStackTrace(new PrintWriter(sw));
-		body.put("stackTrace", sw.toString());
+		
+		// Solo incluir stack trace en desarrollo
+		if (System.getProperty("spring.profiles.active", "").contains("dev")) {
+			StringWriter sw = new StringWriter();
+			ex.printStackTrace(new PrintWriter(sw));
+			body.put("stackTrace", sw.toString());
+		} else {
+			body.put("stackTrace", "No disponible en producción");
+		}
+		
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
 	}
 

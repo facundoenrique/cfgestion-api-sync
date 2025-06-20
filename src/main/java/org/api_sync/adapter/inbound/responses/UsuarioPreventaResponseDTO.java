@@ -23,4 +23,5 @@ public class UsuarioPreventaResponseDTO {
     private BigDecimal montoTotal;
     private Integer unidadesPedidas;
     private List<Map<String, Object>> articulos;
+    private String proveedor;
 } 

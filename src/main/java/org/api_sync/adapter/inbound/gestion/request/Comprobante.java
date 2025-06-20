@@ -1,6 +1,5 @@
 package org.api_sync.adapter.inbound.gestion.request;
 
-
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;

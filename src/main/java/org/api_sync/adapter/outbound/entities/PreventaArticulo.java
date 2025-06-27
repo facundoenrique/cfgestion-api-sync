@@ -1,7 +1,6 @@
 package org.api_sync.adapter.outbound.entities;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,13 +21,9 @@ public class PreventaArticulo {
 	private String nombre;
 	@Column(nullable = false)
 	private BigDecimal importe;
-	@Builder.Default
 	private BigDecimal iva = BigDecimal.ZERO;
-	@Builder.Default
 	private Integer defecto = 1;
-	@Builder.Default
 	private Integer unidadesPorVulto = 1;
-	@Builder.Default
 	private Integer multiplicador = 1;
 	
 	@ManyToOne

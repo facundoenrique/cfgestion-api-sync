@@ -36,7 +36,7 @@ public class UsuarioPedidoController {
 
     @PutMapping("/{pedidoId}/participar")
     public ResponseEntity<Pedido> marcarParticipacion(
-            @PathVariable("pedido_id") Long pedidoId,
+            @PathVariable Long pedidoId,
             @RequestParam("usuario_id") Long usuarioId,
             @RequestParam EstadoParticipacion participa) {
         return ResponseEntity.ok(pedidoService.marcarParticipacion(pedidoId, usuarioId, participa));

@@ -3,7 +3,6 @@ package org.api_sync.adapter.outbound.entities.gestion;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.api_sync.adapter.outbound.entities.gestion.Empresa;
 
 @Entity
 @Table(
@@ -31,6 +30,7 @@ public class Usuario {
 	
 	private String nombre;
 	private String password;
+	@Builder.Default
 	private short eliminado = 0;
 	//private Long caja; //esto hace referencia a que?
 	//private Long empleadoId; //este hace referencia a que ?

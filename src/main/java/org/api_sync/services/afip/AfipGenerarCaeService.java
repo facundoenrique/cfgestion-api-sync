@@ -18,10 +18,11 @@ public class AfipGenerarCaeService {
 	private final AfipAuthentificationClient afipAuthentificationClient;
 	private final EmpresaRepository empresaRepository;
 	private final AfipServiceConfig afipServiceConfig;
+	private final CaeErrorMemory caeErrorMemory;
 
 	public CaeResponse generarCae(String empresaId, Integer certificadoPuntoVenta, ComprobanteRequest comprobante) {
 		Empresa empresa = empresaRepository.findByUuid(empresaId)
-				                  .orElseThrow(() -> new RuntimeException("No existe la empresa"));
+					              .orElseThrow(() -> new RuntimeException("No existe la empresa"));
 		
 		try {
 			Authentication auth = afipAuthentificationClient.getAuthentication(empresa.getCuit(), certificadoPuntoVenta);
@@ -34,6 +35,16 @@ public class AfipGenerarCaeService {
 			CaeDTO caeDto = psoapClientSAAJ.getCae(comprobante);
 			
 			log.info("ARCA response: {}", caeDto);
+			
+			// Si el resultado es rechazado y hay errores, almacenar en memoria
+			if (caeDto.getAfipResponseDetails() != null && caeDto.getAfipResponseDetails().getErrors() != null && !caeDto.getAfipResponseDetails().getErrors().isEmpty()) {
+				StringBuilder errorMsg = new StringBuilder();
+				caeDto.getAfipResponseDetails().getErrors().forEach(err -> errorMsg.append("[" + err.getCode() + "] " + err.getMessage() + "; "));
+				caeErrorMemory.addError(comprobante.getPtoVta(), comprobante.getCbteTipo(), errorMsg.toString());
+			} else {
+				// Limpiar error si existe para este punto de venta y tipo
+				caeErrorMemory.clearError(comprobante.getPtoVta(), comprobante.getCbteTipo());
+			}
 			
 			return CaeResponse.builder()
 					       .cae(caeDto.getCae())

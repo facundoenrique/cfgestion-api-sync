@@ -7,9 +7,13 @@ import org.api_sync.adapter.inbound.request.preventa.PreventaUpdateDTO;
 import org.api_sync.adapter.inbound.request.preventa.PreventaRequestDTO;
 import org.api_sync.adapter.inbound.request.preventa.PreventaEstadoDTO;
 import org.api_sync.adapter.inbound.responses.PreventaResponseDTO;
+import org.api_sync.adapter.inbound.responses.PedidoConItemsDTO;
+import org.api_sync.adapter.outbound.entities.Pedido;
 import org.api_sync.adapter.outbound.entities.Preventa;
 import org.api_sync.adapter.outbound.entities.PreventaArticulo;
+import org.api_sync.services.pedidos.PedidoService;
 import org.api_sync.services.preventas.PreventaService;
+import org.api_sync.services.preventas.UsuarioPreventaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +35,8 @@ import static org.api_sync.adapter.inbound.responses.PreventaResponseDTO.toPreve
 public class PreventaController implements PreventaApi {
 
 	private final PreventaService preventaService;
+	private final PedidoService pedidoService;
+	private final UsuarioPreventaService usuarioPreventaService;
 
 	@Override
 	@GetMapping
@@ -146,4 +152,9 @@ public class PreventaController implements PreventaApi {
 		preventaService.actualizarEstado(id, dto.getEstado());
 		return ResponseEntity.ok().build();
 	}
+	
+    @GetMapping("/{preventaId}/pedidos")
+    public ResponseEntity<List<PedidoConItemsDTO>> getPedidosPorPreventa(@PathVariable Long preventaId) {
+        return ResponseEntity.ok(pedidoService.listarPedidosConItemsPorPreventa(preventaId));
+    }
 }

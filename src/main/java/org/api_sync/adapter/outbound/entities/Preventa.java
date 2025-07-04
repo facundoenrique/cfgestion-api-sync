@@ -3,6 +3,7 @@ package org.api_sync.adapter.outbound.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class Preventa {
 	private EstadoPreventa estado = EstadoPreventa.ABIERTA;
 	
 	@OneToMany(mappedBy = "preventa", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
 	private List<PreventaArticulo> articulos = new ArrayList<>();
 
 }

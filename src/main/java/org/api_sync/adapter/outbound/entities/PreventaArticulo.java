@@ -3,6 +3,7 @@ package org.api_sync.adapter.outbound.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.math.BigDecimal;
 
@@ -28,6 +29,7 @@ public class PreventaArticulo {
 	
 	@ManyToOne
 	@JoinColumn(name = "preventa_id")
+	@JsonBackReference
 	private Preventa preventa;
 
 

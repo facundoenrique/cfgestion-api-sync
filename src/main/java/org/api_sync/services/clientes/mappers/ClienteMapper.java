@@ -23,6 +23,7 @@ public class ClienteMapper {
 
 	public ClienteResponse toResponse(Cliente cliente) {
 		return ClienteResponse.builder()
+				       .id(cliente.getId())
 				       .razonSocial(cliente.getRazonSocial())
 				       .cuit(cliente.getCuit())
 				       .email(cliente.getEmail())

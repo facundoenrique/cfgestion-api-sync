@@ -24,9 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ArticuloService {
-private final PrecioRepository precioRepository;
-private final ListaPreciosRepository listaPreciosRepository;
-private final ItemListaPreciosRepository itemListaPreciosRepository;
+	private final PrecioRepository precioRepository;
+	private final ListaPreciosRepository listaPreciosRepository;
+	private final ItemListaPreciosRepository itemListaPreciosRepository;
 	private final ArticuloRepository articuloRepository;
 	private final ArticuloMapper articuloMapper;
 	private final PrecioService precioService;

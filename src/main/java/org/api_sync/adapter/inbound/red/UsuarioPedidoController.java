@@ -34,19 +34,22 @@ public class UsuarioPedidoController {
         return ResponseEntity.ok(pedidoService.actualizarItem(pedidoId, preventaArticuloId, cantidad, usuarioCodigo, empresaId));
     }
 
-    @PutMapping("/{pedidoId}/participar")
+    @PutMapping("/{preventaId}/participar")
     public ResponseEntity<Pedido> marcarParticipacion(
-            @PathVariable Long pedidoId,
+            @PathVariable Long preventaId,
             @RequestParam("usuario_id") Long usuarioId,
-            @RequestParam EstadoParticipacion participa) {
-        return ResponseEntity.ok(pedidoService.marcarParticipacion(pedidoId, usuarioId, participa));
+            @RequestParam EstadoParticipacion participa,
+            @RequestParam(name = "empresa_id") String empresaId) {
+        pedidoService.marcarParticipacion(preventaId, usuarioId, participa, empresaId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{pedidoId}/confirmar")
     public ResponseEntity<Pedido> confirmarPedido(
             @PathVariable Long pedidoId,
-            @RequestParam Long usuarioId) {
-        return ResponseEntity.ok(pedidoService.confirmarPedido(pedidoId, usuarioId));
+            @RequestParam("usuario_id") Long usuarioId) {
+        pedidoService.confirmarPedido(pedidoId, usuarioId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/preventa/{preventaId}")

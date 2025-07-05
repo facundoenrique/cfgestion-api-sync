@@ -10,7 +10,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -21,8 +24,30 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class RestControllerExceptionHandler {
+	
+	private void logRequestInfo(String errorType, Exception ex) {
+		try {
+			ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			if (attributes != null) {
+				HttpServletRequest request = attributes.getRequest();
+				
+				log.error("Exception '{}' occurred for request: {} {} from {}", 
+					errorType, 
+					request.getMethod(), 
+					request.getRequestURI(),
+					request.getRemoteAddr());
+			} else {
+				log.warn("No request context available for error: {}", errorType);
+			}
+		} catch (Exception loggingEx) {
+			log.error("Error while logging request info for {}: {}", errorType, loggingEx.getMessage());
+		}
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		logRequestInfo("MethodArgumentNotValidException", ex);
+		
 		Map<String, String> errors = new HashMap<>();
 		ex.getBindingResult().getFieldErrors().forEach(error ->
 				                                               errors.put(error.getField(), error.getDefaultMessage())
@@ -33,6 +58,8 @@ public class RestControllerExceptionHandler {
 	@ExceptionHandler(PedidoNotOwnedException.class)
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public ProblemDetail handlePedidoNotOwnedException(PedidoNotOwnedException e) {
+		logRequestInfo("PedidoNotOwnedException", e);
+		
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
 				HttpStatus.FORBIDDEN, e.getMessage()
 		);
@@ -48,6 +75,8 @@ public class RestControllerExceptionHandler {
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ProblemDetail handleDuplicateKeyException(DataIntegrityViolationException e) {
+		logRequestInfo("DataIntegrityViolationException", e);
+		
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
 				HttpStatus.BAD_REQUEST, e.getLocalizedMessage()
 		);
@@ -63,6 +92,7 @@ public class RestControllerExceptionHandler {
 	@ExceptionHandler(UnsupportedOperationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ProblemDetail handleUnsupportedOperationException(UnsupportedOperationException e) {
+		logRequestInfo("UnsupportedOperationException", e);
 		log.error("Operación no soportada: {}", e.getMessage(), e);
 		
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
@@ -80,6 +110,7 @@ public class RestControllerExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+		logRequestInfo("GeneralException", ex);
 		log.error("Error no manejado: {}", ex.getMessage(), ex);
 		
 		Map<String, Object> body = new LinkedHashMap<>();

@@ -28,7 +28,7 @@ public class JwtUtil {
 				       .setSubject(usuario.getNombre())
 				       .claim("pcName", pcName)
 				       .claim("punto_venta", puntoVenta)
-				       .claim("empresa", usuario.getEmpresa())
+				       .claim("empresa", usuario.getEmpresa().getUuid())
 				       .claim("sucursal", sucursalId)
 				       .claim("empresa_uuid", empresaUuid)
 				       .setIssuedAt(new Date())

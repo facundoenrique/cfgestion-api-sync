@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CaeErrorMemory {
@@ -12,11 +14,15 @@ public class CaeErrorMemory {
         private final int puntoVenta;
         private final int tipo;
         private final String errorMessage;
+        private final Long empresaId;
+        private final String empresaNombre;
 
-        public ErrorInfo(int puntoVenta, int tipo, String errorMessage) {
+        public ErrorInfo(int puntoVenta, int tipo, String errorMessage, Long empresaId, String empresaNombre) {
             this.puntoVenta = puntoVenta;
             this.tipo = tipo;
             this.errorMessage = errorMessage;
+            this.empresaId = empresaId;
+            this.empresaNombre = empresaNombre;
         }
 
         public int getPuntoVenta() { return puntoVenta; }
@@ -34,7 +40,12 @@ public class CaeErrorMemory {
                 default -> String.valueOf(tipo);
             };
         }
+        
         public String getErrorMessage() { return errorMessage; }
+        
+        public Long getEmpresaId() { return empresaId; }
+        
+        public String getEmpresaNombre() { return empresaNombre; }
     }
 
     private final Map<String, ErrorInfo> errorMap = new ConcurrentHashMap<>();
@@ -43,8 +54,8 @@ public class CaeErrorMemory {
         return puntoVenta + ":" + tipo;
     }
 
-    public void addError(int puntoVenta, int tipo, String errorMessage) {
-        errorMap.put(key(puntoVenta, tipo), new ErrorInfo(puntoVenta, tipo, errorMessage));
+    public void addError(int puntoVenta, int tipo, String errorMessage, Long empresaId, String empresaNombre) {
+        errorMap.put(key(puntoVenta, tipo), new ErrorInfo(puntoVenta, tipo, errorMessage, empresaId, empresaNombre));
     }
 
     public void clearError(int puntoVenta, int tipo) {
@@ -53,5 +64,29 @@ public class CaeErrorMemory {
 
     public Collection<ErrorInfo> getAllErrors() {
         return errorMap.values();
+    }
+    
+    /**
+     * Obtener errores agrupados por empresa
+     */
+    public Map<Long, List<ErrorInfo>> getErrorsByEmpresa() {
+        return errorMap.values().stream()
+            .collect(Collectors.groupingBy(ErrorInfo::getEmpresaId));
+    }
+    
+    /**
+     * Obtener errores de una empresa específica
+     */
+    public List<ErrorInfo> getErrorsByEmpresa(Long empresaId) {
+        return errorMap.values().stream()
+            .filter(error -> error.getEmpresaId().equals(empresaId))
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Limpiar errores de una empresa específica
+     */
+    public void clearErrorsByEmpresa(Long empresaId) {
+        errorMap.entrySet().removeIf(entry -> entry.getValue().getEmpresaId().equals(empresaId));
     }
 } 

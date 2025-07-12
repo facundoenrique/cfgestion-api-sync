@@ -36,11 +36,17 @@ public class AfipGenerarCaeService {
 			
 			log.info("ARCA response: {}", caeDto);
 			
-			// Si el resultado es rechazado y hay errores, almacenar en memoria
+			// Si el resultado es rechazado y hay errores, almacenar en memoria con información de la empresa
 			if (caeDto.getAfipResponseDetails() != null && caeDto.getAfipResponseDetails().getErrors() != null && !caeDto.getAfipResponseDetails().getErrors().isEmpty()) {
 				StringBuilder errorMsg = new StringBuilder();
 				caeDto.getAfipResponseDetails().getErrors().forEach(err -> errorMsg.append("[" + err.getCode() + "] " + err.getMessage() + "; "));
-				caeErrorMemory.addError(comprobante.getPtoVta(), comprobante.getCbteTipo(), errorMsg.toString());
+				caeErrorMemory.addError(
+					comprobante.getPtoVta(), 
+					comprobante.getCbteTipo(), 
+					errorMsg.toString(),
+					empresa.getId(),
+					empresa.getNombre()
+				);
 			} else {
 				// Limpiar error si existe para este punto de venta y tipo
 				caeErrorMemory.clearError(comprobante.getPtoVta(), comprobante.getCbteTipo());

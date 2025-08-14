@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -41,7 +40,8 @@ public class CaeErrorReportCron {
             sendGeneralReport();
             
             // 3. Limpiar todos los errores después de enviar los reportes
-            clearAllErrors();
+	        //TODO: Creo que no deberia enviarlos hasta que no se reprocesen correctamente.
+            //clearAllErrors();
             
         } catch (Exception ex) {
             log.error("Error enviando reportes de errores CAE: {}", ex.getMessage(), ex);

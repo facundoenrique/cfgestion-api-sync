@@ -12,7 +12,7 @@ public class ComprobanteRequest {
     private int concepto;
     private int docTipo;
     private long docNro;
-    @JsonProperty("condicion_iva_receptor_id")
+    @JsonProperty("condicion_ivareceptor_id")
     private int condicionIVAReceptorId;
     private int cbteDesde;
     private int cbteHasta;

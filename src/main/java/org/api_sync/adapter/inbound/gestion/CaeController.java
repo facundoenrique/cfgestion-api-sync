@@ -1,5 +1,7 @@
 package org.api_sync.adapter.inbound.gestion;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +53,12 @@ public class CaeController {
 			@RequestBody ComprobanteRequest comprobanteRequest,
 			Principal principal) {
 		
-		log.info("Solicitud de CAE recibida para empresa: {} de usuario: {}",
-				empresaUuid, principal != null ? principal.getName() : "desconocido");
+		try {
+			log.info("Solicitud de CAE recibida para empresa: {} de usuario: {}. request: {}",
+					empresaUuid, principal != null ? principal.getName() : "desconocido", new ObjectMapper().writeValueAsString(comprobanteRequest));
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 		
 		return afipGenerarCaeService.generarCae(empresaUuid, certificadoPuntoVenta, comprobanteRequest);
 	}

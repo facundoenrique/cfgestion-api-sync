@@ -1,14 +1,16 @@
 package org.api_sync.services.afip;
 
+import lombok.ToString;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
+@ToString
 public class CaeErrorMemory {
     public static class ErrorInfo {
         private final int puntoVenta;

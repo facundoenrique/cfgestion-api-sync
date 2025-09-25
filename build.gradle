@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -42,6 +42,12 @@ dependencies {
 	implementation 'org.apache.poi:poi-ooxml:5.2.3'
 	implementation("org.bouncycastle:bcmail-jdk16:1.46")
 	implementation("axis:axis:1.4")
+
+	// Java 21: javax.xml.soap and javax.xml.rpc APIs were removed from the JDK.
+	// Provide them explicitly so Axis 1.4 and SAAJ-based code compiles and runs.
+	implementation 'javax.xml.soap:javax.xml.soap-api:1.4.0'
+	implementation 'com.sun.xml.messaging.saaj:saaj-impl:1.5.3'
+	implementation 'javax.xml.rpc:javax.xml.rpc-api:1.1.2'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
@@ -49,7 +55,6 @@ dependencies {
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8"
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'javax.mail:javax.mail-api:1.6.2'
 }
 
 tasks.named('test') {

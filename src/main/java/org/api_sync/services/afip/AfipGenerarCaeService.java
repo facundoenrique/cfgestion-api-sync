@@ -47,7 +47,6 @@ public class AfipGenerarCaeService {
 					empresa.getId(),
 					empresa.getNombre()
 				);
-				log.info("Errores actuales: {}", caeErrorMemory.getAllErrors());
 			} else {
 				// Limpiar error si existe para este punto de venta y tipo
 				caeErrorMemory.clearError(comprobante.getPtoVta(), comprobante.getCbteTipo());

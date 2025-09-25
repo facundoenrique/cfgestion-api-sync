@@ -83,7 +83,7 @@ class CaeErrorReportCronTest {
     }
 
     @Test
-    void sendDailyErrorReport_SinErrores_NoDeberiaEnviarReportes() throws Exception {
+    void sendDailyErrorReport_SinErrores_NoDeberiaEnviarReportes() {
         // Given
         when(caeErrorMemory.getAllErrors()).thenReturn(Arrays.asList());
 
@@ -92,7 +92,7 @@ class CaeErrorReportCronTest {
 
         // Then
         verify(empresaEmailAlertaService, never()).enviarAlertaEmpresa(any(), any(), any(), any());
-        verify(mailService, never()).sendMail(anyString(), anyString(), anyString());
+        verify(mailService, never()).sendMail(any(), any(), any());
         verify(caeErrorMemory, never()).clearError(anyInt(), anyInt());
     }
 

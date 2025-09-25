@@ -1,16 +1,14 @@
 package org.api_sync.services.afip;
 
-import lombok.ToString;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@ToString
 public class CaeErrorMemory {
     public static class ErrorInfo {
         private final int puntoVenta;
@@ -48,6 +46,13 @@ public class CaeErrorMemory {
         public Long getEmpresaId() { return empresaId; }
         
         public String getEmpresaNombre() { return empresaNombre; }
+	    
+	    
+	    @Override
+	    public String toString() {
+		    return "punto_venta: " + puntoVenta + ", "
+						   + "tipo: " + tipo;
+	    }
     }
 
     private final Map<String, ErrorInfo> errorMap = new ConcurrentHashMap<>();
@@ -91,4 +96,5 @@ public class CaeErrorMemory {
     public void clearErrorsByEmpresa(Long empresaId) {
         errorMap.entrySet().removeIf(entry -> entry.getValue().getEmpresaId().equals(empresaId));
     }
+
 } 

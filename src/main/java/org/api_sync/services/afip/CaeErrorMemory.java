@@ -46,6 +46,13 @@ public class CaeErrorMemory {
         public Long getEmpresaId() { return empresaId; }
         
         public String getEmpresaNombre() { return empresaNombre; }
+	    
+	    
+	    @Override
+	    public String toString() {
+		    return "punto_venta: " + puntoVenta + ", "
+						   + "tipo: " + tipo;
+	    }
     }
 
     private final Map<String, ErrorInfo> errorMap = new ConcurrentHashMap<>();
@@ -89,4 +96,5 @@ public class CaeErrorMemory {
     public void clearErrorsByEmpresa(Long empresaId) {
         errorMap.entrySet().removeIf(entry -> entry.getValue().getEmpresaId().equals(empresaId));
     }
+
 } 

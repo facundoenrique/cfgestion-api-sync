@@ -92,7 +92,7 @@ class CaeControllerTest {
                 .thenReturn(expectedResponse);
                 
         // Act
-        CaeResponse result = caeController.getCae(empresa, certificadoPuntoVenta, comprobanteRequest, mockPrincipal);
+        CaeResponse result = caeController.getCae(empresa, certificadoPuntoVenta, "direct",comprobanteRequest, mockPrincipal);
         
         // Assert
         assertEquals(expectedResponse, result);
@@ -114,7 +114,7 @@ class CaeControllerTest {
                 .thenReturn(expectedResponse);
                 
         // Act
-        CaeResponse result = caeController.getCae(empresa, certificadoPuntoVenta, comprobanteRequest, mockPrincipal);
+        CaeResponse result = caeController.getCae(empresa, certificadoPuntoVenta, "recovery", comprobanteRequest, mockPrincipal);
         
         // Assert
         assertEquals(expectedResponse, result);

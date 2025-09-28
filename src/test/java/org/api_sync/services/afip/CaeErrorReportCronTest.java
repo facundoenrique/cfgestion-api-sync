@@ -83,7 +83,7 @@ class CaeErrorReportCronTest {
     }
 
     @Test
-    void sendDailyErrorReport_SinErrores_NoDeberiaEnviarReportes() {
+    void sendDailyErrorReport_SinErrores_NoDeberiaEnviarReportes() throws Exception {
         // Given
         when(caeErrorMemory.getAllErrors()).thenReturn(Arrays.asList());
 
@@ -97,7 +97,7 @@ class CaeErrorReportCronTest {
     }
 
     @Test
-    void sendDailyErrorReport_ConErrorEnEnvio_DeberiaManejarExcepcion() throws Exception {
+    void sendDailyErrorReport_ConErrorEnEnvio_DeberiaManejarExcepcion() {
         // Given
         List<CaeErrorMemory.ErrorInfo> errores = Arrays.asList(error1);
         when(caeErrorMemory.getAllErrors()).thenReturn(errores);

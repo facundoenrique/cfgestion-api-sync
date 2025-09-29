@@ -50,7 +50,7 @@ public class CaeController {
 	public CaeResponse getCae(
 			@RequestParam("empresa") String empresaUuid,
 			@RequestParam("certificado_punto_venta") Integer certificadoPuntoVenta,
-			@RequestParam("flow") String flow,
+			@RequestParam(name = "flow", required = false) String flow,
 			@RequestBody ComprobanteRequest comprobanteRequest,
 			Principal principal) {
 		
